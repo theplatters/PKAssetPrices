@@ -35,7 +35,9 @@ function get_nulls(model::AssetPKModel)
     du[10] = W - W_0 + h * U
     du[11] = N - a * Y
     du[12] = U - 1 + N / Nᶠ
-    du[13] = 
+    du[13] = b - b0 + asset_returns / r # //TODO how much is consumed is inverse expected returns from asset price
+    du[14] = c - c0 +                   # //TODO credit constraints somehow depend on the asset demand
+    du[15] = S - r * Y                  # //TODO asset price should somehow depend on interest rate
   end
 end
 
