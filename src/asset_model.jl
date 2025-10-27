@@ -41,26 +41,3 @@ function get_nulls(model::AssetPKModel)
   end
 end
 
-function is_curve(r,params::SimplePKModelParams)
-  (; b, c, d_0, d_1, i_0, i_1, m, k, n, W_0, h, a, Nᶠ) = params
-  
-  (1/(1-b)) * (c *(d_0 - d_1 * r))
-end
-
-function ir_curve(Y, params::SimplePKModelParams)
-  (; b, c, d_0, d_1, i_0, i_1, m, k, n, W_0, h, a, Nᶠ) = params
-
-  (1 + m)* (i_0 + i_1 * (1 + n) * a * (W_0 - h * (1 - (a * Y) / Nᶠ)))
-end
-
-function ad_curve(P, params::SimplePKModelParams)
-	(; b, c, d_0, d_1, i_0, i_1, m, k, n, W_0, h, a, Nᶠ) = params
-
-	(1/(1-b)) * (c * (d_0 - d_1 * ((1 + m) * (i_0 + i_1 * P))))
-end
-
-function as_curve(Y, params::SimplePKModelParams)
-	(; b, c, d_0, d_1, i_0, i_1, m, k, n, W_0, h, a, Nᶠ) = params
-
-	(1 + n) * a * (W_0 - h * (1 - (a * Y) / Nᶠ))
-end
