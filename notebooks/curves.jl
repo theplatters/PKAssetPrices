@@ -32,26 +32,24 @@ using Plots
 using PKAssetPrices
 
 # ╔═╡ 84d8b646-eb40-4db0-a794-00a24de3441d
-@bind c Slider(range(0,1,100))
-
-# ╔═╡ 88e2170b-5b96-4619-b3d2-7a4737e816f0
-@bind b Slider(range(0,1,100))
-
-# ╔═╡ 34bea3c0-eeba-4a47-8b7e-9d78cb4e50a5
-@bind d_0 Slider(range(0,10,100))
+md"
+c: $(@bind c Slider(range(0,1,100)))
+b: $(@bind b Slider(range(0,1,100)))
+d0: $(@bind d_0 Slider(range(0,10,100)))
+"
 
 # ╔═╡ d5602ccb-9d63-402e-8e6a-dd0c797d7e00
 params = SimplePKModelParams(c = c, b = b, d_0 = d_0)
 
 # ╔═╡ 78b0a5a3-c2a5-4811-b8c9-91548d1b10ae
 begin
-	plot(range(0,10,10),y -> as_curve(y,params), label = "AS")
+	plot(range(0,10,10),y -> as_curve(y,params), label = "AS", title = "AS-AD curve")
 	plot!(range(0.10,10), p -> ad_curve(p,params), label = "AD")
 end
 
 # ╔═╡ 133a72b4-2806-4acb-8521-92910c099703
 begin
-	plot(range(0,5,10),y -> is_curve(y,params), label = "IS")
+	plot(range(0,5,10),y -> is_curve(y,params), label = "IS", title = "IS-IR curve")
 	plot!(range(0.5,10), p -> ir_curve(p,params), label = "IR")
 end
 
@@ -1960,10 +1958,8 @@ version = "1.9.2+0"
 # ╠═24e2e02d-d9d6-4846-87e8-85b785a0d192
 # ╠═f6b17e67-274f-4cf0-b0ce-5f385e066098
 # ╠═84d8b646-eb40-4db0-a794-00a24de3441d
-# ╠═88e2170b-5b96-4619-b3d2-7a4737e816f0
-# ╠═34bea3c0-eeba-4a47-8b7e-9d78cb4e50a5
-# ╠═d5602ccb-9d63-402e-8e6a-dd0c797d7e00
-# ╠═78b0a5a3-c2a5-4811-b8c9-91548d1b10ae
-# ╠═133a72b4-2806-4acb-8521-92910c099703
+# ╟─d5602ccb-9d63-402e-8e6a-dd0c797d7e00
+# ╟─78b0a5a3-c2a5-4811-b8c9-91548d1b10ae
+# ╟─133a72b4-2806-4acb-8521-92910c099703
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
