@@ -12,11 +12,18 @@ Base.@kwdef struct AssetPKModelParams
 	h::Float64 = 0.8
 	a::Float64 = 0.8
 	Nᶠ::Float64 = 12.0
+  ASold::Float64= 0.2
+  ACreated::Float64 = 0.01
+  p0::Float64 = 1.0
+  p1::Float64 = 1.0
+  p2::Float64 = 1.0
+  α0::Float64 = 1.0
+  α1::Float64 = 1.0
 end
 
 Base.@kwdef struct AssetPKModel <: AbstractPKModel
   params::AssetPKModelParams = AssetPKModelParams()
-  u0::Vector = zeros(12)
+  u0::Vector = zeros(16)
 end
 
 function get_nulls(model::AssetPKModel)
@@ -28,16 +35,17 @@ function get_nulls(model::AssetPKModel)
     du[3] = D - d_0 + d_1 * r
     du[4] = i - i_0 - i_1 * P
     du[5] = r - (1 + m) * i
-    du[6] = dL - c * D
+    du[6] = dL - c * D - SD
     du[7] = dM - dL
     du[8] = dR - k * dM
     du[9] = P - (1 + n) * a * W
     du[10] = W - W_0 + h * U
     du[11] = N - a * Y
     du[12] = U - 1 + N / Nᶠ
-    du[13] = b - b0 + asset_returns / r # //TODO how much is consumed is inversly related to expected returns from asset price
-    du[14] = c - c0 + asset_demand                   # //TODO credit constraints somehow depend on the asset demand
-    du[15] = S - r * Y                  # //TODO asset price should somehow depend on interest rate
+    du[13] = SD - s0 + s1 * r
+    du[14] = AD - α0 + α1 * SD
+    du[15] = AP - p0 - p1 * AD + p2 * AS
+    du[16] = ASold + ACreated
   end
 end
 
