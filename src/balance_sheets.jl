@@ -23,13 +23,13 @@ function get_balance_sheets(sol, params::SimplePKModelParams)
     # Private Sector Balance Sheet
     private = BalanceSheet(
         Dict(
-            "Deposits (D)" => D,
-            "Total Assets" => D
+            "Deposits (D)" => dM,
+            "Total Assets" => dM
         ),
         Dict(
             "Loans (L)" => dL,
-            "Net Worth" => D - dL,
-            "Total Liabilities" => D
+            "Net Worth" => dM - dL,
+            
         )
     )
     
@@ -41,9 +41,9 @@ function get_balance_sheets(sol, params::SimplePKModelParams)
             "Total Assets" => dL + dR
         ),
         Dict(
-            "Deposits (D)" => D,
-            "Central Bank Money (M)" => dM,
-            "Total Liabilities" => D + dM
+            "Deposits (D)" => dM,
+            "Central Bank Money (M)" => dR,
+            "Net Worth" => dL + dR - dM - dR
         )
     )
     
@@ -54,11 +54,13 @@ function get_balance_sheets(sol, params::SimplePKModelParams)
             "Total Assets" => dR
         ),
         Dict(
-            "Money Supply (M)" => dM,
-            "Total Liabilities" => dM
+            "Money Supply (M)" => dR,
+            "Net Worth" => dR - dR 
         )
     )
-    
+
+    # eventuell hier noch eine CB-Kredit-Variable einbauen um das klarer zu haben?    
+
     return SectorBalanceSheets(private, banks, central_bank)
 end
 
