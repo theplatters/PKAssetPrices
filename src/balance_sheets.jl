@@ -188,7 +188,6 @@ macro balance(struct_def)
     end)
 end
 
-# Example usage:
 @balance struct Private
     @asset deposits::Float64
     @liability loans::Float64
@@ -204,6 +203,25 @@ end
 @balance struct CentralBank
     @asset reserves::Float64
     @liability money_supply::Float64
+end
+
+struct SectorBalanceSheets
+    private::Private
+    banks::Banks
+    central_bank::CentralBank
+end
+
+function total_net_worth(sectors::SectorBalanceSheets)
+    net_worth(sectors.private) + 
+    net_worth(sectors.banks) + 
+    net_worth(sectors.central_bank)
+end
+
+function display_all_sectors(sectors::SectorBalanceSheets)
+    display_balance_sheet(sectors.private, "Private Sector")
+    display_balance_sheet(sectors.banks, "Banking Sector")
+    display_balance_sheet(sectors.central_bank, "Central Bank")
+    println("\nTotal Economy Net Worth: $(round(total_net_worth(sectors), digits=2))")
 end
 
 # Test it out
