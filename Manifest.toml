@@ -2,7 +2,7 @@
 
 julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "f6f8016f71fb77d6dce40e6621970f3f17351c9e"
+project_hash = "be5db7d26908dfd332561b537165af5789fbadde"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "27cecae79e5cc9935255f90c53bb831cc3c870d7"
@@ -1189,7 +1189,7 @@ uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
 version = "10.44.0+1"
 
 [[deps.PKAssetPrices]]
-deps = ["NonlinearSolve", "Plots", "Pluto", "PrettyTables", "StaticArrays"]
+deps = ["DataFrames", "NonlinearSolve", "Plots", "Pluto", "PrettyTables", "StaticArrays"]
 path = "."
 uuid = "5fa4aa55-4e4c-4901-99b7-08200d3ce2d7"
 version = "0.1.0"

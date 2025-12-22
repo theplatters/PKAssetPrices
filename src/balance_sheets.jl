@@ -1,4 +1,3 @@
-
 # Macro to mark fields as assets or liabilities
 macro balance(struct_def)
     # Parse the struct definition

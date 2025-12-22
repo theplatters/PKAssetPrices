@@ -3,6 +3,7 @@ module PKAssetPrices
 using NonlinearSolve
 using StaticArrays
 using PrettyTables
+using OrderedCollections
 
 abstract type AbstractPKModel end
 
@@ -11,7 +12,7 @@ export SimplePKModel, SimplePKModelParams
 export PCModel, PCModelParams
 export as_curve, ad_curve, ir_curve, is_curve
 export get_balance_sheets, display_all_balance_sheets, SectorBalanceSheets
-export balance
+export balance, model
 
 include("simple_model.jl")
 include("asset_model.jl")
