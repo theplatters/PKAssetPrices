@@ -18,9 +18,9 @@
 		b = 0.5, "consumption rate"
 		c = 0.8, "credit rationing"
 		d₀ = 5.0, "autonomuous  credit financed demand"
-		d₁ = 0.8, "induced credit financed demand"
+		d₁ = 8, "induced credit financed demand"
 		i₀ = 0.01, "autonomuous policy rate"
-		i₁ = 0.5, "inflation infuced policy rate"
+		i₁ = 0.05, "inflation infuced policy rate"
 		m = 0.15, "policy rate markup"
 		k = 0.3, "resere share"
 		n = 0.15, "firm markup"
@@ -34,8 +34,8 @@
 		Y == ND + c * D
 		ND == b * Y
 		D == d₀ - d₁ * r
-		i == i₀ + i₁ * P
 		r == (1 + m) * i
+		i == i₀ + i₁ * P
 		dL == c * D
 		dM == dL
 		dR == k * dM
