@@ -51,7 +51,6 @@ function generate_helpers(model_struct_name, variables, var_descriptions, parame
 end
 
 
-
 function parse_variables!(variables, descriptions, body)
     for line in body.args
         line isa LineNumberNode && continue
@@ -125,7 +124,7 @@ function generate_param_struct(param_struct_name, parameters)
     
     # Build the struct expression
     struct_expr = quote
-        Base.@kwdef struct $param_struct_name
+        Base.@kwdef struct $param_struct_name <: AbstractPKModelParams
             $(field_exprs...)
         end
     end
@@ -135,11 +134,11 @@ end
 
 function generate_model_struct(model_name, param_struct_name, amount_of_variables)
   struct_expr = quote
-    Base.@kwdef struct $model_name
+    Base.@kwdef struct $model_name <: AbstractPKModel
       params::$param_struct_name = $param_struct_name()
-      u0::SVector{$amount_of_variables, Float64} = zeros(SVector{11})
+      u0::SVector{$amount_of_variables, Float64} = ones(SVector{$amount_of_variables})
     end
-
+  end
   return struct_expr
 end
 
@@ -147,7 +146,7 @@ function generate_get_nulls(model_name, param_name, variables, parameters, equat
     var_tuple = Expr(:tuple, variables...)
     param_syms = collect(keys(parameters))
     
-    residuals = [:($(eq.lhs) - $(eq.rhs)) for eq in equations]
+  residuals = [:($(eq.lhs) - $((eq.rhs))) for eq in equations]
     
     quote
         function get_nulls(model::$model_name)

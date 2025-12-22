@@ -11,8 +11,8 @@ Base.@kwdef struct PCModelParams
 	Bₕ₋::Float64 = 5
 	Hs₋::Float64 = 5
 	Bcb₋::Float64 = 5
-  V₋::Float64 = 10.0
-  Bₛ₋::Float64 = 5
+	V₋::Float64 = 10.0
+	Bₛ₋::Float64 = 5
 end
 
 Base.@kwdef struct PCModel <: AbstractPKModel

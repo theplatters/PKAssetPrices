@@ -6,6 +6,7 @@ using PrettyTables
 using OrderedCollections
 
 abstract type AbstractPKModel end
+abstract type AbstractPKModelParams end
 
 export solve_model, get_nulls
 export SimplePKModel, SimplePKModelParams
@@ -14,6 +15,7 @@ export as_curve, ad_curve, ir_curve, is_curve
 export get_balance_sheets, display_all_balance_sheets, SectorBalanceSheets
 export balance, model
 
+include("model_macros.jl")
 include("simple_model.jl")
 include("asset_model.jl")
 include("pc_model.jl")
