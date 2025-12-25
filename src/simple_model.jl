@@ -52,4 +52,22 @@
 		AS(Y) = (1 + n) * a * (W₀ - h * (1 - (a * Y) / Nᶠ))
 	end
 
+  @balances begin
+    @sheet Private begin
+        @asset deposits = dM
+        @liability loans = dL
+    end
+
+    @sheet Banks begin
+        @asset loans = dL
+        @asset reserves = dR
+        @liability deposits = dM
+        @liability central_bank_money = dR
+    end
+
+    @sheet CentralBank begin
+        @asset reserves = dR
+        @liability money_supply = dM
+    end
+  end
 end
