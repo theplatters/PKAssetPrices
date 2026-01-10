@@ -117,7 +117,7 @@ function generate_helper_methods(balance_sheet, model_name, variables)
     end
 
 
-    calculations = values(balance_sheet.calculations)
+    calculations = [balance_sheet.calculations[field] for field in balance_sheet.fields]
     generate_sheet_from_solution = quote
         function get_sheet(::Type{$(type_name)}, sol)::$(type_name)
             (; $(variables...)) = sol
