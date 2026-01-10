@@ -1,3 +1,11 @@
+struct BalanceSheetAbstractData
+    name::Symbol
+    fields::Vector{Symbol}
+    assets::Vector{Symbol}
+    liabilities::Vector{Symbol}
+    calculations::Dict{Symbol, Union{Symbol, Expr}}
+end
+
 """
     @model name begin
         @variables begin
@@ -53,7 +61,7 @@ end
 
 ## @parameters
 Defines the exogenous parameters and their default values. Each parameter requires a value and can have a description.
-
+}
 **Example:**
 ```julia
 @parameters begin
@@ -101,9 +109,9 @@ end
 
 # Output
 Generates:
-- Parameter struct (`${name}Params`): holds all parameters
-- Model struct (`${name}Model`): holds parameters and initial conditions
-- Solution struct (`${name}Solution`): holds solved variable values and balance sheets
+- Parameter struct (`nameParams`): holds all parameters
+- Model struct (`nameModel`): holds parameters and initial conditions
+- Solution struct (`nameSolution`): holds solved variable values and balance sheets
 - Functions for solving the model and computing curves
 
 # Example
@@ -448,7 +456,7 @@ having to manually create the parameter struct. The base model is inferred from 
 - `body`: Block containing parameter assignments
 
 # Returns
-An instance of `${name}Model` with the specified parameters and default initial conditions.
+An instance of `nameModel` with the specified parameters and default initial conditions.
 
 # Example
 ```julia
@@ -506,14 +514,6 @@ macro scenario(name, body)
             )
         end
     )
-end
-
-struct BalanceSheetAbstractData
-    name::Symbol
-    fields::Vector{Symbol}
-    assets::Vector{Symbol}
-    liabilities::Vector{Symbol}
-    calculations::Dict{Symbol, Union{Symbol, Expr}}
 end
 
 
@@ -833,7 +833,7 @@ having to manually create the parameter struct. The base model is inferred from 
 - `body`: Block containing parameter assignments
 
 # Returns
-An instance of `${name}Model` with the specified parameters and default initial conditions.
+An instance of `namModel` with the specified parameters and default initial conditions.
 
 # Example
 ```julia
