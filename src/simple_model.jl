@@ -62,12 +62,12 @@
             @asset loans = dL
             @asset reserves = dR
             @liability deposits = dM
-            @liability central_bank_money = dR
+            @liability central_bank_credit = dR
         end
 
         @sheet CentralBank begin
-            @asset reserves = dR
-            @liability money_supply = dM
+            @asset central_bank_credit = dR
+            @liability reserves = dR
         end
     end
 end
