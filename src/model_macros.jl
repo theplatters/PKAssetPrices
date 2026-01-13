@@ -196,7 +196,7 @@ macro model(name, body)
             $(balance_sheet_quoted...)
             $(balance_sheet_functions...)
             $solve_method
-            $helper_funcs
+            $(helper_funcs...)
         end
     )
 end
@@ -235,7 +235,47 @@ function generate_solve_method(name::Symbol, variables::Vector{Symbol}, balance_
 end
 
 function generate_helpers(model_struct_name, variables, var_descriptions, parameters, param_descriptions)
-    return []
+    display_model = quote
+        function display_model(model::$model_struct_name)
+            line = "="^60
+            colw = 24  # width for the name column
+
+            println("\n", line)
+            println("Variables")
+            println(line)
+
+            for v in $variables
+                desc = get($var_descriptions, v, "")
+                println(rpad(string(v), colw), "  ", desc)
+            end
+
+            println("\n", line)
+            println("Parameters")
+            println(line)
+
+            keys_params = collect(keys($parameters))
+            for p in sort!(keys_params; by = string)
+                desc = get($param_descriptions, p, "")
+                println(rpad(string(p), colw), "  ", desc)
+            end
+
+            return nothing
+        end
+    end
+
+    variable_des = quote
+        function variable_descriptions(model::$model_struct_name)
+            return $var_descriptions
+        end
+    end
+
+    param_des = quote
+        function param_descriptions(model::$model_struct_name)
+            return $param_descriptions
+        end
+    end
+
+    return [display_model, variable_des, param_des]
 end
 
 

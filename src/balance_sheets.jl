@@ -62,7 +62,7 @@ function generate_helper_methods(balance_sheet, model_name, variables)
     display_method = quote
         function display_balance_sheet(bs::$type_name, sector_name::String = "Balance Sheet")
             println("\n" * "="^60)
-            println("  $sector_name")
+            println($balance_sheet.name)
             println("="^60)
 
             assets = assets_dict(bs)
