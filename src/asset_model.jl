@@ -63,6 +63,34 @@
         AS == AQ * (α + gₐ)
         α == α₀ / 2 * (1 + AP)
     end
+
+    @curves begin
+        IS(r) = (1 / (1 - b)) * (c * (d₀ - d₁ * r))
+        IR(Y) = (1 + m) * (i₀ + i₁ * (1 + n) * a * (W₀ - h * (1 - (a * Y) / Nᶠ)))
+        AD(P) = (1 / (1 - b)) * (c * (d₀ - d₁ * ((1 + m) * (i₀ + i₁ * P))))
+        AS(Y) = (1 + n) * a * (W₀ - h * (1 - (a * Y) / Nᶠ))
+    end
+
+
+    @balances begin
+        @sheet Private begin
+            @asset deposits = dM
+            @liability loans = dL
+        end
+
+        @sheet Banks begin
+            @asset loans = dL
+            @asset reserves = dR
+            @liability deposits = dM
+            @liability central_bank_credit = dR
+        end
+
+        @sheet CentralBank begin
+            @asset central_bank_credit = dR
+            @liability reserves = dR
+        end
+    end
+
 end
 
 
@@ -134,5 +162,24 @@ end
         AS == AQ * (α + gₐ)
         α == α₀ / 2 * (1 + AP)
         c == c₀ - c₁ * SD
+    end
+
+    @balances begin
+        @sheet Private begin
+            @asset deposits = dM
+            @liability loans = dL
+        end
+
+        @sheet Banks begin
+            @asset loans = dL
+            @asset reserves = dR
+            @liability deposits = dM
+            @liability central_bank_credit = dR
+        end
+
+        @sheet CentralBank begin
+            @asset central_bank_credit = dR
+            @liability reserves = dR
+        end
     end
 end
