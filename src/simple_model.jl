@@ -18,15 +18,15 @@
         b = 0.5, "consumption rate"
         c = 0.8, "credit rationing"
         d₀ = 5.0, "autonomuous  credit financed demand"
-        d₁ = 8, "induced credit financed demand"
+        d₁ = 8, "max discretonary credit demand when r=0"
         i₀ = 0.01, "autonomuous policy rate"
         i₁ = 0.05, "inflation infuced policy rate"
-        m = 0.15, "policy rate markup"
-        k = 0.3, "resere share"
+        m = 0.15, "bank markup"
+        k = 0.3, "reserve share"
         n = 0.15, "firm markup"
         W₀ = 2.0, "autonomuous wages"
-        h = 0.8, "bargaining power?"
-        a = 0.8, "production induced employment "
+        h = 0.8, "bargaining power" # impact of unemployment on wages
+        a = 0.8, "production induced employment"
         Nᶠ = 12.0, "total labour supply"
     end
 
