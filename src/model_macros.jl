@@ -286,6 +286,10 @@ function parse_variables!(variables, descriptions, body)
         if line isa Expr && line.head == :(=)
             var_name = line.args[1]
             var_desc = line.args[2]
+
+            if var_name isa Expr && var_name.head == :(call)
+                error("Only allowed in dynamic models")
+            end
             push!(variables, var_name)
             descriptions[var_name] = var_desc
         elseif line isa Symbol
@@ -556,3 +560,99 @@ macro scenario(name, body)
         end
     )
 end
+
+
+macro dynmodel(name, body)
+    static_vars = Symbol[]
+    dyn_vars = Symbol[]
+    var_descriptions = OrderedDict{Symbol, String}()
+    parameters = OrderedDict{Symbol, Any}()
+    param_descriptions = OrderedDict{Symbol, String}()
+    equations = []
+    curves = OrderedDict{Symbol, Any}()
+    balanace_sheets = BalanceSheetAbstractData[]
+    balanace_sheet_calculations = []
+    timeframe = []
+
+    # Parse the model body
+    for expr in body.args
+        expr isa LineNumberNode && continue
+
+        if expr isa Expr && expr.head == :macrocall
+            macro_name = expr.args[1]
+            macro_body = expr.args[3]
+
+            if macro_name == Symbol("@variables")
+                parse_variables_for_dyn!(static_vars, dyn_vars, var_descriptions, macro_body)
+            elseif macro_name == Symbol("@parameters")
+                parse_parameters!(parameters, param_descriptions, macro_body)
+            elseif macro_name == Symbol("@equations")
+                parse_equations!(equations, macro_body)
+            elseif macro_name == Symbol("@curves")
+                parse_curves!(curves, macro_body)
+            elseif macro_name == Symbol("@balances")
+                parse_balances!(balanace_sheets, macro_body)
+            elseif macro_name == Symbol("timeframe")
+                parse_timeframe(timeframe, macro_body)
+            end
+        end
+    end
+
+
+    # Generate all the code
+    param_struct_name = Symbol(name, "Params")
+    model_struct_name = Symbol(name, "Model")
+
+    param_struct = generate_param_struct(param_struct_name, parameters)
+    model_struct = generate_model_struct(model_struct_name, param_struct_name, length(variables))
+    get_nulls_func = generate_get_nulls(model_struct_name, param_struct_name, variables, parameters, equations)
+    curve_funcs = generate_curves(curves, param_struct_name, parameters, name)
+    helper_funcs = generate_helpers(model_struct_name, variables, var_descriptions, parameters, param_descriptions)
+    balance_sheet_quoted = generate_balance_sheets(balanace_sheets, name)
+    balance_sheet_functions = generate_balance_sheets_helper_methods(balanace_sheets, name, variables)
+
+
+    solve_method = generate_solve_method(name, variables, balanace_sheets)
+    return esc(
+        quote
+            $param_struct
+            $model_struct
+            $get_nulls_func
+            $(curve_funcs...)
+            $(balance_sheet_quoted...)
+            $(balance_sheet_functions...)
+            $solve_method
+            $(helper_funcs...)
+        end
+    )
+end
+function parse_timeframe!(timeframe, body)
+
+    
+end
+function parse_variables_for_dyn!(static_vars::Symbol[], dyn_vars::Symbol[], descriptions, body)
+    for line in body.args
+        line isa LineNumberNode && continue
+
+        if line isa Expr && line.head == :(=)
+            var_name = line.args[1]
+            var_desc = line.args[2]
+
+            if var_name isa Expr && var_name.head == :(call)
+                push!(dyn_vars, var_name.args[1])
+            else
+                push!(static_vars, var_name)
+            end
+            descriptions[var_name] = var_desc
+        elseif line isa Symbol
+            # Just variable name
+            push!(static_vars, line)
+            descriptions[line] = ""
+        elseif  line isa Expr && line.head == :(call)
+            push!(dyn_vars, line)
+        end
+    end
+    return
+end
+
+
