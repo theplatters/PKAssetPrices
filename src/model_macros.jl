@@ -564,7 +564,7 @@ end
 
 macro dynmodel(name, body)
     static_vars = Symbol[]
-    dyn_vars = Symbol[]
+    dyn_vars = OrderedDict{Symbol, Any}()
     var_descriptions = OrderedDict{Symbol, String}()
     parameters = OrderedDict{Symbol, Any}()
     param_descriptions = OrderedDict{Symbol, String}()
@@ -572,7 +572,9 @@ macro dynmodel(name, body)
     curves = OrderedDict{Symbol, Any}()
     balanace_sheets = BalanceSheetAbstractData[]
     balanace_sheet_calculations = []
-    timeframe = []
+    timeframe::Expr = quote
+        1:100
+    end
 
     # Parse the model body
     for expr in body.args
@@ -593,7 +595,7 @@ macro dynmodel(name, body)
             elseif macro_name == Symbol("@balances")
                 parse_balances!(balanace_sheets, macro_body)
             elseif macro_name == Symbol("timeframe")
-                parse_timeframe(timeframe, macro_body)
+                timeframe = parse_timeframe(macro_body)
             end
         end
     end
@@ -604,8 +606,8 @@ macro dynmodel(name, body)
     model_struct_name = Symbol(name, "Model")
 
     param_struct = generate_param_struct(param_struct_name, parameters)
-    model_struct = generate_model_struct(model_struct_name, param_struct_name, length(variables))
-    get_nulls_func = generate_get_nulls(model_struct_name, param_struct_name, variables, parameters, equations)
+    (dyn_var_struct, model_struct) = generate_model_struct_dyn(model_struct_name, param_struct_name, length(static_vars), dyn_vars)
+    get_nulls_func = generate_get_nulls_dyn(model_struct_name, param_struct_name, static_vars, dyn_vars, parameters, equations)
     curve_funcs = generate_curves(curves, param_struct_name, parameters, name)
     helper_funcs = generate_helpers(model_struct_name, variables, var_descriptions, parameters, param_descriptions)
     balance_sheet_quoted = generate_balance_sheets(balanace_sheets, name)
@@ -616,6 +618,7 @@ macro dynmodel(name, body)
     return esc(
         quote
             $param_struct
+            $dyn_var_struct
             $model_struct
             $get_nulls_func
             $(curve_funcs...)
@@ -626,11 +629,19 @@ macro dynmodel(name, body)
         end
     )
 end
-function parse_timeframe!(timeframe, body)
 
-    
+function parse_timeframe(body)
+    for line in body.args
+        line isa LineNumberNode && continue
+
+        if line isa Expr && line.head == :(=)
+            return line.args[2]
+        end
+    end
+    return
 end
-function parse_variables_for_dyn!(static_vars::Symbol[], dyn_vars::Symbol[], descriptions, body)
+
+function parse_variables_for_dyn!(static_vars::Vector{Symbol}, dyn_vars::Vector{Symbol}, descriptions, body)
     for line in body.args
         line isa LineNumberNode && continue
 
@@ -638,6 +649,7 @@ function parse_variables_for_dyn!(static_vars::Symbol[], dyn_vars::Symbol[], des
             var_name = line.args[1]
             var_desc = line.args[2]
 
+            #TODO: Adjust parsing of dynamic variables
             if var_name isa Expr && var_name.head == :(call)
                 push!(dyn_vars, var_name.args[1])
             else
@@ -648,11 +660,58 @@ function parse_variables_for_dyn!(static_vars::Symbol[], dyn_vars::Symbol[], des
             # Just variable name
             push!(static_vars, line)
             descriptions[line] = ""
-        elseif  line isa Expr && line.head == :(call)
+        elseif line isa Expr && line.head == :(call)
             push!(dyn_vars, line)
         end
     end
     return
 end
 
+function generate_model_struct_dyn(model_name::Symbol, param_struct_name::Symbol, length_of_static_vars::Int, dyn_vars::OrderedDict{Symbol, Any})::Tuple{Expr, Expr}
 
+    dyn_vars_struct_name = Symbol(model_name, "DynVars")
+
+    dyn_var_fields = [:($key = $value) for (key, value) in dyn_vars]
+
+    dyn_var_struct_expr = quote
+        Base.@kwdef struct $dyn_vars_struct_name
+            $(dyn_var_fields...)
+        end
+    end
+
+    time_step_struct_name = Symbol(model_name, "Step")
+    time_step_struct_expr = quote
+        Base.@kwdef struct $time_step_struct_name
+            params::$param_struct_name = $param_struct_name()
+            dyn_vars::$dyn_vars_struct_name = $dyn_vars_struct_name()
+        end
+    end
+
+    model_struct_expr = quote
+        Base.@kwdef struct $model_name <: AbstractPKModel
+            params::$param_struct_name = $param_struct_name()
+            dyn_vars::$dyn_vars_struct_name = $dyn_vars_struct_name()
+            u0::SVector{$length_of_static_vars, Float64} = ones(SVector{$length_of_static_vars})
+        end
+    end
+
+    return (dyn_var_struct_expr, time_step_struct_expr, model_struct_expr)
+end
+
+function generate_get_nulls_dyn(model_name, param_name, static_vars, dyn_vars, parameters, equations)
+    var_tuple = Expr(:tuple, variables...)
+    param_syms = collect(keys(parameters))
+
+    residuals = [:($(eq.lhs) - $((eq.rhs))) for eq in equations]
+
+    return quote
+        function get_nulls(model::$model_name)
+            return function (u, p::$param_name)
+                (; $(param_syms...)) = p
+                (; $(param_syms...)) = p
+                $var_tuple = u
+                return StaticArrays.SA[$(residuals...)]
+            end
+        end
+    end
+end
