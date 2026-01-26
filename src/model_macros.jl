@@ -189,16 +189,33 @@ macro model(name, body)
     solve_method = generate_solve_method(name, variables, balanace_sheets)
     return esc(
         quote
-            $param_struct
-            $model_struct
-            $get_nulls_func
-            $(curve_funcs...)
-            $(balance_sheet_quoted...)
-            $(balance_sheet_functions...)
-            $solve_method
-            $(helper_funcs...)
+            $(model_struct_name) = Model(
+                $variables, $(keys(parameters)), $equations, $balance_sheet_quoted
+            )
+
+            $(param_struct_name) = Parametrization(
+                $(model_struct_name), $(parameters)
+            )
         end
     )
+end
+function generate_get_null(m::Parametrization)
+    equations = m.model.equations
+    res_exprs = [:($(eq.lhs) - $(eq.rhs)) for eq in equations]
+
+    return quote
+        function get_null(u, p)
+            return SVector{$(length(res_exprs))}($(res_exprs...))
+        end
+    end |> esc
+end
+
+function solve_model(m::Parametrization)
+    nulls! = generate_get_null(m)
+    p = model.params
+    prob = NonlinearProblem(null!, m.u0, p)
+    sol = solve(prob)
+    return sol
 end
 
 
