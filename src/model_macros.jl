@@ -1,11 +1,3 @@
-struct BalanceSheetAbstractData
-    name::Symbol
-    fields::Vector{Symbol}
-    assets::Vector{Symbol}
-    liabilities::Vector{Symbol}
-    calculations::Dict{Symbol, Union{Symbol, Expr}}
-end
-
 """
     @model name begin
         @variables begin
@@ -134,21 +126,20 @@ Generates:
 end
 
 # Solve the model
-sol = solve_model(SimplePK2Model())
+sol = solve_model(SimplePK)
 println(sol.sol.Y)
 ```
 
 See also: [`@scenario`](@ref)
 """
-macro model(name, body)
+macro model(body)
     variables = Symbol[]
-    var_descriptions = OrderedDict{Symbol, String}()
-    parameters = OrderedDict{Symbol, Any}()
-    param_descriptions = OrderedDict{Symbol, String}()
-    equations = []
-    curves = OrderedDict{Symbol, Any}()
-    balanace_sheets = BalanceSheetAbstractData[]
-    balanace_sheet_calculations = []
+    var_descriptions = Dict{Symbol, String}()
+    parameters = Dict{Symbol, Float64}()
+    param_descriptions = Dict{Symbol, String}()
+    equations = Equation[]
+    curves = Curve[]
+    balance_sheets = BalanceSheet[]
 
     # Parse the model body
     for expr in body.args
@@ -167,132 +158,134 @@ macro model(name, body)
             elseif macro_name == Symbol("@curves")
                 parse_curves!(curves, macro_body)
             elseif macro_name == Symbol("@balances")
-                parse_balances!(balanace_sheets, macro_body)
+                parse_balances!(balance_sheets, macro_body)
             end
         end
     end
 
 
-    # Generate all the code
-    param_struct_name = Symbol(name, "Params")
-    model_struct_name = Symbol(name, "Model")
-
-    param_struct = generate_param_struct(param_struct_name, parameters)
-    model_struct = generate_model_struct(model_struct_name, param_struct_name, length(variables))
-    get_nulls_func = generate_get_nulls(model_struct_name, param_struct_name, variables, parameters, equations)
-    curve_funcs = generate_curves(curves, param_struct_name, parameters, name)
-    helper_funcs = generate_helpers(model_struct_name, variables, var_descriptions, parameters, param_descriptions)
-    balance_sheet_quoted = generate_balance_sheets(balanace_sheets, name)
-    balance_sheet_functions = generate_balance_sheets_helper_methods(balanace_sheets, name, variables)
+    sort_equations_by_variables!(equations, variables)
+    nulls = generate_get_nulls(variables, parameters, equations)
+    curve_funcs = generate_curve_eval(curves, variables, parameters)
 
 
-    solve_method = generate_solve_method(name, variables, balanace_sheets)
     return esc(
         quote
-            $(model_struct_name) = Model(
-                $variables, $(keys(parameters)), $equations, $balance_sheet_quoted
-            )
-
-            $(param_struct_name) = Parametrization(
-                $(model_struct_name), $(parameters)
+            Parametrization(
+                Model(
+                    $variables,
+                    $(collect(keys(parameters))),
+                    $var_descriptions,
+                    $param_descriptions,
+                    $equations,
+                    $curves,
+                    $curve_funcs,
+                    $nulls,
+                    $balance_sheets
+                ),
+                $parameters,
+                ones($(length(variables)))
             )
         end
     )
-end
-function generate_get_null(m::Parametrization)
-    equations = m.model.equations
-    res_exprs = [:($(eq.lhs) - $(eq.rhs)) for eq in equations]
 
-    return quote
-        function get_null(u, p)
-            return SVector{$(length(res_exprs))}($(res_exprs...))
+end
+
+"Evaluate a Symbol/Expr/Number given variable values and parameter values."
+function _eval_calc(x, vars::Dict{Symbol, Float64}, params::Dict{Symbol, Float64})
+    if x isa Number
+        return Float64(x)
+    elseif x isa Symbol
+        if haskey(vars, x)
+            return vars[x]
         end
-    end |> esc
+        if haskey(params, x)
+            return params[x]
+        end
+        error("Unknown symbol in balance sheet calculation: $x")
+    elseif x isa Expr
+        # Evaluate expression in a local scope with bindings from vars/params
+        # (simple, but uses eval; OK if expressions are trusted and module-scoped)
+        assigns = Any[
+            :($(k) = $(v)) for (k, v) in vars
+        ]
+        append!(
+            assigns, Any[
+                :($(k) = $(v)) for (k, v) in params
+            ]
+        )
+
+        return Base.eval(
+            PKAssetPrices, quote
+                let
+                    $(assigns...)
+                    $(x)
+                end
+            end
+        ) |> Float64
+    else
+        error("Unsupported calc type: $(typeof(x))")
+    end
 end
 
-function solve_model(m::Parametrization)
-    nulls! = generate_get_null(m)
-    p = model.params
-    prob = NonlinearProblem(null!, m.u0, p)
+function fill_balance_sheets(model::Parametrization, sol_u::AbstractVector{<:Real})
+    # solved variables dict
+    vars = Dict{Symbol, Float64}(
+        model.model.variables[i] => Float64(sol_u[i])
+            for i in eachindex(model.model.variables)
+    )
+    params = model.params
+
+    filled = BalanceSheetFilled[]
+    for bs in model.model.balance_sheets
+        # compute all calculations once
+        calcvals = Dict{Symbol, Float64}()
+        for (name, expr) in bs.calculations
+            calcvals[name] = _eval_calc(expr, vars, params)
+        end
+
+        assets = Pair{Symbol, Float64}[]
+        for a in bs.assets
+            v = haskey(calcvals, a) ? calcvals[a] : _eval_calc(a, vars, params)
+            push!(assets, a => v)
+        end
+
+        liabilities = Pair{Symbol, Float64}[]
+        for l in bs.liabilities
+            v = haskey(calcvals, l) ? calcvals[l] : _eval_calc(l, vars, params)
+            push!(liabilities, l => v)
+        end
+
+        push!(filled, BalanceSheetFilled(bs.name, assets, liabilities))
+    end
+    return filled
+end
+
+
+function sort_equations_by_variables!(equations::Vector{Equation}, variables::Vector{Symbol})
+    varpos = Dict{Symbol, Int}(v => i for (i, v) in pairs(variables))
+
+    # (optional) only enforce that LHS are Symbols and are declared variables
+    for eq in equations
+        eq.lhs isa Symbol || error("Equation LHS must be a Symbol, got: $(eq.lhs)")
+        haskey(varpos, eq.lhs) || error("Equation LHS $(eq.lhs) not declared in @variables")
+    end
+
+    # stable sort => duplicates stay next to each other, preserving original order
+    sort!(equations; by = eq -> varpos[eq.lhs], alg = Base.Sort.MergeSort)
+    return equations
+end
+
+
+function solve_model(model::Parametrization)
+    nulls! = model.model.nulls
+    p = (; model.params...)   # OrderedDict/Dic -> NamedTuple
+    prob = NonlinearProblem(nulls!, model.u0, p)
     sol = solve(prob)
-    return sol
-end
+    variables = Dict{Symbol, Float64}((v => sol.u[i] for (i, v) in enumerate(model.model.variables)))
 
-
-function generate_solve_method(name::Symbol, variables::Vector{Symbol}, balance_sheets::Vector{BalanceSheetAbstractData})
-    sol_struct_name = Symbol(name, "Solution")
-    sol_var_struct_name = Symbol(sol_struct_name, "Var")
-    sol_sheets_struct_name = Symbol(sol_struct_name, "Sheets")
-    modelname = Symbol(name, "Model")
-    solution_fields = [:($(variable)::Float64) for variable in variables ]
-    sol_sheets = [:(get_sheet($(Symbol(name, balance_sheet.name)), sol_var)) for balance_sheet in balance_sheets]
-    @info solution_fields
-    return quote
-        struct $sol_var_struct_name
-            $(solution_fields...)
-        end
-
-        struct $sol_struct_name
-            sol::$sol_var_struct_name
-            sheets::Vector{BalanceSheet}
-        end
-
-
-        function solve_model(md::$(modelname))
-            sol = get_solution(md)
-
-            sol_var = $(sol_var_struct_name)(sol.u...)
-            sol_sheets = [$(sol_sheets...)]
-            return $(sol_struct_name)(
-                sol_var,
-                sol_sheets
-            )
-        end
-    end
-end
-
-function generate_helpers(model_struct_name, variables, var_descriptions, parameters, param_descriptions)
-    display_model = quote
-        function display_model(model::$model_struct_name)
-            line = "="^60
-            colw = 24  # width for the name column
-
-            println("\n", line)
-            println("Variables")
-            println(line)
-
-            for v in $variables
-                desc = get($var_descriptions, v, "")
-                println(rpad(string(v), colw), "  ", desc)
-            end
-
-            println("\n", line)
-            println("Parameters")
-            println(line)
-
-            keys_params = collect(keys($parameters))
-            for p in sort!(keys_params; by = string)
-                desc = get($param_descriptions, p, "")
-                println(rpad(string(p), colw), "  ", desc)
-            end
-
-            return nothing
-        end
-    end
-
-    variable_des = quote
-        function variable_descriptions(model::$model_struct_name)
-            return $var_descriptions
-        end
-    end
-
-    param_des = quote
-        function param_descriptions(model::$model_struct_name)
-            return $param_descriptions
-        end
-    end
-
-    return [display_model, variable_des, param_des]
+    sheets = fill_balance_sheets(model, sol.u)
+    return Solution(variables, model, sheets)
 end
 
 
@@ -348,7 +341,7 @@ function parse_equations!(equations, body)
         line isa LineNumberNode && continue
 
         if line isa Expr && line.head == :call && line.args[1] == :(==)
-            push!(equations, (lhs = line.args[2], rhs = line.args[3]))
+            push!(equations, Equation(line.args[2], line.args[3]))
         end
     end
     return
@@ -364,15 +357,15 @@ function parse_curves!(curves, body)
 
             if lhs isa Expr && lhs.head == :call
                 curve_name = lhs.args[1]
-                curve_args = lhs.args[2:end]
-                curves[curve_name] = (args = curve_args, body = rhs)
+                curve_args = lhs.args[2]
+                push!(curves, Curve(curve_name, curve_args, rhs))
             end
         end
     end
     return
 end
 
-function parse_balance!(balance_sheets, body)
+function parse_balance!(body)
 
     balance_sheet_name = body.args[3]
     balance_sheet_body = body.args[4]
@@ -399,7 +392,7 @@ function parse_balance!(balance_sheets, body)
 
         end
     end
-    return BalanceSheetAbstractData(
+    return BalanceSheet(
         balance_sheet_name,
         fields,
         assets,
@@ -414,74 +407,44 @@ function parse_balances!(balance_sheets, body)
 
         if line isa Expr && line.head == :(macrocall) && line.args[1] == Symbol("@sheet")
 
-            balance_sheet = parse_balance!(balance_sheets, line)
-            @info balance_sheet
+            balance_sheet = parse_balance!(line)
             push!(balance_sheets, balance_sheet)
         end
     end
     return
 end
 
-function generate_param_struct(param_struct_name, parameters)
-    field_exprs = [:($(field)::Float64 = $(value)) for (field, value) in parameters]
 
-    # Build the struct expression
-    struct_expr = quote
-        Base.@kwdef struct $param_struct_name <: AbstractPKParams
-            $(field_exprs...)
-        end
-    end
-
-    return struct_expr
-end
-
-function generate_model_struct(model_name, param_struct_name, amount_of_variables)
-    struct_expr = quote
-        Base.@kwdef struct $model_name <: AbstractPKModel
-            params::$param_struct_name = $param_struct_name()
-            u0::SVector{$amount_of_variables, Float64} = ones(SVector{$amount_of_variables})
-        end
-    end
-    return struct_expr
-end
-
-function generate_get_nulls(model_name, param_name, variables, parameters, equations)
+function generate_get_nulls(variables, parameters, equations)
     var_tuple = Expr(:tuple, variables...)
     param_syms = collect(keys(parameters))
 
     residuals = [:($(eq.lhs) - $((eq.rhs))) for eq in equations]
 
     return quote
-        function get_nulls(model::$model_name)
-            return function (u, p::$param_name)
-                (; $(param_syms...)) = p
-                $var_tuple = u
-                return StaticArrays.SA[$(residuals...)]
-            end
+        function (u, p)
+            (; $(param_syms...)) = p
+            $var_tuple = u
+            return [$(residuals...)]
         end
     end
 end
 
-function generate_curves(curves, param_name, parameters, model_name)
-    curve_funcs = []
+function generate_curve_eval(curves, variables, parameters)
+
+    var_tuple = Expr(:tuple, variables...)
     param_syms = collect(keys(parameters))
-
-    for (name, curve_data) in curves
-        args = curve_data.args
-        body = curve_data.body
-
-        cure_name = Symbol(model_name, name)
-        func = quote
-            function $(cure_name)($(args...), params::$param_name)
-                (; $(param_syms...)) = params
-                $body
-            end
+    body = [curve.name => curve.body for curve in curves]
+    func = quote
+        function (u, p)
+            (; $(param_syms...)) = p
+            return $var_tuple = u
+            ($(body...))
         end
-
-        push!(curve_funcs, func)
     end
 
-    return curve_funcs
+
+    return func
 end
 
 function generate_balance_sheets(balance_sheets, model_name)
@@ -587,7 +550,7 @@ macro dynmodel(name, body)
     param_descriptions = OrderedDict{Symbol, String}()
     equations = []
     curves = OrderedDict{Symbol, Any}()
-    balanace_sheets = BalanceSheetAbstractData[]
+    balanace_sheets = BalanceSheet[]
     balanace_sheet_calculations = []
     timeframe::Expr = quote
         1:100
@@ -625,7 +588,7 @@ macro dynmodel(name, body)
     param_struct = generate_param_struct(param_struct_name, parameters)
     (dyn_var_struct, model_struct) = generate_model_struct_dyn(model_struct_name, param_struct_name, length(static_vars), dyn_vars)
     get_nulls_func = generate_get_nulls_dyn(model_struct_name, param_struct_name, static_vars, dyn_vars, parameters, equations)
-    curve_funcs = generate_curves(curves, param_struct_name, parameters, name)
+    curve_funcs = generate_curve_eval(curves, param_struct_name, parameters, name)
     helper_funcs = generate_helpers(model_struct_name, variables, var_descriptions, parameters, param_descriptions)
     balance_sheet_quoted = generate_balance_sheets(balanace_sheets, name)
     balance_sheet_functions = generate_balance_sheets_helper_methods(balanace_sheets, name, variables)

@@ -1,4 +1,4 @@
-@model PC begin
+PC = @model begin
     @parameters begin
         θ = 0.7, "idk"
         λ₀ = 0.1, "idk"

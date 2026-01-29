@@ -1,4 +1,4 @@
-@model AssetPK begin
+AssetPK = @model begin
 
     @variables  begin
         Y = "Output"
@@ -58,7 +58,7 @@
         N == a * Y
         U == 1 - N / Nᶠ
         SD == s0 - s1 * r
-        AD == γ0 + (1 / (1 - γ)) * SD/p1 # SD is in euros, but should be a quantity(?)
+        AD == γ0 + (1 / (1 - γ)) * SD / p1 # SD is in euros, but should be a quantity(?)
         AP == p1 * (AD / AS)
         AS == AQ * (α + gₐ)
         α == α₀ / 2 * (1 + AP)
@@ -94,7 +94,7 @@
 end
 
 
-@model AssetPK2 begin
+AssetPK2 = @model begin
 
     @variables  begin
         Y = "Output"
@@ -157,7 +157,7 @@ end
         N == a * Y
         U == 1 - N / Nᶠ
         SD == s0 - s1 * r + s2 * (AP - 1)
-        AD == γ0 + (1 / (1 - γ)) * SD/p1 # SD is in euros, but should be a quantity(?)
+        AD == γ0 + (1 / (1 - γ)) * SD / p1 # SD is in euros, but should be a quantity(?)
         AP == p1 * (AD / AS)
         AS == AQ * (α + gₐ)
         α == α₀ / 2 * (1 + AP)
@@ -184,7 +184,7 @@ end
     end
 end
 
-@model EndAlpha begin
+EndAlpha = @model begin
 
     @variables  begin
         Y = "Output"
@@ -246,7 +246,7 @@ end
         N == a * Y
         U == 1 - N / Nᶠ
         SD == s0 - s1 * r + s2 * (AP - 1)
-        AD == γ0 + (1 / (1 - γ)) * SD/p1 # SD is in euros, but should be a quantity(?)
+        AD == γ0 + (1 / (1 - γ)) * SD / p1 # SD is in euros, but should be a quantity(?)
         AP == p1 * (AD / AS)
         AS == AQ * (α + gₐ)
         c == c₀ - c₁ * SD
@@ -271,3 +271,4 @@ end
         end
     end
 end
+

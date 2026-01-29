@@ -1,4 +1,4 @@
-@model SimplePK begin
+SimplePK = @model begin
     @variables begin
         Y = "Output"
         ND = "Non debt-financed demand"
