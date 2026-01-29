@@ -2,66 +2,21 @@ module PKAssetPrices
 
 using NonlinearSolve
 using StaticArrays
-using PrettyTables
 using OrderedCollections
 
-abstract type AbstractPKModel end
-abstract type AbstractPKParams end
+
+import Base: show
 
 export BalanceSheet, Model, Parametrization, Solution
 export solve_model
-export @model
+export @model, @scenario
+export display_sheets
 
-struct Equation
-    lhs::Symbol
-    rhs::Union{Expr, Symbol, Number}
-end
 
-struct BalanceSheet
-    name::Symbol
-    fields::Vector{Symbol}
-    assets::Vector{Symbol}
-    liabilities::Vector{Symbol}
-    calculations::Dict{Symbol, Union{Symbol, Expr}}
-end
-
-struct Curve
-    name::Symbol
-    arg::Symbol
-    body::Expr
-end
-struct BalanceSheetFilled
-    sector_name::Symbol
-    assets::Vector{Pair{Symbol, Float64}}
-    liabilities::Vector{Pair{Symbol, Float64}}
-end
-
-struct Model{F <: Function, C <: Function}
-    variables::Vector{Symbol}
-    parameters::Vector{Symbol}
-    variable_descritpions::Dict{Symbol, String}
-    parameter_descritpions::Dict{Symbol, String}
-    equations::Vector{Equation}
-    curves::Vector{Curve}
-    curve_eval::C
-    nulls::F
-    balance_sheets::Vector{BalanceSheet}
-end
-
-struct Parametrization{F <: Function, C <: Function}
-    model::Model{F, C}
-    params::Dict{Symbol, Float64}
-    u0::Vector{Float64}
-end
-
-struct Solution{F <: Function, C <: Function}
-    variables::Dict{Symbol, Float64}
-    model::Parametrization{F, C}
-    sheets::Vector{BalanceSheetFilled}
-end
-
-include("balance_sheets.jl")
-include("model_macros.jl")
+include("static/static_model.jl")
+include("static/balance_sheets.jl")
+include("static/model_macros.jl")
+include("static/helper_functions.jl")
 include("simple_model.jl")
 include("asset_model.jl")
 
