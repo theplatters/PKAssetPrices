@@ -1,7 +1,12 @@
-struct Equation
-    lhs::Symbol
-    rhs::Union{Expr, Symbol, Number}
-end
+module Static
+
+using NonlinearSolve
+import ..BaseModels: AbstractModel, Equation
+
+export BalanceSheet, BalanceSheetFilled, Curve, Model, Parametrization, Solution
+export solve_model
+export @model, @scenario
+
 
 struct BalanceSheet
     name::Symbol
@@ -16,13 +21,14 @@ struct Curve
     arg::Symbol
     body::Expr
 end
+
 struct BalanceSheetFilled
     sector_name::Symbol
     assets::Vector{Pair{Symbol, Float64}}
     liabilities::Vector{Pair{Symbol, Float64}}
 end
 
-struct Model{F <: Function, C <: Function}
+struct Model{F <: Function, C <: Function} <: AbstractModel
     variables::Vector{Symbol}
     parameters::Vector{Symbol}
     variable_descritpions::Dict{Symbol, String}
@@ -44,4 +50,13 @@ struct Solution{F <: Function, C <: Function}
     variables::Dict{Symbol, Float64}
     model::Parametrization{F, C}
     sheets::Vector{BalanceSheetFilled}
+end
+
+include("model_macros.jl")
+include("balance_sheets.jl")
+include("helper_functions.jl")
+
+include("models/asset_model.jl")
+include("models/pc_model.jl")
+include("models/simple_model.jl")
 end

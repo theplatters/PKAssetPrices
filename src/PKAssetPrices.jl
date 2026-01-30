@@ -1,23 +1,11 @@
 module PKAssetPrices
 
-using NonlinearSolve
-using StaticArrays
-using OrderedCollections
 
+export Dynamic, Static
 
-import Base: show
-
-export BalanceSheet, Model, Parametrization, Solution
-export solve_model
-export @model, @scenario
-export display_sheets
-
-
+include("base.jl")
 include("static/static_model.jl")
-include("static/balance_sheets.jl")
-include("static/model_macros.jl")
-include("static/helper_functions.jl")
-include("simple_model.jl")
-include("asset_model.jl")
+include("dynamic/dynamic_model.jl")
+
 
 end # module PKAssetPrices

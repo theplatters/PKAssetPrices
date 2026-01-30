@@ -1,3 +1,4 @@
+using .Static: @model
 SimplePK = @model begin
     @variables begin
         Y = "Output"

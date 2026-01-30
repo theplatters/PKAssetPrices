@@ -271,4 +271,3 @@ EndAlpha = @model begin
         end
     end
 end
-
