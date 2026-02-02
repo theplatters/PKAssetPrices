@@ -1,4 +1,3 @@
-import Base: show
 
 """
     display_sheets(sol::Solution; digits=3, compact=false, show_diff=true)

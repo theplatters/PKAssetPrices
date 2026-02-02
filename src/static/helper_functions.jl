@@ -169,3 +169,10 @@ end
 function show(io::IO, ::MIME"text/plain", sol::Solution{F, C}) where {F <: Function, C <: Function}
     return show(io, sol)
 end
+
+function Base.getproperty(m::Solution{F, C}, x::Symbol) where {F <: Function, C <: Function}
+    if haskey(getfield(m, :(variables)), x)
+        return m.variables[x]
+    end
+    return getfield(m, x)
+end
