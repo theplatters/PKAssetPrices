@@ -430,22 +430,32 @@ function generate_get_nulls(variables, parameters, equations)
     end
 end
 
-function generate_curve_eval(curves, variables, parameters)
 
+function generate_curve_eval(curves, variables, parameters)
     var_tuple = Expr(:tuple, variables...)
     param_syms = collect(keys(parameters))
-    body = [curve.name => curve.body for curve in curves]
-    func = quote
+
+    isempty(curves) && return quote
         function (u, p)
-            (; $(param_syms...)) = p
-            return $var_tuple = u
-            ($(body...))
+            return nothing
         end
     end
 
+    assigns = [:($(c.name) = $(c.body)) for c in curves]
 
-    return func
+    # field expressions for (; ...):  IS = IS, IR = IR, ...
+    fields = [:($(c.name) = $(c.name)) for c in curves]
+
+    return quote
+        function (u, p)
+            (; $(param_syms...)) = NamedTuple(p)
+            $var_tuple = u
+            $(assigns...)
+            return (; $(fields...))
+        end
+    end
 end
+
 
 function generate_balance_sheets(balance_sheets, model_name)
     balance_sheet_quoted = Expr[]

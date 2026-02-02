@@ -23,14 +23,14 @@ AssetPK = @model begin
     @parameters begin
         b = 0.5, "consumption rate"
         c = 0.8, "credit rationing"
-        d_0 = 5.0, "autonomous credit financed demand"
-        d_1 = 8.0, "max discretonary credit demand when r=0"
-        i_0 = 0.01, "autonomous policy rate"
-        i_1 = 0.05, "inflation infuced policy rate"
+        d0 = 5.0, "autonomous credit financed demand"
+        d1 = 8.0, "max discretonary credit demand when r=0"
+        i0 = 0.01, "autonomous policy rate"
+        i1 = 0.05, "inflation infuced policy rate"
         m = 0.15, "bank markup"
         k = 0.3, "reserve share"
         n = 0.15, "firm markup"
-        W_0 = 2.0, "autonomous wages"
+        W0 = 2.0, "autonomous wages"
         h = 0.8, "bargaining power" # impact of unemployment on wages
         a = 0.8, "productivity"
         Nᶠ = 12.0, "total labour supply"
@@ -47,14 +47,14 @@ AssetPK = @model begin
     @equations begin
         Y == ND + c * D
         ND == b * Y
-        D == d_0 - d_1 * r
-        i == i_0 + i_1 * P
+        D == d0 - d1 * r
+        i == i0 + i1 * P
         r == (1 + m) * i
         dL == c * D + SD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
-        W == W_0 - h * U
+        W == W0 - h * U
         N == a * Y
         U == 1 - N / Nᶠ
         SD == s0 - s1 * r
@@ -65,10 +65,10 @@ AssetPK = @model begin
     end
 
     @curves begin
-        IS(r) = (1 / (1 - b)) * (c * (d₀ - d₁ * r))
-        IR(Y) = (1 + m) * (i₀ + i₁ * (1 + n) * a * (W₀ - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d₀ - d₁ * ((1 + m) * (i₀ + i₁ * P))))
-        AS(Y) = (1 + n) * a * (W₀ - h * (1 - (a * Y) / Nᶠ))
+        IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
+        IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
+        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     end
 
 

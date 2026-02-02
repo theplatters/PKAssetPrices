@@ -2,9 +2,10 @@ module Static
 
 using NonlinearSolve
 import ..BaseModels: AbstractModel, Equation
+import ..PKAssetPrices: solve_model
+
 import Base: show, getproperty
 export BalanceSheet, BalanceSheetFilled, Curve, Model, Parametrization, Solution
-export solve_model
 export @model, @scenario
 
 

@@ -3,6 +3,7 @@ module Dynamic
 using NonlinearSolve
 
 import ..BaseModels: AbstractModel, Equation
+import ..PKAssetPrices: solve_model
 
 abstract type AbstractTimeDomain end
 
