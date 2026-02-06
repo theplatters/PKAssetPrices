@@ -283,6 +283,10 @@ function solve_model(model::Parametrization)
     prob = NonlinearProblem(nulls!, model.u0, p)
     sol = solve(prob)
     variables = Dict{Symbol, Float64}((v => sol.u[i] for (i, v) in enumerate(model.model.variables)))
+    if sol.retcode != :Success
+        @warn sol.retcode
+        @warn "Model solution did not converge: $(sol.retcode)"
+    end
 
     sheets = fill_balance_sheets(model, sol.u)
     return Solution(variables, model, sheets)
