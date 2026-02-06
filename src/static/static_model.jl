@@ -1,6 +1,7 @@
 module Static
 
 using NonlinearSolve
+using PrettyTable
 import ..BaseModels: AbstractModel, Equation
 import ..PKAssetPrices: solve_model
 
