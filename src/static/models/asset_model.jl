@@ -184,7 +184,7 @@ AssetPK2 = @model begin
     end
 end
 
-EndAlpha = @model begin
+ExoAlpha = @model begin
 
     @variables  begin
         Y = "Output"
