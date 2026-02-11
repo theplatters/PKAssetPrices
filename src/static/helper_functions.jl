@@ -2,51 +2,8 @@
 _equation_str(eq::Equation) = string(eq.lhs, " = ", eq.rhs)
 
 function show(io::IO, m::Model{F, C}) where {F <: Function, C <: Function}
-    # Compact (e.g. when embedded in other displays)
-    if get(io, :compact, false)
-        return print(
-            io, "Model(", length(m.variables), " vars, ",
-            length(m.parameters), " params, ",
-            length(m.equations), " eqs, ",
-            length(m.curves), " curves, ",
-            length(m.balance_sheets), " sheets)"
-        )
-    end
+    return column_labels = ["Variables", "Parameters", "Equations"]
 
-    println(io, "Model")
-    println(io, "─────")
-    println(io, "Variables:      ", length(m.variables))
-    println(io, "Parameters:     ", length(m.parameters))
-    println(io, "Equations:      ", length(m.equations))
-    println(io, "Curves:         ", length(m.curves))
-    println(io, "Balance sheets: ", length(m.balance_sheets))
-
-    preview(xs; n = 8) = begin
-        k = min(length(xs), n)
-        k == 0 && return ""
-        s = join(string.(xs[1:k]), ", ")
-        length(xs) > n ? s * ", …" : s
-    end
-
-    if !isempty(m.variables)
-        println(io, "var: ", preview(m.variables))
-    end
-    if !isempty(m.parameters)
-        println(io, "par: ", preview(m.parameters))
-    end
-    if !isempty(m.balance_sheets)
-        println(io, "sheets: ", preview([bs.name for bs in m.balance_sheets]))
-    end
-
-    # Equations in model format
-    println(io)
-    println(io, "Equations")
-    println(io, "─────────")
-    for (i, eq) in enumerate(m.equations)
-        println(io, lpad(i, 3), ": ", _equation_str(eq))
-    end
-
-    return nothing
 end
 
 function show(io::IO, ::MIME"text/plain", m::Model{F, C}) where {F <: Function, C <: Function}
