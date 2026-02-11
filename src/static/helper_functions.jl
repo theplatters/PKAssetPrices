@@ -1,9 +1,26 @@
-# Helper: print an equation as `lhs = rhs`
-_equation_str(eq::Equation) = string(eq.lhs, " = ", eq.rhs)
+@inline pad_to(v, n, x) = length(v) >= n ? v : vcat(v, fill(x, n - length(v)))
 
 function show(io::IO, m::Model{F, C}) where {F <: Function, C <: Function}
-    return column_labels = ["Variables", "Parameters", "Equations"]
+    payload = displaysize(io)[2] >= 80 ?
+        [["$var: $(m.variable_descritpions[var])" for var in m.variables], ["$parameter: $(m.parameter_descritpions[parameter])" for parameter in m.parameters], string.(m.equations)] :
+        [m.variables, m.parameters, string.(m.equations)]
+    column_labels = [["Variables", "Parameters", "Equations"], "Amount: " .* string.(length.([m.variables, m.parameters, m.equations]))]
+    max_len = length.([m.variables, m.parameters, m.equations]) |> maximum
+    data = reduce(
+        hcat,
+        pad_to.(payload, max_len, "")
+    )
 
+    show(
+        io, pretty_table(
+            data;
+            title = "Model",
+            column_labels = column_labels,
+            fit_table_in_display_vertically = false,
+            fit_table_in_display_horizontally = false
+        )
+    )
+    return nothing
 end
 
 function show(io::IO, ::MIME"text/plain", m::Model{F, C}) where {F <: Function, C <: Function}
@@ -132,4 +149,84 @@ function Base.getproperty(m::Solution{F, C}, x::Symbol) where {F <: Function, C 
         return m.variables[x]
     end
     return getfield(m, x)
+end
+
+# "central_bank_credit" -> "Central Bank Credit"
+function title_from_snake(s::AbstractString)
+    words = split(s, '_'; keepempty = false)
+    cap1(w) = isempty(w) ? w : uppercasefirst(lowercase(w))
+    return join(cap1.(words), ' ')
+end
+
+# "central_bank_credit" -> "Central Bank Credit"
+title_from_snake(s::Symbol) = title_from_snake(string(s))
+function to_html(b::BalanceSheetFilled)
+    header = """
+    <div style="border: 1px solid #ddd; padding: 9px;">
+    <h3> Sector: $(b.sector_name) </h3>
+    <table>
+      <thead  style="border-bottom: 2px solid #ddd">
+      <tr>
+        <th>Assets </th>
+        <th> Value </th>
+        <th>Liabilities </th>
+        <th> Value </th>
+      </tr>
+      </thead>
+    """
+
+    body = "<tbody>"
+    for (asset, liability) in zip(b.assets, b.liabilities)
+        body *= """
+          <tr>
+            <td> $(title_from_snake(asset[1]))</td>
+            <td> $(round(asset[2], digits = 2)) </td>
+            <td> $(title_from_snake(liability[1]))</td>
+            <td> $(round(liability[2], digits = 2)) </td>
+          </tr>
+        """
+    end
+
+    body *= "</tbody>"
+
+    footer = """
+    <tfoot style="border-top: 2px solid #ddd">
+          <tr>
+            <td> Total</td>
+            <td> $(round(assets(b), digits = 2))</td>
+            <td> Total</td>
+            <td> $(round(liabilities(b), digits = 2))</td>
+          </tr>
+    </tfoot>
+    </table>
+    </div>
+    """
+
+
+    return header * body * footer
+end
+
+
+function Base.show(io::IO, ::MIME"text/html", x::BalanceSheetFilled)
+    println(io, to_html(x))
+    return nothing
+end
+
+
+function Base.show(io::IO, ::MIME"text/html", x::Vector{BalanceSheetFilled})
+    tables = join(to_html.(x), "\n")  # each to_html already returns a <table> block
+
+    html = """
+    <div style="
+        display:flex;
+        flex-wrap:wrap;
+        gap:16px;
+        align-items:flex-start;
+    ">
+      $tables
+    </div>
+    """
+
+    print(io, html)
+    return nothing
 end

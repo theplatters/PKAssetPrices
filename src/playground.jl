@@ -2,8 +2,16 @@ using PKAssetPrices.Static: @model, AssetPK
 using PKAssetPrices
 Revise.retry()
 
-sol = solve_model(AssetPK2)
-Static.
+
+Static.AssetPK.model
+
+
+max_len = length.([m.variables, m.parameters, m.equations]) |> maximum
+data = reduce(hcat, Static.pad_to.([m.variables, m.parameters, m.equations], max_len, nothing))
+
+sol = solve_model(Static.AssetPK2)
+sol
+
 
 AssetPK.model.curve_eval(2 .* AssetPK.u0, AssetPK.params)
 
