@@ -1,3 +1,8 @@
+# AssetPK has endogenous alpha and exogenous c
+# AssetPK2 als makes c endognous, which makes it impossible to draw curves (have there been any other problems with this?)
+# ExoAlpha gas endogenous c and exogenous alpha; the remainder are variations, where CBsense has a central bank that is sensitive to asset prices, and DualInterest additionally has a policy rate that is sensitive to asset prices. Both of these are still work in progress, and not fully tested yet.
+# Another, maybe unnoticed difference relates to the equations for SD and AD, where I have correct the latter (from p1 to AP), but SD still lacks the second term (s2 * (AP - 1)) found in all other models. One should maybe check what difference this makes, and whether it should be added to AssetPK as well.
+
 AssetPK = @model begin
 
     @variables  begin
@@ -58,7 +63,7 @@ AssetPK = @model begin
         N == a * Y
         U == 1 - N / Nᶠ
         SD == s0 - s1 * r
-        AD == γ0 + (1 / (1 - γ)) * SD / p1 # SD is in euros, but should be a quantity(?)
+        AD == γ0 + (1 / (1 - γ)) * SD / AP # SD is in euros, but should be a quantity(?)
         AP == p1 * (AD / AS)
         AS == AQ * (α + gₐ)
         α == α₀ / 2 * (1 + AP)

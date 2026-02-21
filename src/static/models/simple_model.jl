@@ -1,3 +1,4 @@
+# This model is basically a reproduction of the original model from Blecker/Setterfield (see: https://macrosimulation.org/a_post_keynesian_macro_model_with_endogenous_money#fig-dg-pkmacro)
 using .Static: @model
 SimplePK = @model begin
     @variables begin
