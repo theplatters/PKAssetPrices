@@ -1,6 +1,9 @@
 # Created by https://gitignore.org
 # TeX.gitignore
 
+## Synology Helper
+.DS_Store
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
