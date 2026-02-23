@@ -3,6 +3,8 @@
 # ExoAlpha gas endogenous c and exogenous alpha; the remainder are variations, where CBsense has a central bank that is sensitive to asset prices, and DualInterest additionally has a policy rate that is sensitive to asset prices. Both of these are still work in progress, and not fully tested yet.
 # Another, maybe unnoticed difference relates to the equations for SD and AD, where I have correct the latter (from p1 to AP), but SD still lacks the second term (s2 * (AP - 1)) found in all other models. One should maybe check what difference this makes, and whether it should be added to AssetPK as well.
 
+# we probably have to recheck all the specifications for "curves", because this is case-sensitive and we mostly used copy-paste to generate this ;-) ??
+
 AssetPK = @model begin
 
     @variables  begin
