@@ -230,3 +230,25 @@ function Base.show(io::IO, ::MIME"text/html", x::Vector{BalanceSheetFilled})
     print(io, html)
     return nothing
 end
+
+function build_table_from_solutions(solutions, scenario_names = ["Baseline", "Exogenous Alpha", "Central Bank Sense", "Dual Interest", "ExoAlpha + Dual Interest"])
+    table = "<table><tr><th>Variable</th>"
+    for (i, solution) in enumerate(solutions)
+        table *= "<th>Scenario $i: $(scenario_names[i])</th>"
+    end
+    table *= "</tr>"
+
+    variables = solutions[1].model.model.variables
+
+    for var in variables
+        table *= "<tr><td>$var</td>"
+        for solution in solutions
+            value = getproperty(solution, var)
+            table *= "<td>$value</td>"
+        end
+        table *= "</tr>"
+    end
+
+    table *= "</table>"
+    return HTML{String}(table)
+end
