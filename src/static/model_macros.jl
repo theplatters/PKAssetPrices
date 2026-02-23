@@ -436,24 +436,24 @@ end
 
 
 function generate_curve_eval(curves, variables, parameters)
-    var_tuple = Expr(:tuple, variables...)
     param_syms = collect(keys(parameters))
 
     isempty(curves) && return quote
-        function (u, p)
+        function (u::AbstractDict{Symbol,<:Real}, p)
             return nothing
         end
     end
 
-    assigns = [:($(c.name) = $(c.body)) for c in curves]
+    # Pull variables out of the dict: S = u[:S], I = u[:I], ...
+    var_assigns = [:( $(v) = u[$(QuoteNode(v))] ) for v in variables]
 
-    # field expressions for (; ...):  IS = IS, IR = IR, ...
-    fields = [:($(c.name) = $(c.name)) for c in curves]
+    assigns = [:($(c.name) = $(c.body)) for c in curves]
+    fields  = [:($(c.name) = $(c.name)) for c in curves]
 
     return quote
-        function (u, p)
+        function (u::AbstractDict{Symbol,<:Real}, p)
             (; $(param_syms...)) = NamedTuple(p)
-            $var_tuple = u
+            $(var_assigns...)
             $(assigns...)
             return (; $(fields...))
         end

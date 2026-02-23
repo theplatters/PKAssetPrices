@@ -252,3 +252,11 @@ function build_table_from_solutions(solutions, scenario_names = ["Baseline", "Ex
     table *= "</table>"
     return HTML{String}(table)
 end
+
+function eval_curve(param::Parametrization, input::Dict{Symbol, Float64})
+    return param.model.curve_eval(input, param.params)
+end
+
+function eval_curve(sol:: Solution)
+    return sol.model.model.curve_eval(sol.variables, sol.model.params)
+end
