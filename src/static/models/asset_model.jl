@@ -68,6 +68,8 @@ AssetPKQ = @model begin
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
         AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
         AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        AMS(AP) = AP * AQ * (gₐ + α)
+        AMD(AP) = p1 * ( (s0 - r * s1) / (1 - γ) + γ0)
     end
 
 
@@ -161,6 +163,8 @@ AssetPKPQ = @model begin
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
         AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
         AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        AMS(AP) =AP * AQ * (gₐ + α)
+        AMD(AP) = p1 * ((s0 - r * s1) / (AP * (1 - γ)) + γ0)
     end
 
 
