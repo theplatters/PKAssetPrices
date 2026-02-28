@@ -160,6 +160,7 @@ end
 
 # "central_bank_credit" -> "Central Bank Credit"
 title_from_snake(s::Symbol) = title_from_snake(string(s))
+
 function to_html(b::BalanceSheetFilled)
     header = """
     <div style="border: 1px solid #ddd; padding: 9px;">
