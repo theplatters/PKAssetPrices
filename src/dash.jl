@@ -2,19 +2,12 @@
 # Dash.jl "Model Panel" template
 # - Select a model from a list
 # - Dynamically render text inputs for that model's parameters
-# - Keep params in a Dict available as `model.params`
-# - Solve on demand
+# - Re-solve automatically whenever a parameter changes
 # - Display solution + a plot (via Plotly)
 ###############################################################################
 
 using Dash
-# using Plots          # Not needed for Dash (Dash uses Plotly natively)
-using PKAssetPrices  # Uncomment if you have this package
-
-###############################################################################
-# MOCK of the PKAssetPrices types — remove this block once you use the real
-# package, and uncomment `using PKAssetPrices` above.
-###############################################################################
+using PKAssetPrices
 
 const MODEL_OPTIONS = Dict{String,Static.Parametrization}(
     "Q"  => Static.AssetPKQ,
@@ -23,8 +16,6 @@ const MODEL_OPTIONS = Dict{String,Static.Parametrization}(
 
 # ------------------------------- Dash layout --------------------------------
 app = dash(
-    # IMPORTANT: suppress callback exceptions because the parameter inputs
-    # are created dynamically and don't exist in the initial layout.
     suppress_callback_exceptions = true,
 )
 
@@ -33,7 +24,6 @@ app.layout = html_div(
         "maxWidth"    => "1900px",
         "margin"      => "auto",
         "padding"     => "24px",
-        "fontFamily"  => "'Segoe UI', Roboto, sans-serif",
         "background"  => "#f0f2f5",
         "minHeight"   => "100vh",
     )
@@ -46,7 +36,7 @@ app.layout = html_div(
             "borderBottom" => "3px solid #4a90d9",
             "paddingBottom"=> "12px",
         ),
-    )
+    ),
     html_div(
         style = Dict(
             "background"   => "#fff",
@@ -78,28 +68,15 @@ app.layout = html_div(
         ),
 
         # ── Dynamic parameter inputs ──
-        html_div(id = "param-container"),
-
-        # ── Solve button ──
-        html_button("Solve", id = "solve-button", n_clicks = 0,
-            style = Dict(
-                "background"   => "#4a90d9",
-                "color"        => "#fff",
-                "border"       => "none",
-                "borderRadius" => "8px",
-                "padding"      => "12px 32px",
-                "fontSize"     => "15px",
-                "fontWeight"   => "600",
-                "cursor"       => "pointer",
-                "letterSpacing"=> "0.5px",
-                "transition"   => "background 0.2s ease, box-shadow 0.2s ease",
-                "boxShadow"    => "0 2px 8px rgba(74,144,217,0.3)",
-                "marginTop"    => "8px",
-            ),
-        )
+        html_div(id = "param-container")
     end,
     html_hr(style = Dict("border" => "none", "borderTop" => "1px solid #dee2e6", "margin" => "24px 0")),
-    html_div(id = "solution-output")
+    # ── Loading wrapper around the solution output ──
+    dcc_loading(
+        id = "solution-loading",
+        type = "circle",
+        children = html_div(id = "solution-output"),
+    )
 end
 
 # ── Callback 1: rebuild parameter inputs when the model changes ─────────────
@@ -110,10 +87,6 @@ callback!(
 ) do model_name
     model = MODEL_OPTIONS[model_name]
     params  = model.params
-    # Build one labelled numeric input per parameter.
-    # Each input gets an id that is a JSON-serialisable dict so we can
-    # later collect them with pattern-matching (type + index).
-
 
     param_inputs = html_div(
         style = Dict(
@@ -152,7 +125,6 @@ callback!(
                         "borderRadius" => "8px",
                         "border"       => "1px solid #dee2e6",
                         "fontSize"     => "14px",
-                        "fontFamily"   => "monospace",
                         "background"   => "#f8f9fa",
                         "transition"   => "border-color 0.2s ease, box-shadow 0.2s ease",
                         "outline"      => "none",
@@ -164,11 +136,6 @@ callback!(
         ]
     end
 
-
-
-
-    # Also store the current parameter names so the solve callback knows
-    # which names go with which values.
     hidden_store = dcc_store(
         id = "param-names-store",
         data = [pname for (pname, _) in params],
@@ -179,7 +146,6 @@ end
 
 const table_style = Dict(
         "borderCollapse" => "collapse",
-        "fontFamily"     => "'Segoe UI', Roboto, sans-serif",
         "fontSize"       => "14px",
         "border"         => "1px solid #dee2e6",
         "borderRadius"   => "8px",
@@ -198,7 +164,6 @@ const    td_name_style = Dict(
     const td_value_style = Dict(
         "padding"      => "10px 16px",
         "textAlign"    => "right",
-        "fontFamily"   => "monospace",
         "background"   => "#f8f9fa",
         "borderBottom" => "1px solid #dee2e6",
         "borderRight"  => "1px solid #dee2e6",
@@ -217,7 +182,6 @@ const    td_name_style = Dict(
         "padding"      => "10px 16px",
         "fontWeight"   => "700",
         "textAlign"    => "right",
-        "fontFamily"   => "monospace",
         "background"   => "#e9ecef",
         "borderTop"    => "2px solid #4a90d9",
         "borderRight"  => "1px solid #dee2e6",
@@ -225,8 +189,8 @@ const    td_name_style = Dict(
 
 
 const th_style = Dict(
-        "background"     => "#4a90d9",
-        "color"          => "#fff",
+        "background"     => "#ffff",
+        "color"          => "#4a90d9",
         "fontWeight"     => "600",
         "padding"        => "10px 16px",
         "textAlign"      => "right",
@@ -238,7 +202,6 @@ const th_style = Dict(
 const td_style = Dict(
         "padding"      => "10px 16px",
         "textAlign"    => "left",
-        "fontFamily"   => "monospace",
         "background"   => "#f8f9fa",
         "borderBottom" => "1px solid #dee2e6",
         "borderLeft"   => "2px solid #dee2e6",
@@ -338,24 +301,22 @@ end
 
 
 function curve_component(solution::Static.Solution)
-    # Get the equilibrium interest rate from the solution
+    # Get the equilibrium values
     r_eq = solution.variables[:r]
     y_eq = solution.variables[:Y]
 
-    # Build a range of r values around the equilibrium
+    # Build a range of r values around the equilibrium for IS
     r_min = r_eq * 0.2
     r_max = r_eq * 3.0
     r_range = range(r_min, r_max; length = 200)
 
+    # Build a range of Y values around the equilibrium for IR
     y_min = y_eq * 0.2
     y_max = y_eq * 3.0
     y_range = range(y_min, y_max; length = 200)
 
-    # Evaluate IS and IM curves: for each r, substitute into the solved
-    # variables and compute the curve values
+    # IS curve: r → Y  (plot as x=r, y=IS(r))
     is_values = Float64[]
-    ir_values = Float64[]
-
     for r in r_range
         vars = copy(solution.variables)
         vars[:r] = r
@@ -363,18 +324,14 @@ function curve_component(solution::Static.Solution)
         push!(is_values, curves.IS)
     end
 
+    # IR curve: Y → r  (plot as x=IR(Y), y=Y so both axes match)
+    ir_r_values = Float64[]
     for y in y_range
         vars = copy(solution.variables)
         vars[:Y] = y
         curves = Static.eval_curve(solution.model, vars)
-        push!(ir_values, curves.IR)
+        push!(ir_r_values, curves.IR)
     end
-
-    # Equilibrium point
-    eq_vars  = copy(solution.variables)
-    eq_curves = Static.eval_curve(solution.model, eq_vars)
-    eq_y_is  = eq_curves.IS
-    eq_y_ir  = eq_curves.IR
 
     # ── Plotly traces ──
     is_trace = (
@@ -389,9 +346,10 @@ function curve_component(solution::Static.Solution)
         ),
     )
 
+    # IR: x = IR(Y) (the r values), y = Y
     ir_trace = (
-        x    = collect(y_range),
-        y    = ir_values,
+        x    = ir_r_values,
+        y    = collect(y_range),
         type = "scatter",
         mode = "lines",
         name = "IR",
@@ -403,7 +361,7 @@ function curve_component(solution::Static.Solution)
 
     eq_trace = (
         x    = [r_eq],
-        y    = [eq_y_is],
+        y    = [y_eq],
         type = "scatter",
         mode = "markers",
         name = "Equilibrium",
@@ -454,10 +412,10 @@ function curve_component(solution::Static.Solution)
         "annotations"   => [
             Dict(
                 "x"         => r_eq,
-                "y"         => eq_y_is,
+                "y"         => y_eq,
                 "xref"      => "x",
                 "yref"      => "y",
-                "text"      => "r* = $(round(r_eq; digits=4))",
+                "text"      => "r* = $(round(r_eq; digits=4)), Y* = $(round(y_eq; digits=2))",
                 "showarrow" => true,
                 "arrowhead" => 2,
                 "ax"        => 40,
@@ -515,24 +473,27 @@ function solution_component(solution::Static.Solution)
     end
 end
 
-# ── Callback 2: solve when the button is clicked ────────────────────────────
+# ── Callback 2: solve whenever params change OR model changes ────────────────
 callback!(
     app,
     Output("solution-output", "children"),
-    Input("solve-button", "n_clicks"),
-    State("model-dropdown", "value"),
-    State((type = "param-input", index = ALL), "value"),
+    Input("model-dropdown", "value"),
+    Input((type = "param-input", index = ALL), "value"),
     State("param-names-store", "data"),
-    prevent_initial_call=true,
-) do n_clicks, model_name, param_values, param_names
-    n_clicks == 0 && return ""
+) do model_name, param_values, param_names
+    # On initial load or when model just changed, param_names may be nothing
+    # or param_values may be empty — solve with defaults in that case
     p = MODEL_OPTIONS[model_name]
 
-    new_params = Dict(Symbol(k) => Float64(v) for (k, v) in zip(param_names, param_values))
-    updated_p = Static.Parametrization(p.model,  new_params, p.u0)
+    if !isnothing(param_names) && !isempty(param_values) && length(param_names) == length(param_values)
+        # Check that all values are valid numbers (not nothing/missing)
+        if all(v -> v isa Number, param_values)
+            new_params = Dict(Symbol(k) => Float64(v) for (k, v) in zip(param_names, param_values))
+            p = Static.Parametrization(p.model, new_params, p.u0)
+        end
+    end
 
-    sol = solve_model(updated_p)
-
+    sol = solve_model(p)
     solution_component(sol)
 end
 
