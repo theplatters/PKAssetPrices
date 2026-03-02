@@ -4,6 +4,7 @@ using Dash
 using ..Static
 
 include("styles.jl")
+include("views.jl")
 include("components.jl")
 include("app.jl")
 

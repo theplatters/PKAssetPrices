@@ -261,3 +261,13 @@ end
 function eval_curve(sol:: Solution)
     return sol.model.model.curve_eval(sol.variables, sol.model.params)
 end
+
+function eval_curve(sol::Solution,variable, iter_range, curve)
+  evaluated = Float64[]
+  vars = copy(sol.variables)
+  for item in iter_range
+      vars[variable] = item
+      push!(evaluated,sol.model.model.curve_eval(sol.variables, sol.model.params)[curve])
+  end
+  return evaluated
+end

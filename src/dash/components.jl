@@ -87,7 +87,86 @@ function balance_sheet_component(solution::Static.Solution)
     end
 end
 
-function curve_component(solution::Static.Solution)
+function curve_component(data, layout)
+    return html_div(
+        style = Dict(
+            "border" => "1px solid #dee2e6",
+            "borderRadius" => "12px",
+            "background" => "#fff",
+            "padding" => "16px",
+            "boxShadow" => "0 2px 12px rgba(0,0,0,0.06)",
+        ),
+    ) do
+        dcc_graph(
+            id = "is-ir-curve-plot",
+            figure = Dict(
+                "data" => data,
+                "layout" => layout,
+            ),
+            config = Dict(
+                "displayModeBar" => true,
+                "displaylogo" => false,
+                "modeBarButtonsToRemove" => ["lasso2d", "select2d"],
+            ),
+            style = Dict(
+                "width" => "100%",
+                "height" => "480px",
+            ),
+        )
+    end
+end
+
+function get_layout(; title, xaxis_title, yaxis_title, x_annotation, y_annotation, annotatation_text)
+    return Dict(
+        "title" => Dict(
+            "text" => title,
+            "font" => Dict(
+                "size" => 18,
+                "color" => "#2c3e50",
+                "family" => "'Segoe UI', Roboto, sans-serif",
+            ),
+        ),
+        "xaxis" => Dict(
+            "title" => xaxis_title,
+            "gridcolor" => "#e9ecef",
+            "zeroline" => false,
+        ),
+        "yaxis" => Dict(
+            "title" => yaxis_title,
+            "gridcolor" => "#e9ecef",
+            "zeroline" => false,
+        ),
+        "legend" => Dict(
+            "orientation" => "h",
+            "yanchor" => "bottom",
+            "y" => 1.02,
+            "xanchor" => "right",
+            "x" => 1,
+            "font" => Dict("size" => 13),
+        ),
+        "plot_bgcolor" => "#fafbfc",
+        "paper_bgcolor" => "#fff",
+        "margin" => Dict("l" => 60, "r" => 24, "t" => 60, "b" => 50),
+        "hovermode" => "x unified",
+        "annotations" => [
+            Dict(
+                "x" => x_annotation,
+                "y" => y_annotation,
+                "xref" => "x",
+                "yref" => "y",
+                "text" => annotatation_text,
+                "showarrow" => true,
+                "arrowhead" => 2,
+                "ax" => 40,
+                "ay" => -30,
+                "font" => Dict("size" => 12, "color" => "#2c3e50"),
+            ),
+        ],
+    )
+end
+
+
+function is_ir_component(solution::Static.Solution)
     # Get the equilibrium values
     r_eq = solution.variables[:r]
     y_eq = solution.variables[:Y]
@@ -165,86 +244,26 @@ function curve_component(solution::Static.Solution)
     )
 
     # ── Layout ──
-    layout = Dict(
-        "title" => Dict(
-            "text" => "IS – IR Curves",
-            "font" => Dict(
-                "size" => 18,
-                "color" => "#2c3e50",
-                "family" => "'Segoe UI', Roboto, sans-serif",
-            ),
-        ),
-        "xaxis" => Dict(
-            "title" => Dict("text" => "Interest rate (r)"),
-            "gridcolor" => "#e9ecef",
-            "zeroline" => false,
-        ),
-        "yaxis" => Dict(
-            "title" => Dict("text" => "Output (Y)"),
-            "gridcolor" => "#e9ecef",
-            "zeroline" => false,
-        ),
-        "legend" => Dict(
-            "orientation" => "h",
-            "yanchor" => "bottom",
-            "y" => 1.02,
-            "xanchor" => "right",
-            "x" => 1,
-            "font" => Dict("size" => 13),
-        ),
-        "plot_bgcolor" => "#fafbfc",
-        "paper_bgcolor" => "#fff",
-        "margin" => Dict("l" => 60, "r" => 24, "t" => 60, "b" => 50),
-        "hovermode" => "x unified",
-        "annotations" => [
-            Dict(
-                "x" => r_eq,
-                "y" => y_eq,
-                "xref" => "x",
-                "yref" => "y",
-                "text" => "r* = $(round(r_eq; digits = 4)), Y* = $(round(y_eq; digits = 2))",
-                "showarrow" => true,
-                "arrowhead" => 2,
-                "ax" => 40,
-                "ay" => -30,
-                "font" => Dict("size" => 12, "color" => "#2c3e50"),
-            ),
-        ],
+    layout = get_layout(
+        title = "IS – IR Curves",
+        xaxis_title = Dict("text" => "Interest rate (r)"),
+        yaxis_title = Dict("text" => "Output (Y)"),
+        x_annotation = r_eq,
+        y_annotation = y_eq,
+        annotatation_text = "r* = $(round(r_eq; digits = 4)),
+                        Y* = $(round(y_eq; digits = 2))"
     )
 
-    return html_div(
-        style = Dict(
-            "border" => "1px solid #dee2e6",
-            "borderRadius" => "12px",
-            "background" => "#fff",
-            "padding" => "16px",
-            "boxShadow" => "0 2px 12px rgba(0,0,0,0.06)",
-            "marginTop" => "24px",
-        ),
-    ) do
-        dcc_graph(
-            id = "is-ir-curve-plot",
-            figure = Dict(
-                "data" => [is_trace, ir_trace, eq_trace],
-                "layout" => layout,
-            ),
-            config = Dict(
-                "displayModeBar" => true,
-                "displaylogo" => false,
-                "modeBarButtonsToRemove" => ["lasso2d", "select2d"],
-            ),
-            style = Dict(
-                "width" => "100%",
-                "height" => "480px",
-            ),
-        )
-    end
+
+    return curve_component([is_trace, ir_trace, eq_trace], layout)
+
 end
 
 function ad_as_curve_component(solution::Static.Solution)
     # Get the equilibrium values
     AP_eq = solution.variables[:AP]
     AS_eq = solution.variables[:AS]
+    AD_eq = solution.variables[:AS]
 
     # Build a range of r values around the equilibrium for IS
     AP_min = AP_eq * 0.2
@@ -291,7 +310,7 @@ function ad_as_curve_component(solution::Static.Solution)
     )
 
     eq_trace = (
-        x = [AS_eq],
+        x = [AP_eq * AS_eq],
         y = [AP_eq],
         type = "scatter",
         mode = "markers",
@@ -309,80 +328,18 @@ function ad_as_curve_component(solution::Static.Solution)
     )
 
     # ── Layout ──
-    layout = Dict(
-        "title" => Dict(
-            "text" => "AmS – AmD Curves",
-            "font" => Dict(
-                "size" => 18,
-                "color" => "#2c3e50",
-                "family" => "'Segoe UI', Roboto, sans-serif",
-            ),
-        ),
-        "xaxis" => Dict(
-            "title" => Dict("text" => "Quantity"),
-            "gridcolor" => "#e9ecef",
-            "zeroline" => false,
-        ),
-        "yaxis" => Dict(
-            "title" => Dict("text" => "Asset price (AP"),
-            "gridcolor" => "#e9ecef",
-            "zeroline" => false,
-        ),
-        "legend" => Dict(
-            "orientation" => "h",
-            "yanchor" => "bottom",
-            "y" => 1.02,
-            "xanchor" => "right",
-            "x" => 1,
-            "font" => Dict("size" => 13),
-        ),
-        "plot_bgcolor" => "#fafbfc",
-        "paper_bgcolor" => "#fff",
-        "margin" => Dict("l" => 60, "r" => 24, "t" => 60, "b" => 50),
-        "hovermode" => "x unified",
-        "annotations" => [
-            Dict(
-                "x" => AS_eq,
-                "y" => AP_eq,
-                "xref" => "x",
-                "yref" => "y",
-                "text" => "",
-                "showarrow" => true,
-                "arrowhead" => 2,
-                "ax" => 40,
-                "ay" => -30,
-                "font" => Dict("size" => 12, "color" => "#2c3e50"),
-            ),
-        ],
+    layout = get_layout(
+        title = "AmS – AmD Curves",
+        xaxis_title = Dict("text" => "Quantity"),
+        yaxis_title = Dict("text" => "Asset price (AP"),
+        x_annotation = AP_eq * AS_eq,
+        y_annotation = AP_eq,
+        annotatation_text = "Q* = $(round(AS_eq; digits = 4)),
+                        AP* = $(round(AP_eq; digits = 2))"
     )
 
-    return html_div(
-        style = Dict(
-            "border" => "1px solid #dee2e6",
-            "borderRadius" => "12px",
-            "background" => "#fff",
-            "padding" => "16px",
-            "boxShadow" => "0 2px 12px rgba(0,0,0,0.06)",
-            "marginTop" => "24px",
-        ),
-    ) do
-        dcc_graph(
-            id = "is-ir-curve-plot",
-            figure = Dict(
-                "data" => [ad_trace, as_trace, eq_trace],
-                "layout" => layout,
-            ),
-            config = Dict(
-                "displayModeBar" => true,
-                "displaylogo" => false,
-                "modeBarButtonsToRemove" => ["lasso2d", "select2d"],
-            ),
-            style = Dict(
-                "width" => "100%",
-                "height" => "480px",
-            ),
-        )
-    end
+
+    return curve_component([ad_trace, as_trace, eq_trace], layout)
 end
 
 function solution_component(solution::Static.Solution)
@@ -398,8 +355,236 @@ function solution_component(solution::Static.Solution)
             ) do
                 variable_component(solution),
                 balance_sheet_component(solution),
-                curve_component(solution),
+                is_ir_component(solution),
                 ad_as_curve_component(solution)
         end
     end
 end
+
+function model_column(model_options, idx::Int)
+    html_div(
+        id = (type = "cmp-col", index = idx),
+        style = Dict(
+            "background"    => "#fff",
+            "borderRadius"  => "12px",
+            "padding"       => "20px",
+            "boxShadow"     => "0 2px 12px rgba(0,0,0,0.08)",
+            "minWidth"      => "280px",
+            "flex"          => "1 1 0",
+        ),
+    ) do
+        html_h3(
+            "Model $idx",
+            style = Dict(
+                "color"        => "#4a90d9",
+                "fontWeight"   => "600",
+                "marginBottom" => "12px",
+            ),
+        ),
+        html_label(
+            "Model",
+            style = Dict(
+                "fontWeight"      => "600",
+                "fontSize"        => "13px",
+                "color"           => "#6c757d",
+                "textTransform"   => "uppercase",
+                "letterSpacing"   => "0.8px",
+                "marginBottom"    => "6px",
+                "display"         => "block",
+            ),
+        ),
+        dcc_dropdown(
+            id = (type = "cmp-model-dropdown", index = idx),
+            options = [(label = k, value = k) for k in keys(model_options)],
+            value = first(keys(model_options)),
+            style = Dict("marginBottom" => "16px"),
+        ),
+        html_div(id = (type = "cmp-param-container", index = idx)),
+        dcc_store(
+            id = (type = "cmp-param-names-store", index = idx),
+            data = [],
+        )
+    end
+end
+
+function add_model_button()
+    html_div(
+        style = Dict(
+            "display"        => "flex",
+            "alignItems"     => "center",
+            "justifyContent" => "center",
+            "minWidth"       => "64px",
+        ),
+    ) do
+        html_button(
+            "+",
+            id = "cmp-add-model-btn",
+            n_clicks = 0,
+            style = Dict(
+                "width"        => "48px",
+                "height"       => "48px",
+                "borderRadius" => "50%",
+                "border"       => "2px dashed #4a90d9",
+                "background"   => "transparent",
+                "color"        => "#4a90d9",
+                "fontSize"     => "24px",
+                "fontWeight"   => "700",
+                "cursor"       => "pointer",
+                "transition"   => "all 0.2s",
+            ),
+        )
+    end
+end
+
+function curves_grid(solutions, labels)
+    n = length(solutions)
+
+    cards = map(1:n) do i
+        sol   = solutions[i]
+        label = labels[i]
+
+        html_div(
+            style = Dict(
+                "background"   => "#fff",
+                "borderRadius" => "12px",
+                "padding"      => "16px",
+                "boxShadow"    => "0 2px 8px rgba(0,0,0,0.06)",
+            ),
+        ) do
+            html_h4(
+                label,
+                style = Dict(
+                    "color"        => "#4a90d9",
+                    "fontWeight"   => "600",
+                    "marginBottom" => "12px",
+                    "textAlign"    => "center",
+                ),
+            ),
+            is_ir_component(sol),
+            ad_as_curve_component(sol)
+        end
+    end
+
+    html_div(
+        style = Dict(
+            "display"             => "grid",
+            "gridTemplateColumns" => "repeat($n, 1fr)",
+            "gap"                 => "20px",
+        ),
+    ) do
+        cards
+    end
+end
+
+# ── Balance-sheet comparison table ───────────────────────────────────
+
+function balance_sheet_comparison_table(solutions, labels)
+
+    html_div(
+        style = Dict("overflowX" => "auto"),
+    ) do
+        html_table(
+            style = Dict(
+                "width"          => "100%",
+                "borderCollapse" => "collapse",
+                "fontSize"       => "14px",
+            ),
+        ) do
+        end
+    end
+end
+
+# ── Variable comparison table ────────────────────────────────────────
+
+function variable_comparison_table(solutions, labels)
+    # Collect the union of all variable names
+    all_vars = unique(vcat([collect(keys(sol.variables)) for sol in solutions]...))
+    sort!(all_vars)
+
+    header = vcat(
+        [html_th("Variable", style = th_style)],
+        [html_th(lbl, style = th_style) for lbl in labels],
+    )
+
+    rows = map(all_vars) do var
+        cells = vcat(
+            [html_td(string(var), style = td_style)],
+            [
+                html_td(
+                    haskey(sol.variables, var) ? round(sol.variables[var]; digits = 4) : "—",
+                    style = td_style,
+                )
+                for sol in solutions
+            ],
+        )
+        html_tr(cells)
+    end
+
+    html_div(
+        style = Dict("overflowX" => "auto"),
+    ) do
+        html_table(
+            style = Dict(
+                "width"          => "100%",
+                "borderCollapse" => "collapse",
+                "fontSize"       => "14px",
+            ),
+        ) do
+            html_thead(html_tr(header)),
+            html_tbody(rows)
+        end
+    end
+end
+
+
+
+"""
+Build the full comparison output: variable table, balance-sheet table,
+and a grid of IS-LM / AD-AS curve plots.
+"""
+function comparison_results(solutions, labels)
+    html_div() do
+        # ── Section 1: Variable comparison table ──
+        html_h2(
+            "Variables Comparison",
+            style = Dict(
+                "color"        => "#2c3e50",
+                "fontWeight"   => "600",
+                "marginBottom" => "12px",
+            ),
+        ),
+        variable_comparison_table(solutions, labels),
+
+        html_hr(style = Dict("border" => "none", "borderTop" => "1px solid #dee2e6", "margin" => "24px 0")),
+
+        # ── Section 2: Balance-sheet comparison table ──
+        html_h2(
+            "Balance Sheets Comparison",
+            style = Dict(
+                "color"        => "#2c3e50",
+                "fontWeight"   => "600",
+                "marginBottom" => "12px",
+            ),
+        ),
+        balance_sheet_comparison_table(solutions, labels),
+
+        html_hr(style = Dict("border" => "none", "borderTop" => "1px solid #dee2e6", "margin" => "24px 0")),
+
+        # ── Section 3: IS-LM & AD-AS curve grid ──
+        html_h2(
+            "IS-LM & AD-AS Curves",
+            style = Dict(
+                "color"        => "#2c3e50",
+                "fontWeight"   => "600",
+                "marginBottom" => "12px",
+            ),
+        ),
+        curves_grid(solutions, labels)
+    end
+end
+
+
+
+
+
+
