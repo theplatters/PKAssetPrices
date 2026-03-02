@@ -78,6 +78,7 @@ function balance_sheet_component(solution::Static.Solution)
         style = Dict(
             "display" => "flex",
             "flexWrap" => "wrap",
+            "flex-direction" => "column",
             "flex" => 2,
             "gap" => "16px",
             "alignItems" => "flex-start",
@@ -483,13 +484,15 @@ function balance_sheet_comparison_table(solutions, labels)
     html_div(
         style = Dict("overflowX" => "auto"),
     ) do
-        html_table(
+        html_div(
             style = Dict(
                 "width"          => "100%",
                 "borderCollapse" => "collapse",
                 "fontSize"       => "14px",
+                "display" => "flex",
             ),
         ) do
+          [balance_sheet_component(sol) for sol in solutions] 
         end
     end
 end

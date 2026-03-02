@@ -96,6 +96,4 @@ function comparisons(model_options)
     end
 end
 
-#  Register comparison callbacks
-# ─────────────────────────────────────────────────────────────────────
 
