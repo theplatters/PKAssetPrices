@@ -584,7 +584,8 @@ AssetPKPQCr = @model begin
 
 end
 
-# here we try different interest rates as dicussed.
+# here we try different interest rates as dicussed. this does roughly what it should, the net effect is quite small. also it is not that stable.
+
 AssetPKPQCrDIFF = @model begin
 
     @variables  begin
@@ -615,7 +616,7 @@ AssetPKPQCrDIFF = @model begin
         d1 = 8.0, "max discretonary credit demand when r=0"
         i0 = 0.01, "autonomous policy rate"
         i1 = 0.05, "inflation infuced policy rate"
-        iAP = 2; "Penalty for financing speculative assets"
+        iAP = 2, "Penalty for financing speculative assets"
         m = 0.15, "bank markup"
         k = 0.3, "reserve share"
         n = 0.15, "firm markup"
