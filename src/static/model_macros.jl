@@ -277,7 +277,7 @@ function sort_equations_by_variables!(equations::Vector{Equation}, variables::Ve
 end
 
 
-function solve_model(model::Parametrization)
+function solve_model(model::Parametrization)::Static.Solution
     nulls! = model.model.nulls
     p = (; model.params...)   # OrderedDict/Dic -> NamedTuple
     prob = NonlinearProblem(nulls!, model.u0, p)
@@ -439,19 +439,19 @@ function generate_curve_eval(curves, variables, parameters)
     param_syms = collect(keys(parameters))
 
     isempty(curves) && return quote
-        function (u::AbstractDict{Symbol,<:Real}, p)
+        function (u::AbstractDict{Symbol, <:Real}, p)
             return nothing
         end
     end
 
     # Pull variables out of the dict: S = u[:S], I = u[:I], ...
-    var_assigns = [:( $(v) = u[$(QuoteNode(v))] ) for v in variables]
+    var_assigns = [:($(v) = u[$(QuoteNode(v))]) for v in variables]
 
     assigns = [:($(c.name) = $(c.body)) for c in curves]
-    fields  = [:($(c.name) = $(c.name)) for c in curves]
+    fields = [:($(c.name) = $(c.name)) for c in curves]
 
     return quote
-        function (u::AbstractDict{Symbol,<:Real}, p)
+        function (u::AbstractDict{Symbol, <:Real}, p)
             (; $(param_syms...)) = NamedTuple(p)
             $(var_assigns...)
             $(assigns...)

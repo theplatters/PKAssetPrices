@@ -1,7 +1,7 @@
 module PKAssetPrices
 
 
-export Dynamic, Static, Dashboard
+export Dashboard, Dynamic, Static
 export solve_model
 
 function solve_model() end
