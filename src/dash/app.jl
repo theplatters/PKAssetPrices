@@ -1,4 +1,14 @@
+const SOLVE_CACHE = Dict{UInt, Solution}()
+const COMPONENT_CACHE = Dict{UInt, Dash.Component}()
+
+
 function get_app(model_options::Dict{String, Static.Parametrization})
+
+    @async for p in values(model_options)
+        solve_cached(p)
+    end
+
+
     app = dash(
         suppress_callback_exceptions = true,
     )
@@ -21,6 +31,20 @@ function get_app(model_options::Dict{String, Static.Parametrization})
 
     return app
 
+end
+
+function solve_cached(p::Static.Parametrization)
+    key = hash((p.model.equations, p.params, p.u0))
+    return get!(SOLVE_CACHE, key) do
+        Static.solve_model(p)
+    end
+end
+
+function get_param_input(param_names, params)
+    key = hash(param_names)
+    return get!(COMPONENT_CACHE, key) do
+        param_inputs(param_names, params)
+    end
 end
 
 
@@ -46,10 +70,12 @@ function register_comparison_callbacks!(app, model_options)
         app,
         Output((type = "cmp-param-container", index = MATCH), "children"),
         Input((type = "cmp-model-dropdown", index = MATCH), "value"),
-    ) do model_name
+        State((type = "cmp-model-dropdown", index = MATCH), "id"),
+        State("param-names-store", "data"),
+    ) do model_name, model_id, param_names
         isnothing(model_name) && return ([], [])
         model = model_options[model_name]
-        params = model.params
+        params = param_names[model_name]
 
         param_inputs = html_div(
             style = Dict(
@@ -78,14 +104,14 @@ function register_comparison_callbacks!(app, model_options)
                             ),
                         ),
                         dcc_input(
-                            id = (type = "cmp-param-input", index = "$pname"),
+                            id = (type = "cmp-param-input", model = model_id["index"], index = "$pname"),
                             type = "number",
-                            value = pval,
+                            value = model.params[Symbol(pname)],
                             debounce = true,
                             style = dcc_input_style,
                         )
                 end
-                    for (pname, pval) in params
+                    for pname in params
             ]
         end
 
@@ -96,14 +122,21 @@ function register_comparison_callbacks!(app, model_options)
     callback!(
         app,
         Output("cmp-results-output", "children"),
+        Input((type = "cmp-param-container", index = ALL), "children"),
         Input((type = "cmp-model-dropdown", index = ALL), "value"),
-        Input((type = "cmp-param-input", index = ALL), "value"),
-        State((type = "param-names-store", index = ALL), "data"),
+        Input((type = "cmp-param-input", model = ALL, index = ALL), "value"),
+        State((type = "cmp-param-input", model = ALL, index = ALL), "id"),
+        State("param-names-store", "data"),
         State("cmp-num-models", "data"),
-    ) do model_names, all_param_values, all_param_names, num_models
+    ) do _, model_names, all_param_values, all_param_ids, all_param_names, num_models
         # ── Solve each model ──
         solutions = []
         labels = String[]
+
+        new_params = [copy(model_options[mname].params) for mname in model_names]
+        for (id, val) in zip(all_param_ids, all_param_values)
+            new_params[id.model][Symbol(id.index)] = val
+        end
 
         for i in 1:num_models
             mname = model_names[i]
@@ -114,16 +147,10 @@ function register_comparison_callbacks!(app, model_options)
             # Slice the flat param values for this column
             # (Each column's MATCH params are grouped by index order)
             if !isnothing(pnames) && !isempty(pnames)
-                n_params = length(pnames)
-                offset = sum(length.(all_param_names[1:(i - 1)])) + 1
-                pvals = all_param_values[offset:(offset + n_params - 1)]
-                if length(pvals) == n_params && all(v -> v isa Number, pvals)
-                    new_params = Dict(Symbol(k) => Float64(v) for (k, v) in zip(pnames, pvals))
-                    p = Static.Parametrization(p.model, new_params, p.u0)
-                end
+                p = Static.Parametrization(p.model, new_params[i], p.u0)
             end
 
-            sol = Static.solve_model(p)
+            sol = solve_cached(p)
             push!(solutions, sol)
             push!(labels, "$mname (#$i)")
         end
@@ -138,8 +165,6 @@ end
 
 
 function register_callbacks!(app, model_options)
-
-
     callback!(
         app,
         Output("tabs-content", "children"),
@@ -161,50 +186,9 @@ function register_callbacks!(app, model_options)
         model = model_options[model_name]
         param_names = param_names_store[model_name]
         params = model.params
-        @info params
-        @info model_name
 
 
-        param_inputs = html_div(
-            style = Dict(
-                "display" => "grid",
-                "gridTemplateColumns" => "repeat(auto-fill, minmax(200px, 1fr))",
-                "gap" => "16px",
-                "padding" => "8px 0 20px 0",
-            ),
-        ) do
-            [
-                html_div(
-                        style = Dict(
-                            "display" => "flex",
-                            "flexDirection" => "column",
-                            "gap" => "4px",
-                        ),
-                    ) do
-                        html_label(
-                            "$pname",
-                            style = Dict(
-                                "fontWeight" => "600",
-                                "fontSize" => "12px",
-                                "color" => "#6c757d",
-                                "textTransform" => "uppercase",
-                                "letterSpacing" => "0.6px",
-                            ),
-                        ),
-                        dcc_input(
-                            id = (type = "param-input", index = pname),
-                            type = "number",
-                            value = params[Symbol(pname)],
-                            debounce = true,
-                            style = dcc_input_style
-                        )
-                end
-                    for pname in param_names
-            ]
-        end
-
-
-        return vcat(param_inputs)
+        return vcat(get_param_input(param_names, params))
     end
 
 
@@ -213,8 +197,9 @@ function register_callbacks!(app, model_options)
         Output("solution-output", "children"),
         Input("model-dropdown", "value"),
         Input((type = "param-input", index = ALL), "value"),
+        Input("param-container", "children"),  # ensures ordering
         State("param-names-store", "data"),
-    ) do model_name, param_values, param_names_store
+    ) do model_name, param_values, _, param_names_store
         # On initial load or when model just changed, param_names may be nothing
         # or param_values may be empty — solve with defaults in that case
         p = model_options[model_name]
@@ -229,8 +214,7 @@ function register_callbacks!(app, model_options)
             end
         end
 
-        sol::Static.Solution = Static.solve_model(p)
-        solution_component(sol)
+        solve_cached(p) |> solution_component
     end
 
     register_comparison_callbacks!(app, model_options)

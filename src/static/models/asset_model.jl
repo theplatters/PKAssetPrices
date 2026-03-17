@@ -1,4 +1,4 @@
-# AP influences AS 
+# AP influences AS
 AssetPKPQ = @model begin
 
     @variables  begin
@@ -60,7 +60,7 @@ AssetPKPQ = @model begin
         SD == s0 - s1 * r
         AD == γ0 + (1 / (1 - γ)) * SD / AP
         AP == p1 * (AD / AS)
-        AS ==  AQ * (α + gₐ)
+        AS == AQ * (α + gₐ)
     end
 
     @curves begin
@@ -157,7 +157,7 @@ AssetPKPQA = @model begin
         SD == s0 - s1 * r
         AD == γ0 + (1 / (1 - γ)) * SD / AP
         AP == p1 * (AD / AS)
-        AS ==  AQ * (α + gₐ)
+        AS == AQ * (α + gₐ)
         α == α₀ / 2 * (1 + AP)
     end
 
@@ -257,7 +257,7 @@ AssetPKPQC = @model begin
         SD == s0 - s1 * r
         AD == γ0 + (1 / (1 - γ)) * SD / AP
         AP == p1 * (AD / AS)
-        AS ==  AQ * (α + gₐ)
+        AS == AQ * (α + gₐ)
         c == c₀ - c₁ * SD
     end
 
@@ -358,13 +358,56 @@ AssetPKPQCr = @model begin
         SD == s0 - s1 * r
         AD == γ0 + (1 / (1 - γ)) * SD / AP
         AP == p1 * (AD / AS)
-        AS ==  AQ * (α + gₐ)
+        AS == AQ * (α + gₐ)
         c == c₀ - c₁ * SD
     end
 
     @curves begin
-        IS(r, c) = (1 / (1 - b)) * (c * (d0 - d1 * r))
-        IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
+        IS(r) = 1 / (1 - b) * (d0 - d1 * r) * (c₀ - c₁ * s0 + c₁ * s1 * r)
+        IR(Y) = 1 / (2 * AQ * Nᶠ * (gₐ + α) * (-1 + γ)) * (
+            2 * AQ * (1 + m) * (
+                i0 * Nᶠ +
+                    a * i1 * (1 + n) * (-h * Nᶠ + Nᶠ * W0 + a * h * Y)
+            ) * (gₐ + α) * (-1 + γ)
+                +
+                i2 * (1 + m) * Nᶠ * p1 * (
+                i2 * (1 + m) * s1 + (-1 + γ) * γ0
+            )
+                -
+                sqrt(
+                (
+                    i2^2 * (1 + m)^2 * Nᶠ * p1 * (
+                        -4 * AQ * (
+                            Nᶠ * (
+                                s0 - (1 + m) * s1 * (i0 - a * i1 * (1 + n) * (h - W0))
+                            )
+                                - a^2 * h * i1 * (1 + m) * (1 + n) * s1 * Y
+                        ) * (gₐ + α) * (-1 + γ)
+                            +
+                            Nᶠ * p1 * (
+                            i2 * (1 + m) * s1 + (-1 + γ) * γ0
+                        )^2
+                    )
+                ) / (-1 + γ)^2
+            )
+                +
+                γ * sqrt(
+                (
+                    i2^2 * (1 + m)^2 * Nᶠ * p1 * (
+                        -4 * AQ * (
+                            Nᶠ * (
+                                s0 - (1 + m) * s1 * (i0 - a * i1 * (1 + n) * (h - W0))
+                            )
+                                - a^2 * h * i1 * (1 + m) * (1 + n) * s1 * Y
+                        ) * (gₐ + α) * (-1 + γ)
+                            +
+                            Nᶠ * p1 * (
+                            i2 * (1 + m) * s1 + (-1 + γ) * γ0
+                        )^2
+                    )
+                ) / (-1 + γ)^2
+            )
+        )
         AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
         AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
         AMS(AP) = AQ * (gₐ + α)
@@ -459,7 +502,7 @@ AssetPKPQCrDIFF = @model begin
         SD == s0 - s1 * r * iAP
         AD == γ0 + (1 / (1 - γ)) * SD / AP
         AP == p1 * (AD / AS)
-        AS ==  AQ * (α + gₐ)
+        AS == AQ * (α + gₐ)
         c == c₀ - c₁ * SD
     end
 
