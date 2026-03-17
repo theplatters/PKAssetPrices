@@ -2,7 +2,7 @@
 
 function show(io::IO, m::Model{F, C}) where {F <: Function, C <: Function}
     payload = displaysize(io)[2] >= 80 ?
-        [["$var: $(m.variable_descritpions[var])" for var in m.variables], ["$parameter: $(m.parameter_descritpions[parameter])" for parameter in m.parameters], string.(m.equations)] :
+        [["$var: $(m.variable_descriptions[var])" for var in m.variables], ["$parameter: $(m.parameter_descriptions[parameter])" for parameter in m.parameters], string.(m.equations)] :
         [m.variables, m.parameters, string.(m.equations)]
     column_labels = [["Variables", "Parameters", "Equations"], "Amount: " .* string.(length.([m.variables, m.parameters, m.equations]))]
     max_len = length.([m.variables, m.parameters, m.equations]) |> maximum
@@ -258,16 +258,16 @@ function eval_curve(param::Parametrization, input::Dict{Symbol, Float64})
     return param.model.curve_eval(input, param.params)
 end
 
-function eval_curve(sol:: Solution)
+function eval_curve(sol::Solution)
     return sol.model.model.curve_eval(sol.variables, sol.model.params)
 end
 
-function eval_curve(sol::Solution,variable, iter_range, curve)
-  evaluated = Float64[]
-  vars = copy(sol.variables)
-  for item in iter_range
-      vars[variable] = item
-      push!(evaluated,sol.model.model.curve_eval(sol.variables, sol.model.params)[curve])
-  end
-  return evaluated
+function eval_curve(sol::Solution, variable, iter_range, curve)
+    evaluated = Float64[]
+    vars = copy(sol.variables)
+    for item in iter_range
+        vars[variable] = item
+        push!(evaluated, sol.model.model.curve_eval(sol.variables, sol.model.params)[curve])
+    end
+    return evaluated
 end

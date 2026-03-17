@@ -34,8 +34,8 @@ end
 struct Model{F <: Function, C <: Function} <: AbstractModel
     variables::Vector{Symbol}
     parameters::Vector{Symbol}
-    variable_descritpions::Dict{Symbol, String}
-    parameter_descritpions::Dict{Symbol, String}
+    variable_descriptions::Dict{Symbol, String}
+    parameter_descriptions::Dict{Symbol, String}
     equations::Vector{Equation}
     curves::Vector{Curve}
     curve_eval::C

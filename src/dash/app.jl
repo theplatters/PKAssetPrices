@@ -40,13 +40,6 @@ function solve_cached(p::Static.Parametrization)
     end
 end
 
-function get_param_input(param_names, params)
-    key = hash(param_names)
-    return get!(COMPONENT_CACHE, key) do
-        param_inputs(param_names, params)
-    end
-end
-
 
 function register_comparison_callbacks!(app, model_options)
     # ── 1. Add-model button: increase counter & re-render columns ──
@@ -72,50 +65,19 @@ function register_comparison_callbacks!(app, model_options)
         Input((type = "cmp-model-dropdown", index = MATCH), "value"),
         State((type = "cmp-model-dropdown", index = MATCH), "id"),
         State("param-names-store", "data"),
-    ) do model_name, model_id, param_names
+    ) do model_name, model_id, param_names_all
         isnothing(model_name) && return ([], [])
         model = model_options[model_name]
-        params = param_names[model_name]
+        params = model.params
+        param_names = param_names_all[model_name]
 
-        param_inputs = html_div(
-            style = Dict(
-                "display" => "grid",
-                "gridTemplateColumns" => "repeat(auto-fill, minmax(160px, 1fr))",
-                "gap" => "12px",
-                "padding" => "8px 0 12px 0",
-            ),
-        ) do
-            [
-                html_div(
-                        style = Dict(
-                            "display" => "flex",
-                            "flexDirection" => "column",
-                            "gap" => "4px",
-                        ),
-                    ) do
-                        html_label(
-                            "$pname",
-                            style = Dict(
-                                "fontWeight" => "600",
-                                "fontSize" => "12px",
-                                "color" => "#6c757d",
-                                "textTransform" => "uppercase",
-                                "letterSpacing" => "0.6px",
-                            ),
-                        ),
-                        dcc_input(
-                            id = (type = "cmp-param-input", model = model_id["index"], index = "$pname"),
-                            type = "number",
-                            value = model.params[Symbol(pname)],
-                            debounce = true,
-                            style = dcc_input_style,
-                        )
-                end
-                    for pname in params
-            ]
-        end
 
-        return (param_inputs)
+        param_inputs(
+            param_names,
+            params,
+            model.model.parameter_descriptions,
+            id = pname -> (type = "cmp-param-input", model = model_id["index"], index = "$pname")
+        )
     end
 
     # ── 3. Master solve callback: collect ALL model selections + params → render tables & graphs ──
@@ -188,7 +150,7 @@ function register_callbacks!(app, model_options)
         params = model.params
 
 
-        return vcat(get_param_input(param_names, params))
+        return vcat(get_param_input(param_names, params, model.model.parameter_descriptions))
     end
 
 

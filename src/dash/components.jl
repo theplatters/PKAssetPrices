@@ -13,7 +13,7 @@ function variable_component(solution::Static.Solution)
                 [
                     html_tr(
                             [
-                                html_th(var_name, style = th_style),
+                                html_th(var_name, style = th_style, title = solution.model.model.variable_descriptions[var_name]),
                                 html_td(
                                     string(round(solution.variables[var_name]; digits = 6)),
                                     style = td_style,
@@ -343,7 +343,8 @@ function ad_as_curve_component(solution::Static.Solution)
     return curve_component([ad_trace, as_trace, eq_trace], layout)
 end
 
-function param_inputs(param_names, params)
+
+function param_inputs(param_names, params, param_descriptions; id = pname -> (type = "param-input", index = pname))
     return html_div(
         style = Dict(
             "display" => "grid",
@@ -354,6 +355,7 @@ function param_inputs(param_names, params)
     ) do
         [
             html_div(
+                    title = param_descriptions[Symbol(pname)],
                     style = Dict(
                         "display" => "flex",
                         "flexDirection" => "column",
@@ -371,7 +373,7 @@ function param_inputs(param_names, params)
                         ),
                     ),
                     dcc_input(
-                        id = (type = "param-input", index = pname),
+                        id = id(pname),
                         type = "number",
                         value = params[Symbol(pname)],
                         debounce = true,
@@ -380,6 +382,13 @@ function param_inputs(param_names, params)
             end
                 for pname in param_names
         ]
+    end
+end
+
+function get_param_input(param_names, params, param_descriptions)
+    key = hash(param_names)
+    return get!(COMPONENT_CACHE, key) do
+        param_inputs(param_names, params, param_descriptions)
     end
 end
 
@@ -543,6 +552,7 @@ end
 function variable_comparison_table(solutions, labels)
     # Collect the union of all variable names
     all_vars = unique(vcat([collect(keys(sol.variables)) for sol in solutions]...))
+    all_var_descriptions = merge([sol.model.model.variable_descriptions for sol in solutions]...)
     sort!(all_vars)
 
     header = vcat(
@@ -561,7 +571,7 @@ function variable_comparison_table(solutions, labels)
                     for sol in solutions
             ],
         )
-        html_tr(cells)
+        html_tr(cells, title = all_var_descriptions[var])
     end
 
     return html_div(
