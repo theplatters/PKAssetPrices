@@ -264,7 +264,7 @@ function ad_as_curve_component(solution::Static.Solution)
     # Get the equilibrium values
     AP_eq = solution.variables[:AP]
     AS_eq = solution.variables[:AS]
-    AD_eq = solution.variables[:AS]
+    AD_eq = solution.variables[:AD]
 
     # Build a range of r values around the equilibrium for IS
     AP_min = AP_eq * 0.2
@@ -311,7 +311,7 @@ function ad_as_curve_component(solution::Static.Solution)
     )
 
     eq_trace = (
-        x = [AP_eq * AS_eq],
+        x = [AD_eq / AP_eq],
         y = [AP_eq],
         type = "scatter",
         mode = "markers",
