@@ -333,7 +333,7 @@ function ad_as_curve_component(solution::Static.Solution)
         title = "AmS – AmD Curves",
         xaxis_title = Dict("text" => "Quantity"),
         yaxis_title = Dict("text" => "Asset price (AP"),
-        x_annotation = AP_eq * AS_eq,
+        x_annotation = AS_eq / AD_eq,
         y_annotation = AP_eq,
         annotatation_text = "Q* = $(round(AS_eq; digits = 4)),
                         AP* = $(round(AP_eq; digits = 2))"
