@@ -150,7 +150,7 @@ function register_callbacks!(app, model_options)
         params = model.params
 
 
-        return vcat(get_param_input(param_names, params, model.model.parameter_descriptions))
+        return get_param_input(param_names, params, model.model.parameter_descriptions)
     end
 
 
