@@ -399,9 +399,8 @@ function solution_component(solution::Static.Solution)
             html_div(
                 style = Dict(
                     "display" => "flex",
-                    "flexWrap" => "wrap",
+                    "flex-wrap" => "wrap",
                     "gap" => "16px",
-                    "alignItems" => "flex-start",
                 ),
             ) do
                 variable_component(solution),

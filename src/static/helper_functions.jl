@@ -271,3 +271,29 @@ function eval_curve(sol::Solution, variable, iter_range, curve)
     end
     return evaluated
 end
+
+
+function bar_chart(sols::OrderedDict{String, Solution}, variables::Vector{Symbol})
+    colors = Makie.wong_colors()
+    sol_values = (
+        key => [getproperty(sol, variable) / getproperty(first(values(sols)), variable) for variable in variables] for (key, sol) in sols
+    )
+    labels = map(first, sol_values)
+    value_raw = map(last, sol_values) |> Base.Fix1(reduce, vcat)
+
+    bar_positions = reduce(vcat, [fill(0, length(variables)) .+ i for i in 1:length(labels)])
+
+
+    fig = Figure()
+    ax = Axis(fig[1, 1], xticks = (1:length(labels), labels))
+    grouping = repeat(1:length(variables), length(labels))
+    barplot!(ax, bar_positions, value_raw, dodge = grouping, color = [colors[i] for i in grouping])
+
+    elements = [PolyElement(color = colors[i]) for i in 1:length(variables)]
+    title = "Groups"
+
+    Legend(fig[1, 2], elements, String.(variables), title)
+
+    return fig
+end
+

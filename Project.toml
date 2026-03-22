@@ -4,9 +4,9 @@ version = "0.1.0"
 authors = ["theplatters <fscharnreitner@gmail.com>"]
 
 [deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 Dash = "1b08a953-4be3-4667-9a23-3db579824955"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 NonlinearSolve = "8913a72c-1f9b-4ce2-8d82-65094dcecaec"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
@@ -17,9 +17,9 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 WGLMakie = "276b4fcb-3e11-5398-bf8b-a0c2d153d008"
 
 [compat]
+CairoMakie = "0.15.8"
 Dash = "1.5.0"
 DataFrames = "1.8.1"
-GLMakie = "0.13.8"
 MacroTools = "0.5.16"
 NonlinearSolve = "4.12.0"
 OrderedCollections = "1.8.1"
