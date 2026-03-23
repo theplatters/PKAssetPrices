@@ -88,6 +88,7 @@ function balance_sheet_component(solution::Static.Solution)
     end
 end
 
+
 function curve_component(data, layout)
     return html_div(
         style = Dict(

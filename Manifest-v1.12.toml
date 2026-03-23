@@ -1668,7 +1668,7 @@ weakdeps = ["StatsBase"]
     StatsBaseExt = "StatsBase"
 
 [[deps.PKAssetPrices]]
-deps = ["Dash", "DataFrames", "MacroTools", "NonlinearSolve", "OrderedCollections", "Plots", "Pluto", "PrettyTables", "StaticArrays", "WGLMakie"]
+deps = ["CairoMakie", "Dash", "DataFrames", "MacroTools", "NonlinearSolve", "OrderedCollections", "Plots", "Pluto", "PrettyTables", "StaticArrays", "WGLMakie"]
 path = "."
 uuid = "5fa4aa55-4e4c-4901-99b7-08200d3ce2d7"
 version = "0.1.0"

@@ -297,3 +297,159 @@ function bar_chart(sols::OrderedDict{String, Solution}, variables::Vector{Symbol
     return fig
 end
 
+function is_ir_component(solution::Static.Solution)
+    r_eq = solution.variables[:r]
+    y_eq = solution.variables[:Y]
+
+    r_min = r_eq * 0.2
+    r_max = r_eq * 3.0
+    r_range = range(r_min, r_max; length = 200)
+
+    y_min = y_eq * 0.2
+    y_max = y_eq * 3.0
+    y_range = range(y_min, y_max; length = 200)
+
+    is_values = Float64[]
+    for r in r_range
+        vars = copy(solution.variables)
+        vars[:r] = r
+        curves = Static.eval_curve(solution.model, vars)
+        push!(is_values, curves.IS)
+    end
+
+    ir_r_values = Float64[]
+    for y in y_range
+        vars = copy(solution.variables)
+        vars[:Y] = y
+        curves = Static.eval_curve(solution.model, vars)
+        push!(ir_r_values, curves.IR)
+    end
+
+    fig = Figure(size = (800, 480))
+    ax = Axis(
+        fig[1, 1];
+        title = "IS – IR Curves",
+        xlabel = "Interest rate (r)",
+        ylabel = "Output (Y)",
+        backgroundcolor = :white,
+    )
+
+    lines!(ax, collect(r_range), is_values; color = :royalblue, linewidth = 3, label = "IS")
+    lines!(ax, ir_r_values, collect(y_range); color = :crimson, linewidth = 3, label = "IR")
+    scatter!(
+        ax, [r_eq], [y_eq];
+        color = :black,
+        markersize = 14,
+        strokecolor = :white,
+        strokewidth = 2,
+        label = "Equilibrium",
+    )
+
+
+    axislegend(ax; position = :rt, framevisible = false)
+
+    return fig
+end
+function ad_as_component(solution::Static.Solution)
+
+    AP_eq = solution.variables[:AP]
+    AS_eq = solution.variables[:AS]
+    AD_eq = solution.variables[:AD]
+
+    AP_min = AP_eq * 0.2
+    AP_max = AP_eq * 3.0
+    AP_range = range(AP_min, AP_max; length = 200)
+
+    ad_values = Float64[]
+    as_values = Float64[]
+    for AP in AP_range
+        vars = copy(solution.variables)
+        vars[:AP] = AP
+        curves = Static.eval_curve(solution.model, vars)
+        push!(ad_values, curves.AMD)
+        push!(as_values, curves.AMS)
+    end
+
+    fig = Figure(size = (800, 480))
+    ax = Axis(
+        fig[1, 1];
+        title = "AmS – AmD Curves",
+        xlabel = "Quantity",
+        ylabel = "Asset price (AP)",
+        backgroundcolor = :white,
+    )
+
+    lines!(ax, ad_values, collect(AP_range); color = :royalblue, linewidth = 3, label = "AmD")
+    lines!(ax, as_values, collect(AP_range); color = :crimson, linewidth = 3, label = "AmS")
+    scatter!(
+        ax, [AD_eq / AP_eq], [AP_eq];
+        color = :black,
+        markersize = 14,
+        strokecolor = :white,
+        strokewidth = 2,
+        label = "Equilibrium",
+    )
+
+    axislegend(ax; position = :rt, framevisible = false)
+
+    return fig
+end
+
+function ad_as_comparison_component(solutions::Vector{Static.Solution}, labels::Vector{String})
+    fig = Figure(size = (800, 480))
+    ax = Axis(
+        fig[1, 1];
+        title = "AmS – AmD Curves Comparison",
+        xlabel = "Quantity",
+        ylabel = "Asset price (AP)",
+        backgroundcolor = :white,
+    )
+
+    colors = Makie.wong_colors()
+
+    for (i, (solution, label)) in enumerate(zip(solutions, labels))
+        AP_eq = solution.variables[:AP]
+        AS_eq = solution.variables[:AS]
+        AD_eq = solution.variables[:AD]
+
+        AP_range = range(AP_eq * 0.2, AP_eq * 3.0; length = 200)
+
+        ad_values = Float64[]
+        as_values = Float64[]
+        for AP in AP_range
+            vars = copy(solution.variables)
+            vars[:AP] = AP
+            curves = Static.eval_curve(solution.model, vars)
+            push!(ad_values, curves.AMD)
+            push!(as_values, curves.AMS)
+        end
+
+        color = colors[mod1(i, length(colors))]
+
+        lines!(
+            ax, ad_values, collect(AP_range);
+            color = color,
+            linewidth = 3,
+            label = "AmD – $label",
+        )
+        lines!(
+            ax, as_values, collect(AP_range);
+            color = color,
+            linewidth = 3,
+            linestyle = :dash,
+            label = "AmS – $label",
+        )
+        scatter!(
+            ax, [AD_eq / AP_eq], [AP_eq];
+            color = color,
+            markersize = 14,
+            strokecolor = :white,
+            strokewidth = 2,
+            label = "Eq. – $label",
+        )
+    end
+
+    axislegend(ax; position = :rt, framevisible = false)
+
+    return fig
+end
