@@ -72,7 +72,7 @@ Of these new assets $beta$ are sold to inverstors, while $(1 - beta)$ are held b
 
 
 $
-&"SD"_t = s_0 - s_1 r    \
+&"SD"_t = s_0 - s_1 r_t   \
 &"AD"_t = gamma_0 + (1 / (1 - gamma)) "SD"_t / "AP"_t \
 &"AQ"_t = (1+ g_alpha) "AQ"_(t-1) \
 &"AS"_t = alpha "AQ"_(t) \
@@ -81,7 +81,7 @@ $
 
 or alternatively if we allow firms to keep back assets at a factor $1- beta$ we could adjust this to
 $
-&"SD"_t = s_0 - s_1 r    \
+&"SD"_t = s_0 - s_1 r_t    \
 &"AD"_t = gamma_0 + (1 / (1 - gamma)) "SD"_t / "AP"_t \
 &"AQ"_t = (1+ g_alpha) "AQ"_(t-1) \
 &"AC"_t = "AC"_(t-1) + beta ("AQ"_(t) - "AQ"_(t-1)) - alpha_0 "AC"_t\
@@ -96,7 +96,7 @@ We assume that the decision in which quantity to sell assets is taken on previou
 So the equations for $alpha$ is given as
 
 $
-alpha = s("AP"_(t-1))
+alpha_t = s("AP"_(t-1))
 $
 
 
@@ -104,4 +104,25 @@ where $s$ could be either linear, or a more complex function that incorporates p
 (e.g $\s("AP") = omega_p / (1 + e^(k_p ("AP" - P_p))) + omega_h / (1 + e^(-k_h ("AP" - P_h)))$
 
 
+== Endogenizing $c$ 
+
+In the same vain as $alpha$ we can endogenize $c$ without problem by taking the formula developed in the static model but taking the base year prices
+
+$
+        c_t = c_0 - c_1  "AD"_t
+$
+
+
+== Super duper extra: A energy based hysteresis model
+
+A totally different direction could be to incorporates a energy based hysteresis model to determine the asset price
+
+
+
+$
+&"SD"_t = s_0 - s_1 r_t   \
+&"AQ"_t = (1+ g_alpha) "AQ"_(t-1) \
+&"AS"_t = alpha "AQ"_(t) \
+&"AP"_t = arg min_m U (m) -   chevron.l m, "SD"_t  chevron.r + chi norm(m - "AP"_(t-1))
+$
 
