@@ -81,34 +81,27 @@ function _contains_time_index(expr, syms::Set{Symbol})
     return any(_contains_time_index(a, syms) for a in expr.args)
 end
 
-"Check that only stocks are indexed, and only with [t] or [t-1]."
-function _validate_time_indexing!(eqs::Vector{Equation}, stocks::Vector{DynVar}, flows::Vector{DynVar})
-    stockset = Set(v.name for v in stocks)
-    flowset = Set(v.name for v in flows)
+function check_expr(ex)
+    ex isa Expr || return
+    if ex.head == :ref
+        base = ex.args[1]
+        base isa Symbol || error("Invalid time indexing: $ex")
 
-    function check_expr(ex)
-        ex isa Expr || return
-        if ex.head == :ref
-            base = ex.args[1]
-            base isa Symbol || error("Invalid time indexing: $ex")
-            if base in flowset
-                error("Flows cannot be time-indexed: found $ex")
-            elseif !(base in stockset)
-                error("Only stocks may be time-indexed: found $ex")
-            end
-            # Only allow [t] and [t-1]
-            idx = ex.args[2]
-            ok = (idx == :t) ||
-                (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == 1) ||
-                (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == :(1))
-            ok || error("Only [t] and [t-1] are allowed for stocks. Found: $ex")
-        end
-        for a in ex.args
-            check_expr(a)
-        end
-        return
+        # Only allow [t] and [t-1]
+        idx = ex.args[2]
+        ok = (idx == :t) ||
+            (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == 1) ||
+            (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == :(1))
+        ok || error("Only [t] and [t-1] are allowed for variables. Found: $ex")
     end
+    for a in ex.args
+        check_expr(a)
+    end
+    return
+end
 
+"Check that only stocks are indexed, and only with [t] or [t-1]."
+function _validate_time_indexing!(eqs::Vector{Equation})
     for eq in eqs
         check_expr(eq.lhs)
         check_expr(eq.rhs)
@@ -122,6 +115,11 @@ Rewrite stock refs:
 - x[t-1]  -> (Symbol(\"x[t - 1]\"))  (lookup from p as key :(x[t - 1]))
 """
 function _rewrite_time_refs(expr, stockset::Set{Symbol})
+    # If it's a stock variable without indexing, treat it as [t]
+    if expr isa Symbol && expr in stockset
+        return expr
+    end
+
     expr isa Expr || return expr
 
     if expr.head == :ref && expr.args[1] isa Symbol && (expr.args[1] in stockset)
@@ -140,15 +138,14 @@ end
 
 # -------- nulls generation for DynamicModel --------
 
-function _generate_nulls(flows::Vector{DynVar}, stocks::Vector{DynVar}, params::Vector{DynVar}, eqs::Vector{Equation})
-    flow_syms = [v.name for v in flows]
-    stock_syms = [v.name for v in stocks]
+function _generate_nulls(variables::Vector{DynVar}, params::Vector{DynVar}, eqs::Vector{Equation})
+    variable_syms = [v.name for v in variables]
     param_syms = [v.name for v in params]
 
-    stockset = Set(stock_syms)
+    variable_set = Set(variable_syms)
 
     # variables in u are flows then current stocks
-    var_tuple = Expr(:tuple, vcat(flow_syms, stock_syms)...)
+    var_tuple = Expr(:tuple, variable_syms...)
 
     # rewrite equations to:
     # - current stocks as symbols in u
@@ -157,15 +154,15 @@ function _generate_nulls(flows::Vector{DynVar}, stocks::Vector{DynVar}, params::
     for eq in eqs
         push!(
             rewritten, Equation(
-                _rewrite_time_refs(eq.lhs, stockset),
-                _rewrite_time_refs(eq.rhs, stockset),
+                _rewrite_time_refs(eq.lhs, variable_set),
+                _rewrite_time_refs(eq.rhs, variable_set),
             )
         )
     end
 
     # collect lag symbols we need to destructure from p
     lag_syms = Symbol[]
-    for s in stock_syms
+    for s in variable_syms
         push!(lag_syms, Symbol(string(s), "[t - 1]"))
     end
 
@@ -211,9 +208,8 @@ end
 """
 macro model(body)
     time_expr = nothing
-    flows = DynVar[]
-    stocks = DynVar[]
     params = DynVar[]
+    variables = DynVar[]
     defaults = Dict{Symbol, Any}()
     eqs = Equation[]
     init = Dict{Symbol, Float64}()
@@ -229,10 +225,8 @@ macro model(body)
         if mac == Symbol("@time")
             # @time 0.0:1.0:100.0
             time_expr = blk
-        elseif mac == Symbol("@flows")
-            _parse_dynvars!(flows, blk)
-        elseif mac == Symbol("@stocks")
-            _parse_dynvars!(stocks, blk)
+        elseif mac == Symbol("@variables")
+            _parse_dynvars!(variables, blk)
         elseif mac == Symbol("@parameters")
             _parse_params!(params, defaults, blk)
         elseif mac == Symbol("@equations")
@@ -244,12 +238,12 @@ macro model(body)
 
     time_expr === nothing && error("Dynamic @model requires a @time block, e.g. @time 0.0:1.0:100.0")
 
-    _validate_time_indexing!(eqs, stocks, flows)
+    _validate_time_indexing!(eqs)
 
-    nulls = _generate_nulls(flows, stocks, params, eqs)
+    nulls = _generate_nulls(variables, params, eqs)
 
     # default u0: ones(nFlows+nStocks)
-    n = length(flows) + length(stocks)
+    n = length(variables)
 
     return esc(
         quote
@@ -257,8 +251,7 @@ macro model(body)
                 local grid = collect($time_expr)
                 local m = DynamicModel(
                     DiscreteTime(grid),
-                    $stocks,
-                    $flows,
+                    $variables,
                     $params,
                     $eqs,
                     $nulls

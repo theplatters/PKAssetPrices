@@ -20,8 +20,7 @@ end
 
 struct DynamicModel{F} <: AbstractModel
     time::DiscreteTime
-    stocks::Vector{DynVar}            # time-varying variables
-    flows::Vector{DynVar}
+    variables::Vector{DynVar}            # time-varying variables
     params::Vector{DynVar}          # time-invariant parameters
     equations::Vector{Equation}     # convention: may reference x[t], x[t-1], etc.
     nulls::F
@@ -45,24 +44,17 @@ include("model_macros.jl")
 @inline _at(v::Float64, ::Int) = v
 @inline _at(v::AbstractVector{<:Real}, t::Int) = float(v[t])
 
-# Build a NamedTuple for this time t:
-# - params: scalar or time-indexed
-# - exog: time-indexed
-# - lags: previous-period values of selected variables
 function build_context(dp::DynamicParametrization, t::Int, paths::Dict{Symbol, Vector{Float64}})
     # base params (β, α, …), scalar or vector[t]
     par_nt = (; (k => _at(v, t) for (k, v) in dp.params)...)
-    lag_pairs = isone(t) ? [Symbol(s.name, :[t - 1]) => dp.init[s.name] for s in dp.model.stocks] : [Symbol(s.name, :[t - 1]) => paths[s.name][t - 1] for s in dp.model.stocks]
+    lag_pairs = isone(t) ? [Symbol(s.name, :[t - 1]) => get!(dp.init, s.name, 0.0) for s in dp.model.variables] : [Symbol(s.name, :[t - 1]) => paths[s.name][t - 1] for s in dp.model.variables]
     lag_nt = (; lag_pairs...)
     return merge(par_nt, lag_nt)
 end
 
 function init_paths(m::DynamicModel, T::Int)
     paths = Dict{Symbol, Vector{Float64}}()
-    for v in m.flows
-        paths[v.name] = Vector{Float64}(undef, T)
-    end
-    for v in m.stocks
+    for v in m.variables
         paths[v.name] = Vector{Float64}(undef, T)
     end
     return paths
@@ -74,12 +66,8 @@ function solve_model(dp::DynamicParametrization)
     m = dp.model
     paths = init_paths(m, T)
 
-    nF = length(m.flows)
-    nS = length(m.stocks)
 
-    # initial guess for unknowns each period
-    u = copy(dp.u0)                     # should be length nF+nS
-    @assert length(u) == nF + nS
+    u = copy(dp.u0)
 
     for t in 1:T
         θt = build_context(dp, t, paths)
@@ -90,11 +78,8 @@ function solve_model(dp::DynamicParametrization)
         ut = sol.u
 
         # store period t solution into paths
-        for i in 1:nF
-            paths[m.flows[i].name][t] = ut[i]
-        end
-        for i in 1:nS
-            paths[m.stocks[i].name][t] = ut[nF + i]
+        for i in eachindex(sol.u)
+            paths[m.variables[i].name][t] = ut[i]
         end
 
         # warm start next period

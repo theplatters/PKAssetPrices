@@ -1,16 +1,11 @@
 using PKAssetPrices.Dynamic: DynamicModel, DiscreteTime, DynamicParametrization, solve_model, @model
-using PKAssetPrices
 
-Revise.retry()
 test = @model begin
     @time 0.0:1.0:100.0
 
-    @flows begin
+    @variables begin
         Y = "output"
         C = "consumption"
-    end
-
-    @stocks begin
         K = "capital"
         B = "debt"
     end
@@ -28,10 +23,12 @@ test = @model begin
     end
 
     @equations begin
-        Y == C + I
+        Y == C + β * I + K[t]
         K[t] == K[t - 1] + I - δ * K[t - 1]
+        C == 0.2 * Y
     end
 end
+Revise.retry()
 
 test.model.equations[2]
 solve_model(test).paths
