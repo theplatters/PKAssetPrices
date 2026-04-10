@@ -98,6 +98,8 @@ function solve_model(dp::DynamicParametrization)
 
     return DynamicSolution(dp, paths)
 end
+ 
+include("models/models.jl")
 
 
 end
