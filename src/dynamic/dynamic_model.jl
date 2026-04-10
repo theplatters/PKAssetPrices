@@ -18,24 +18,25 @@ struct DynVar
 end
 
 
-struct DynamicModel{F} <: AbstractModel
+struct DynamicModel{F,G} <: AbstractModel
     time::DiscreteTime
-    variables::Vector{DynVar}            # time-varying variables
-    params::Vector{DynVar}          # time-invariant parameters
-    equations::Vector{Equation}     # convention: may reference x[t], x[t-1], etc.
+    variables::Vector{DynVar}
+    params::Vector{DynVar}
+    equations::Vector{Equation}
     nulls::F
+    eval::G
 end
 
-struct DynamicParametrization{F}
-    model::DynamicModel{F}
-    params::Dict{Symbol, Union{Float64, Vector{Float64}}}                 # β, α, ...
-    init::Dict{Symbol, Float64}                   # x(0) or x(1)
+struct DynamicParametrization{F,G}
+    model::DynamicModel{F, G}
+    params::Dict{Symbol, Union{Float64, Vector{Float64}}}
+    init::Dict{Symbol, Float64}
     u0::Vector{Float64}
 end
 
-struct DynamicSolution{F}
-    model::DynamicParametrization{F}
-    paths::Dict{Symbol, Vector{Float64}}          # x[t] for each time-varying var
+struct DynamicSolution{F,G}
+    model::DynamicParametrization{F,G}
+    paths::Dict{Symbol, Vector{Float64}}
 end
 
 include("model_macros.jl")
@@ -58,6 +59,15 @@ function init_paths(m::DynamicModel, T::Int)
         paths[v.name] = Vector{Float64}(undef, T)
     end
     return paths
+end
+
+function eval_model(dp::DynamicParametrization, values:: Dict{Symbol, Float64}, lag::Dict{Symbol, Float64})
+    par_nt = (; (k => v for (k, v) in dp.params)...)
+    lag_pairs = [Symbol(k, :[t - 1]) => v for (k,v) in lag]
+    lag_nt = (; lag_pairs...)
+    context =  merge(par_nt, lag_nt, NamedTuple(values))
+    
+    dp.model.eval(context)
 end
 
 

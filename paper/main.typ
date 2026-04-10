@@ -47,15 +47,16 @@ Three versions:
 = Steps towards a dynamic model
 <steps-towards-a-dynamic-model>
 
-The goal is to establish a dynamic model, that can capture hysteresis effects aswell as the nonlinear dynamics of the static versions
+The goal is to establish a dynamic model, that can capture hysteresis effects as well as the nonlinear dynamics of the static versions
 
-The core model without the assset market stays unchanged
+The core model without the asset market assumes, that the interest rate is determined by last years prices, so 
+$ i_t = i_0 + i_1  P_(t-1) $
 
+The remaining equations stay unchanged.
 $
 &Y_t = "ND"_t + c  D_t \
 &"ND"_t = b  Y_t \
 &D_t = d_0 - d_1  r_t \
-&i_t = i_0 + i_1  P_t \
 &r_t = (1 + m)  i_t \
 &"dL"_t = c  D_t + "SD"_t \
 &"dM"_t = "dL"_t \
@@ -67,9 +68,6 @@ $
 $
 
 In the asset market the asset supply changees from the static model in that we partially endogenize $"AQ"$ by assuming that $"AQ"$ grows by the factor $g_alpha$ through new assets being created.
-Of these new assets $beta$ are sold to inverstors, while $(1 - beta)$ are held back in reserves 
-
-
 
 $
 &"SD"_t = s_0 - s_1 r_t   \
@@ -79,7 +77,8 @@ $
 &"AP"_t = p_1 "AD"_t/"AS"_t \
 $
 
-or alternatively if we allow firms to keep back assets at a factor $1- beta$ we could adjust this to
+or alternatively if we allow firms to keep back assets at a factor $( 1- beta )$ we could adjust this to
+
 $
 &"SD"_t = s_0 - s_1 r_t    \
 &"AD"_t = gamma_0 + (1 / (1 - gamma)) "SD"_t / "AP"_t \
@@ -96,10 +95,8 @@ We assume that the decision in which quantity to sell assets is taken on previou
 So the equations for $alpha$ is given as
 
 $
-alpha_t = s("AP"_(t-1))
+alpha_t = s("AP"_(t-1)),
 $
-
-
 where $s$ could be either linear, or a more complex function that incorporates panic selling 
 (e.g $\s("AP") = omega_p / (1 + e^(k_p ("AP" - P_p))) + omega_h / (1 + e^(-k_h ("AP" - P_h)))$
 

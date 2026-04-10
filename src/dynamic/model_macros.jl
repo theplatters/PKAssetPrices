@@ -138,6 +138,7 @@ end
 
 # -------- nulls generation for DynamicModel --------
 
+
 function _generate_nulls(variables::Vector{DynVar}, params::Vector{DynVar}, eqs::Vector{Equation})
     variable_syms = [v.name for v in variables]
     param_syms = [v.name for v in params]
@@ -176,6 +177,46 @@ function _generate_nulls(variables::Vector{DynVar}, params::Vector{DynVar}, eqs:
         end
     end
 end
+
+
+
+function _generate_eval(variables::Vector{DynVar}, params::Vector{DynVar}, eqs::Vector{Equation})
+    variable_syms = [v.name for v in variables]
+    param_syms = [v.name for v in params]
+
+    variable_set = Set(variable_syms)
+
+    # rewrite equations:
+    # - x[t]   -> x
+    # - x[t-1] -> Symbol("x[t - 1]")
+    rewritten = Equation[]
+    for eq in eqs
+        push!(
+            rewritten,
+            Equation(
+                _rewrite_time_refs(eq.lhs, variable_set),
+                _rewrite_time_refs(eq.rhs, variable_set),
+            ),
+        )
+    end
+
+    # lagged variable symbols expected in p
+    lag_syms = [Symbol(string(s), "[t - 1]") for s in variable_syms]
+
+    # for evaluation, return rhs expressions
+    values = [eq.rhs for eq in rewritten]
+
+    # destructure everything from p as named fields
+    all_syms = vcat(param_syms, lag_syms, variable_syms)
+
+    return quote
+        function (p)
+            (; $(all_syms...)) = p
+            return [$(values...)]
+        end
+    end
+end
+
 
 # -------- public macros --------
 
@@ -240,6 +281,8 @@ macro model(body)
 
     _validate_time_indexing!(eqs)
 
+    eval_fun = _generate_eval(variables, params, eqs)
+
     nulls = _generate_nulls(variables, params, eqs)
 
     # default u0: ones(nFlows+nStocks)
@@ -247,27 +290,19 @@ macro model(body)
 
     return esc(
         quote
-            let
-                local grid = collect($time_expr)
-                local m = DynamicModel(
-                    DiscreteTime(grid),
+              DynamicParametrization(
+                  DynamicModel(
+                    DiscreteTime(collect($time_expr)),
                     $variables,
                     $params,
                     $eqs,
-                    $nulls
-                )
-
-                # Create a default parametrization:
-                # - params defaults (can be scalars or vectors)
-                # - init empty (user should fill)
-                # - u0 ones
-                DynamicParametrization(
-                    m,
-                    Dict{Symbol, Union{Float64, Vector{Float64}}}($((:($(QuoteNode(k)) => $(v)) for (k, v) in defaults)...)),
-                    $init,
-                    ones($n),
-                )
-            end
+                    $nulls,
+                    $eval_fun
+                  ),
+                  Dict{Symbol, Union{Float64, Vector{Float64}}}($((:($(QuoteNode(k)) => $(v)) for (k, v) in defaults)...)),
+                  $init,
+                  ones($n),
+              )
         end
     )
 end
