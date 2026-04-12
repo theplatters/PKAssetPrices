@@ -1,7 +1,5 @@
-
-
 DynαQCr = @model begin
-    @time 0.0:1.0:100.0
+    @time 0.0:1:100.0
 
     @variables  begin
         Y = "Output"
@@ -43,8 +41,8 @@ DynαQCr = @model begin
         Nᶠ = 6.0, "total labour supply"
         p1 = 1.0, "base asset price"
         s0 = 1.0, "autonomous speculative debt"
-        s1 = 0.5, "speculative debt induced by interest"
-        s2 = 0.5, "speculative debt induced by interest"
+        s1 = 0.1, "speculative debt induced by interest"
+        s2 = 0.2, "speculative debt induced by interest"
         γ0 = 0.0, "autonomous asset demand"
         γ = 0.5, "turnover asset selling"
         α₀ = 0.1, "turnover 2"
@@ -60,7 +58,7 @@ DynαQCr = @model begin
     end
 
     @equations begin
-    i[t] == i0 + i1 * P[t - 1] + i2 * AP[t - 1]
+        i[t] == i0 + i1 * P[t - 1] + i2 * AP[t - 1]
         r == (1 + m) * i
         D == d0 - d1 * r
         Y == ND + c * D
@@ -78,7 +76,7 @@ DynαQCr = @model begin
         AS == α * AQ
         α == α₀ / 2 * (1 + AP[t - 1])
         AQ == (1 + gₐ) * AQ[t - 1]
-        c == c₀ - c₁  * AD[t-1]
+        c == c₀ - c₁ * AD[t - 1]
     end
 end
 DynαQC = @model begin
@@ -158,7 +156,7 @@ DynαQC = @model begin
         AS == α * AQ
         α == α₀ / 2 * (1 + AP[t - 1])
         AQ == (1 + gₐ) * AQ[t - 1]
-        c == c₀ - c₁  * AD[t-1]
+        c == c₀ - c₁ * AD[t - 1]
     end
 end
 
@@ -239,8 +237,6 @@ DynαQ = @model begin
         AQ == (1 + gₐ) * AQ[t - 1]
     end
 end
-
-
 
 
 DynQ = @model begin
@@ -319,8 +315,6 @@ DynQ = @model begin
 end
 
 
-
-
 DynαQ = @model begin
     @time 0.0:1.0:100.0
 
@@ -400,7 +394,6 @@ DynαQ = @model begin
 end
 
 
-
 Dynα = @model begin
     @time 0.0:1.0:100.0
 
@@ -476,6 +469,3 @@ Dynα = @model begin
         α == α₀ / 2 * (1 + AP[t - 1])
     end
 end
-
-
-

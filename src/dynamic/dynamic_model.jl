@@ -18,7 +18,7 @@ struct DynVar
 end
 
 
-struct DynamicModel{F,G} <: AbstractModel
+struct DynamicModel{F, G} <: AbstractModel
     time::DiscreteTime
     variables::Vector{DynVar}
     params::Vector{DynVar}
@@ -27,15 +27,15 @@ struct DynamicModel{F,G} <: AbstractModel
     eval::G
 end
 
-struct DynamicParametrization{F,G}
+struct DynamicParametrization{F, G}
     model::DynamicModel{F, G}
     params::Dict{Symbol, Union{Float64, Vector{Float64}}}
     init::Dict{Symbol, Float64}
     u0::Vector{Float64}
 end
 
-struct DynamicSolution{F,G}
-    model::DynamicParametrization{F,G}
+struct DynamicSolution{F, G}
+    model::DynamicParametrization{F, G}
     paths::Dict{Symbol, Vector{Float64}}
 end
 
@@ -61,13 +61,13 @@ function init_paths(m::DynamicModel, T::Int)
     return paths
 end
 
-function eval_model(dp::DynamicParametrization, values:: Dict{Symbol, Float64}, lag::Dict{Symbol, Float64})
+function eval_model(dp::DynamicParametrization, values::Dict{Symbol, Float64}, lag::Dict{Symbol, Float64})
     par_nt = (; (k => v for (k, v) in dp.params)...)
-    lag_pairs = [Symbol(k, :[t - 1]) => v for (k,v) in lag]
+    lag_pairs = [Symbol(k, :[t - 1]) => v for (k, v) in lag]
     lag_nt = (; lag_pairs...)
-    context =  merge(par_nt, lag_nt, NamedTuple(values))
-    
-    dp.model.eval(context)
+    context = merge(par_nt, lag_nt, NamedTuple(values))
+
+    return dp.model.eval(context)
 end
 
 
@@ -98,7 +98,7 @@ function solve_model(dp::DynamicParametrization)
 
     return DynamicSolution(dp, paths)
 end
- 
+
 include("models/models.jl")
 
 
