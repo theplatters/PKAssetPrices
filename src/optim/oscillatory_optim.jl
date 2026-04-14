@@ -54,7 +54,7 @@ function eval_model(x, p)
 end
 
 function explosion_penalty(y)
-    return sum(max(0, abs(xi) - 100)^2 for xi in reduce(vcat, values(y)))
+    return sum(max(0, abs(xi) - 1000)^2 for xi in reduce(vcat, values(y)))
 end
 
 function oscillation_score(y)
@@ -76,15 +76,10 @@ function oscillation_score(y)
 end
 
 
-p = Dict(
-    :x => [0.3, 10.5],
-    :y => [0.3, 0.5]
-)
+x0 = [0.8, 0.1, 0.01, 0.05, 0.01, 1.0, 0.1, 0.2, 0.5, 0.1, 5.0, 8.0, 0.03, 0.15]
 
-positivity_penalty(p)
+Dict(k => maximum(v) for (k, v) in eval_model(x0, Dynamic.DynαQCr).paths)
 
-
-x0 = [0.008905350496328067, 0.037493422061853576, 0.48152300038241813, 0.24028386950622796, 0.11548465017702524, 0.17509632134056813, 0.35048918515442207, 0.9455059561651523, 0.6241246752385647, 0.044024262656295665, 5.0, 8.0, 0.03, 0.15]
 
 function callback(state, loss)
     println("Iteration: $(state.iter), Loss: $loss, Params: $(state.u)")
@@ -102,4 +97,4 @@ prob = OptimizationProblem(
     lb = lb,
     ub = ub
 )
-sol = solve(prob, OptimizationBBO.BBO_adaptive_de_rand_1_bin_radiuslimited(), callback = callback)
+sol = solve(prob, OptimizationBBO.BBO_xnes(), callback = callback)
