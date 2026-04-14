@@ -96,10 +96,10 @@ p = (
 )
 
 lb = fill(0.0, 14)
-ub = [fill(1.0, 10); 12.0; 12.0; 1.0; 0.1]
+ub = [fill(1.0, 10); 12.0; 12.0; 1.0; 0.4]
 prob = OptimizationProblem(
     objective, x0, p,
     lb = lb,
     ub = ub
 )
-sol = solve(prob, OptimizationBBO.BBO_generating_set_search(), callback = callback)
+sol = solve(prob, OptimizationBBO.BBO_adaptive_de_rand_1_bin_radiuslimited(), callback = callback)
