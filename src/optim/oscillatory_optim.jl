@@ -17,6 +17,13 @@ function objective(x, p)
     model.params[:s0] = x[6]
     model.params[:s1] = x[7]
     model.params[:s2] = x[8]
+    model.params[:γ] = x[9]
+    model.params[:α₀] = x[10]
+    model.params[:d0] = x[11]
+    model.params[:d1] = x[12]
+    model.params[:gₐ] = x[13]
+    model.params[:m] = x[14]
+
 
     sol = Dynamic.solve_model(model)
 
@@ -36,6 +43,10 @@ function eval_model(x, p)
     model.params[:s2] = x[8]
     model.params[:γ] = x[9]
     model.params[:α₀] = x[10]
+    model.params[:d0] = x[11]
+    model.params[:d1] = x[12]
+    model.params[:gₐ] = x[13]
+    model.params[:m] = x[14]
 
     sol = Dynamic.solve_model(model)
 
@@ -73,8 +84,7 @@ p = Dict(
 positivity_penalty(p)
 
 
-x0 = [0.008905350496328067, 0.037493422061853576, 0.48152300038241813, 0.24028386950622796, 0.11548465017702524, 0.17509632134056813, 0.35048918515442207, 0.9455059561651523, 0.6241246752385647, 0.044024262656295665]
-x1 = [0.8463213035143698, 0.2550484113257094, 0.052025500689039134, 0.3184621806282828, 0.06425994550113504, 0.5006502538028674, 0.9706631007613131, 0.0005959482135358993, 0.29553658119280646, 0.31639299459056147]
+x0 = [0.008905350496328067, 0.037493422061853576, 0.48152300038241813, 0.24028386950622796, 0.11548465017702524, 0.17509632134056813, 0.35048918515442207, 0.9455059561651523, 0.6241246752385647, 0.044024262656295665, 5.0, 8.0, 0.03, 0.15]
 
 function callback(state, loss)
     println("Iteration: $(state.iter), Loss: $loss, Params: $(state.u)")
@@ -85,8 +95,8 @@ p = (
     model = Dynamic.DynαQCr
 )
 
-lb = fill(0.0, 10)
-ub = fill(1.0, 10)
+lb = fill(0.0, 14)
+ub = [fill(1.0, 10); 12.0; 12.0; 1.0; 0.1]
 prob = OptimizationProblem(
     objective, x0, p,
     lb = lb,
