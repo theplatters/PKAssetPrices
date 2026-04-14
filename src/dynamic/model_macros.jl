@@ -179,7 +179,6 @@ function _generate_nulls(variables::Vector{DynVar}, params::Vector{DynVar}, eqs:
 end
 
 
-
 function _generate_eval(variables::Vector{DynVar}, params::Vector{DynVar}, eqs::Vector{Equation})
     variable_syms = [v.name for v in variables]
     param_syms = [v.name for v in params]
@@ -290,19 +289,19 @@ macro model(body)
 
     return esc(
         quote
-              DynamicParametrization(
-                  DynamicModel(
+            DynamicParametrization(
+                DynamicModel(
                     DiscreteTime(collect($time_expr)),
                     $variables,
                     $params,
                     $eqs,
                     $nulls,
                     $eval_fun
-                  ),
-                  Dict{Symbol, Union{Float64, Vector{Float64}}}($((:($(QuoteNode(k)) => $(v)) for (k, v) in defaults)...)),
-                  $init,
-                  ones($n),
-              )
+                ),
+                Dict{Symbol, Float64}($((:($(QuoteNode(k)) => $(v)) for (k, v) in defaults)...)),
+                $init,
+                ones($n),
+            )
         end
     )
 end
