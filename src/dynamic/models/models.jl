@@ -58,7 +58,7 @@ DynαQCr = @model begin
     end
 
     @equations begin
-        i[t] == i0 + i1 * P[t - 1] + i2 * AP[t - 1]
+        i[t] == i0 + i1 * (P - P[t - 1]) / P[t-1] + i2 * (AP - AP[t - 1]) / AP[t-1]
         r == (1 + m) * i
         D == d0 - d1 * r
         Y == ND + c * D
@@ -76,7 +76,7 @@ DynαQCr = @model begin
         AS == α * AQ
         α == α₀ / 2 * (1 + AP[t - 1])
         AQ == (1 + gₐ) * AQ[t - 1]
-        c == c₀ - c₁ * AD[t - 1]
+        c == c₀ - c₁ * AD[t - 1] / AQ[t - 1]
     end
 end
 DynαQC = @model begin

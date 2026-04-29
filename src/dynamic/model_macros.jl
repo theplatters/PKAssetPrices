@@ -305,3 +305,23 @@ macro model(body)
         end
     )
 end
+
+
+macro scenario(model, body)
+    assigns = Expr[]
+    for ex in body.args
+        ex isa LineNumberNode && continue
+        if ex isa Expr && ex.head == :(=)
+            push!(assigns, :(params[$(QuoteNode(ex.args[1]))] = $(ex.args[2])))
+        end
+    end
+
+    return esc(
+        quote
+            local m = $model
+            local params = copy(m.params) 
+            $(assigns...)
+            Dynamic.DynamicParametrization(m.model, params, m.init, m.u0)  # note: no "&" in Julia
+        end
+    )
+end
