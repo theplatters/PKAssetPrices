@@ -123,8 +123,8 @@ DynQ2 = @model begin
 
     @init begin
         AQ = 6.0
-        P = 1.76
-        AP = 2.0
+        P = 1.0
+        AP = [1.0, 1.0]
         r = 0.11
     end
 
@@ -199,7 +199,7 @@ DynQ3 = @model begin
     @init begin
         AQ = 6.0
         P = 1.76
-        AP = 2.0
+        AP = [1.0, 1.0]
         r = 0.11
     end
 

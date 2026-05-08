@@ -59,10 +59,10 @@ function _parse_init!(init, body)
     for line in body.args
         line isa LineNumberNode && continue
         if line isa Expr && line.head == :(=)
+            @info line
             name = line.args[1]
             value = line.args[2]
-            @info value
-            init[name] = value
+            init[name] = vcat(eval(value))
         else
             error("@equations entries must be `lhs == rhs`, got: $line")
         end
@@ -91,7 +91,9 @@ function check_expr(ex)
         idx = ex.args[2]
         ok = (idx == :t) ||
             (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == 1) ||
-            (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == :(1))
+            (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == :(1)) ||
+            (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == 2) ||
+            (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == :(2))
         ok || error("Only [t] and [t-1] are allowed for variables. Found: $ex")
     end
     for a in ex.args
@@ -252,7 +254,7 @@ macro model(body)
     variables = DynVar[]
     defaults = Dict{Symbol, Any}()
     eqs = Equation[]
-    init = Dict{Symbol, Float64}()
+    init = Dict{Symbol, Vector{Float64}}()
 
     for expr in body.args
         expr isa LineNumberNode && continue
@@ -319,9 +321,10 @@ macro scenario(model, body)
     return esc(
         quote
             local m = $model
-            local params = copy(m.params) 
+            local params = copy(m.params)
             $(assigns...)
             Dynamic.DynamicParametrization(m.model, params, m.init, m.u0)  # note: no "&" in Julia
         end
     )
 end
+

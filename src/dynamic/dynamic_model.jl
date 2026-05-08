@@ -26,14 +26,14 @@ struct DynamicModel{F, G} <: AbstractModel
     eval::G
 end
 
-struct DynamicParametrization{F, G, T <: Real, U <: Real}
+struct DynamicParametrization{F, G, T <: Real, U}
     model::DynamicModel{F, G}
     params::Dict{Symbol, T}
     init::Dict{Symbol, U}
     u0::Vector{Float64}
 end
 
-struct DynamicSolution{F, G, T <: Real, U <: Real}
+struct DynamicSolution{F, G, T, U}
     model::DynamicParametrization{F, G, T, U}
     paths::Dict{Symbol, Vector{T}}
 end
@@ -41,14 +41,51 @@ end
 include("model_macros.jl")
 
 
-function build_context(dp::DynamicParametrization, t::Int, paths)
+function build_context(dp::DynamicParametrization{F, G, T, U}, t::Int, paths) where {F, G, T, U <: Real}
     # base params (β, α, …), scalar or vector[t]
-    lag_pairs = isone(t) ? 
-        [Symbol(s.name, :[t - 1]) => get!(dp.init, s.name, 0.0) for s in dp.model.variables] : 
+    lag_pairs = isone(t) ?
+        [Symbol(s.name, :[t - 1]) => get!(dp.init, s.name, 0.0) for s in dp.model.variables] :
         [Symbol(s.name, :[t - 1]) => paths[s.name][t - 1] for s in dp.model.variables]
     lag_nt = (; lag_pairs...)
     return merge(NamedTuple(dp.params), lag_nt)
 end
+
+function build_context(dp::DynamicParametrization{F, G, T, U}, t::Int, paths) where {F, G, T, U <: AbstractVector}
+    lag_pairs = Pair{Symbol, Any}[]
+
+    for s in dp.model.variables
+        name = s.name
+        sym_t1 = Symbol(name, "[t - 1]")
+        sym_t2 = Symbol(name, "[t - 2]")
+
+        # 1. Safely fetch initialization array (default to empty if missing)
+        raw_init = get(dp.init, name, Float64[])
+
+        # 2. Left pad with 0.0 to ensure length is at least 2
+        n_missing = max(0, 2 - length(raw_init))
+        init_vals = n_missing > 0 ? vcat(fill(0.0, n_missing), raw_init) : raw_init
+
+        # Now init_vals is guaranteed to have at least 2 elements
+        if isone(t)
+            # init_vals[1] is t-2, init_vals[2] is t-1
+            val_t1 = init_vals[2]
+            val_t2 = init_vals[1]
+        elseif t == 2
+            val_t1 = haskey(paths, name) ? paths[name][t - 1] : 0.0
+            val_t2 = init_vals[2]
+        else
+            val_t1 = haskey(paths, name) ? paths[name][t - 1] : 0.0
+            val_t2 = haskey(paths, name) ? paths[name][t - 2] : 0.0
+        end
+
+        push!(lag_pairs, sym_t1 => val_t1)
+        push!(lag_pairs, sym_t2 => val_t2)
+    end
+
+    lag_nt = (; lag_pairs...)
+    return merge(NamedTuple(dp.params), lag_nt)
+end
+
 
 function init_paths(m::DynamicModel, time_span::Int, ::Type{T}) where {T <: Real}
     paths = Dict{Symbol, Vector{T}}()
@@ -68,7 +105,7 @@ function eval_model(dp::DynamicParametrization, values::Dict{Symbol, Float64}, l
 end
 
 
-function solve_model(dp::DynamicParametrization{F, G, T, U}) where {F, G, T <: Real, U <: Real}
+function solve_model(dp::DynamicParametrization{F, G, T, U}) where {F, G, T, U}
     time_span = length(dp.model.time.grid)
     m = dp.model
     paths = init_paths(m, time_span, T)
@@ -116,6 +153,7 @@ end
 
 
 include("models/models.jl")
+include("models/experiments_on_ap.jl")
 
 
 end
