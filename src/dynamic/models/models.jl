@@ -58,12 +58,12 @@ DynαQCr = @model begin
     end
 
     @equations begin
-        i[t] == i0 + i1 * (P - P[t - 1]) / P[t-1] + i2 * (AP - AP[t - 1]) / AP[t-1]
+        i[t] == i0 + i1 * (P - P[t - 1]) / P[t - 1] + i2 * (AP - AP[t - 1]) / AP[t - 1]
         r == (1 + m) * i
         D == d0 - d1 * r
         Y == ND + c * D
         ND == b * Y
-        dL == c * D + AP * SD
+        dL == c * D + SD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
@@ -143,7 +143,7 @@ DynαQC = @model begin
         D == d0 - d1 * r
         Y == ND + c * D
         ND == b * Y
-        dL == c * D + AP * SD
+        dL == c * D + SD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
@@ -222,7 +222,7 @@ DynαQ = @model begin
         D == d0 - d1 * r
         Y == ND + c * D
         ND == b * Y
-        dL == c * D + AP * SD
+        dL == c * D + SD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
@@ -299,7 +299,7 @@ DynQ = @model begin
         D == d0 - d1 * r
         Y == ND + c * D
         ND == b * Y
-        dL == c * D + AP * SD
+        dL == c * D + SD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
@@ -377,7 +377,7 @@ DynαQ = @model begin
         D == d0 - d1 * r
         Y == ND + c * D
         ND == b * Y
-        dL == c * D + AP * SD
+        dL == c * D + SD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
@@ -455,7 +455,7 @@ Dynα = @model begin
         D == d0 - d1 * r
         Y == ND + c * D
         ND == b * Y
-        dL == c * D + AP * SD
+        dL == c * D + SD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W

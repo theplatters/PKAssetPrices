@@ -50,7 +50,7 @@ PQ = @model begin
         D == d0 - d1 * r
         i == i0 + i1 * P
         r == (1 + m) * i
-        dL == c * D + AP * SD
+        dL == c * D + SD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
@@ -148,7 +148,7 @@ PQCold = @model begin
         D == d0 - d1 * r
         i == i0 + i1 * P
         r == (1 + m) * i
-        dL == c * D + AP * SD
+        dL == c * D + SD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
@@ -246,7 +246,7 @@ PQC = @model begin
         D == d0 - d1 * r
         i == i0 + i1 * P
         r == (1 + m) * i
-        dL == c * D + AP * SD
+        dL == c * D + SD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
@@ -356,7 +356,7 @@ PQCr = @model begin
         D == d0 - d1 * r
         i == i0 + i1 * P + i2 * AP
         r == (1 + m) * i
-        dL == c * D + AP * SD
+        dL == c * D + AD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
@@ -489,7 +489,7 @@ PQCrDIFF = @model begin
         D == d0 - d1 * r
         i == i0 + i1 * P
         r == (1 + m) * i
-        dL == c * D + AP * SD
+        dL == c * D + AD
         dM == dL
         dR == k * dM
         P == (1 + n) * a * W
