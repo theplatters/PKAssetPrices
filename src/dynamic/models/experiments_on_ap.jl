@@ -1,4 +1,4 @@
-DynQ1 = @model begin
+DynQconAPLevelChange = @model begin
     @time 0.0:1.0:100.0
 
     @variables  begin
@@ -74,7 +74,7 @@ DynQ1 = @model begin
     end
 end
 
-DynQ2 = @model begin
+DynQconAPChange = @model begin
     @time 0.0:1.0:100.0
 
     @variables  begin
@@ -149,7 +149,7 @@ DynQ2 = @model begin
     end
 end
 
-DynQ3 = @model begin
+DynQoldAPLevelChange = @model begin
     @time 0.0:1.0:100.0
 
     @variables  begin
@@ -224,7 +224,7 @@ DynQ3 = @model begin
     end
 end
 
-DynQ4 = @model begin
+DynQoldAPChange = @model begin
     @time 0.0:1.0:100.0
 
     @variables  begin
@@ -291,7 +291,7 @@ DynQ4 = @model begin
         W == W0 - h * U
         N == a * Y
         U == 1 - N / Nᶠ
-        SD[t] == s0 - s1 * r[t - 1] + s2 * (AP[t] - AP[t - 1]) / AP[t - 1]
+        SD[t] == s0 - s1 * r[t - 1] + s2 * (AP[t - 1] - AP[t - 2]) / AP[t - 2]
         AD == γ0 + (1 / (1 - γ)) * SD
         AP == p1 * (AD / AS)
         AS == α * AQ
