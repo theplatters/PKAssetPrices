@@ -216,7 +216,7 @@ DynQoldAPLevelChange = @model begin
         W == W0 - h * U
         N == a * Y
         U == 1 - N / Nᶠ
-        SD[t] == s0 - s1 * r[t - 1] + s2 * (AP[t - 1] - AP[t - 2]) / AP[t - 2]
+        SD[t] == s0 - s1 * r + s2 * (AP[t - 1] - AP[t - 2]) / AP[t - 2]
         AD == γ0 + (1 / (1 - γ)) * SD / AP[t - 1]
         AP == p1 * (AD / AS)
         AS == α * AQ
@@ -373,7 +373,6 @@ DynQconAPLevelChange2 = @model begin
         AQ == (1 + gₐ) * AQ[t - 1]
     end
 end
-
 
 DynQodlAPLevelChange2 = @model begin
     @time 0.0:1.0:100.0
