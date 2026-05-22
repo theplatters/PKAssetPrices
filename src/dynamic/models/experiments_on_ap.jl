@@ -366,7 +366,7 @@ DynQconAPLevelChange2 = @model begin
         W == W0 - h * U
         N == a * Y
         U == 1 - N / Nᶠ
-        SD[t] == s0 - s1 * r[t - 1] + s2 * (AP[t] - AP[t - 1]) / AP[t - 1]
+        SD[t] == s0 - s1 * r + s2 * (AP[t] - AP[t - 1]) / AP[t - 1]
         AD == γ0 + (1 / (1 - γ)) * SD / AP
         AP == p1 * (AD / AS)
         AS == α * AQ
