@@ -1,3 +1,4 @@
+#we choose DynQodlAPLevelChange2 for further analysis
 DynQconAPLevelChange = @model begin
     @time 0.0:1.0:100.0
 
@@ -66,7 +67,7 @@ DynQconAPLevelChange = @model begin
         W == W0 - h * U
         N == a * Y
         U == 1 - N / Nᶠ
-        SD[t] == s0 - s1 * r[t - 1] - s2 * AP[t] + s3 * (AP - AP[t - 1]) / AP[t - 1]
+        SD[t] == s0 - s1 * r - s2 * AP[t] + s3 * (AP - AP[t - 1]) / AP[t - 1]
         AD == γ0 + (1 / (1 - γ)) * SD
         AP == p1 * (AD / AS)
         AS == α * AQ
@@ -141,7 +142,7 @@ DynQconAPChange = @model begin
         W == W0 - h * U
         N == a * Y
         U == 1 - N / Nᶠ
-        SD[t] == s0 - s1 * r[t - 1] + s2 * (AP - AP[t - 1]) / AP[t - 1]
+        SD[t] == s0 - s1 * r + s2 * (AP - AP[t - 1]) / AP[t - 1]
         AD == γ0 + (1 / (1 - γ)) * SD
         AP == p1 * (AD / AS)
         AS == α * AQ
@@ -291,7 +292,7 @@ DynQoldAPChange = @model begin
         W == W0 - h * U
         N == a * Y
         U == 1 - N / Nᶠ
-        SD[t] == s0 - s1 * r[t - 1] + s2 * (AP[t - 1] - AP[t - 2]) / AP[t - 2]
+        SD[t] == s0 - s1 * r + s2 * (AP[t - 1] - AP[t - 2]) / AP[t - 2]
         AD == γ0 + (1 / (1 - γ)) * SD
         AP == p1 * (AD / AS)
         AS == α * AQ
@@ -339,11 +340,11 @@ DynQconAPLevelChange2 = @model begin
         p1 = 1.0, "base asset price"
         s0 = 1.0, "autonomous speculative debt"
         s1 = 0.5, "speculative debt induced by interest"
-        s2 = 0.5, "speculative debt induced by interest"
+        s2 = 0.9, "speculative debt induced by interest"
         γ0 = 0.0, "autonomous asset demand"
         γ = 0.5, "turnover asset selling"
         α = 0.1, "turnover 2"
-        gₐ = 0.03, "rate of assets being created"
+        gₐ = 0.003, "rate of assets being created"
     end
 
     @init begin
@@ -419,7 +420,7 @@ DynQodlAPLevelChange2 = @model begin
         γ0 = 0.0, "autonomous asset demand"
         γ = 0.5, "turnover asset selling"
         α = 0.1, "turnover 2"
-        gₐ = 0.03, "rate of assets being created"
+        gₐ = 0.003, "rate of assets being created"
     end
 
     @init begin
@@ -442,7 +443,7 @@ DynQodlAPLevelChange2 = @model begin
         W == W0 - h * U
         N == a * Y
         U == 1 - N / Nᶠ
-        SD[t] == s0 - s1 * r[t - 1] - s2 * AP[t - 1] + s3 * (AP[t - 1] - AP[t - 2]) / AP[t - 2]
+        SD[t] == s0 - s1 * r - s2 * AP[t - 1] + s3 * (AP[t - 1] - AP[t - 2]) / AP[t - 2]
         AD == γ0 + (1 / (1 - γ)) * SD
         AP == p1 * (AD / AS)
         AS == α * AQ
