@@ -1,7 +1,7 @@
 module PKAssetPrices
 
 
-export Dashboard, Dynamic, Static
+export Dashboard, Dynamic, Static, Plotting
 export solve_model
 
 function solve_model() end
@@ -10,6 +10,7 @@ include("base.jl")
 include("static/static_model.jl")
 include("dynamic/dynamic_model.jl")
 include("dash/Dashboard.jl")
+include("plotting/dynamic_plotting.jl")
 
 function @main(args)
     models = Dict("PQ" => Static.AssetPKPQ, "PQA" => Static.AssetPKPQA, "PQC"=> Static.AssetPKPQC, "PQCr"=> Static.AssetPKPQCr, "PQCrDIFF"=> Static.AssetPKPQCrDIFF)
