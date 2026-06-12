@@ -497,7 +497,7 @@ WorkingModel = @model begin
     @parameters begin
         b = 0.5, "consumption rate"
         c₀ = 0.8, "credit rationing initial param"
-        c₁ = 0.01, "credit rationing AP slope"
+        c₁ = 0.1, "credit rationing AP slope"
         d0 = 5.0, "autonomous credit financed demand"
         d1 = 8.0, "max discretonary credit demand when r=0"
         i0 = 0.01, "autonomous policy rate"

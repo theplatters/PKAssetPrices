@@ -88,27 +88,26 @@ function compare_dynq_real_cases(
 end
 
 
-function create_gif(; model = Dynamic.DynQconAPLevelChange2, param_name = :s2, param_range = range(0.1, 0.9, length = 100), filename = "animation.gif")
+function create_gif(; model = Dynamic.DynQconAPLevelChange2, param_name = :s2, param_range = range(0.1, 0.9, length = 100), filename = "animation.gif", plotted_vars = [:AD, :AP, :AS], labels = ["Asset demand", "Asset price", "Asset supply"])
     sol_baseline = Dynamic.solve_model(model)
     xs = 1:length(sol_baseline.paths[:AD])
 
-    ys_ad = Observable(sol_baseline.paths[:AD])
-    ys_ap = Observable(sol_baseline.paths[:AP])
-    ys_as = Observable(sol_baseline.paths[:AS])
+    obs = [Observable(sol_baseline.paths[v]) for v in plotted_vars]
 
     f = Figure()
     ax = Axis(f[1, 1])
-    lines!(ax, xs, ys_ad, label = "Asset demand")
-    lines!(ax, xs, ys_ap, label = "Asset price")
-    lines!(ax, xs, ys_as, label = "Asset supply")
+    for (obs_var, label) in zip(obs, labels)
+        lines!(ax, xs, obs_var, label = label)
+    end
     axislegend(ax)
+    
 
 
     record(f, filename, 1:length(param_range)) do i
-        sol = run_dynq_case(parametrization = model, overwrites = (param_name => param_range[i],))
-        ys_ad[] = sol.paths[:AD]
-        ys_ap[] = sol.paths[:AP]
-        ys_as[] = sol.paths[:AS]
+        sol = run_dynq_case(model = model, overwrites = (param_name => param_range[i],))
+        for (j, v) in enumerate(plotted_vars)
+            obs[j][] = sol.paths[v]
+        end
         ax.title = "$(param_name) = $(round(param_range[i], digits = 2))"
     end
 
