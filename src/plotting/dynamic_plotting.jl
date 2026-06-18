@@ -3,7 +3,7 @@ using CairoMakie
 using ..Dynamic
 using ..Dynamic: DynamicModel, DiscreteTime, DynamicParametrization, solve_model, @model
 
-function run_dynq_case(; model = Dynamic.Dynamic.DynQconAPLevelChange2, overwrites = (;))
+function run_dynq_case(; model = Dynamic.Dynamic.DynQconAPLevelChange2, overwrites = (;), init_vals = (;))
     params = copy(model.params)
 
     for (k, v) in overwrites
@@ -13,7 +13,16 @@ function run_dynq_case(; model = Dynamic.Dynamic.DynQconAPLevelChange2, overwrit
             error("Parameter $(k) not found in model parameters.")
         end
     end
-    scen = Dynamic.DynamicParametrization(model.model, params, model.init, model.u0)
+
+    init = copy(model.init)
+    for (k, v) in init_vals
+        if haskey(init, k)
+            init[k] = v
+        else
+            error("Initial value $(k) not found in model initial values.")
+        end
+    end
+    scen = Dynamic.DynamicParametrization(model.model, params, init, model.u0)
 
     sol = solve_model(scen)
 
@@ -109,6 +118,32 @@ function create_gif(; model = Dynamic.DynQconAPLevelChange2, param_name = :s2, p
             obs[j][] = sol.paths[v]
         end
         ax.title = "$(param_name) = $(round(param_range[i], digits = 2))"
+    end
+
+    return f
+end
+
+function create_gif_init_vars(; model = Dynamic.DynQconAPLevelChange2, init_var_name = :AP, init_var_range = range(0.1, 0.9, length = 100), filename = "animation.gif", plotted_vars = [:AD, :AP, :AS], labels = ["Asset demand", "Asset price", "Asset supply"])
+    sol_baseline = Dynamic.solve_model(model)
+    xs = 1:length(sol_baseline.paths[:AD])
+
+    obs = [Observable(sol_baseline.paths[v]) for v in plotted_vars]
+
+    f = Figure()
+    ax = Axis(f[1, 1])
+    for (obs_var, label) in zip(obs, labels)
+        lines!(ax, xs, obs_var, label = label)
+    end
+    axislegend(ax)
+    
+
+
+    record(f, filename, 1:length(init_var_range)) do i
+        sol = run_dynq_case(model = model, init_vals = (init_var_name => [1.0, init_var_range[i]],))
+        for (j, v) in enumerate(plotted_vars)
+            obs[j][] = sol.paths[v]
+        end
+        ax.title = "$(init_var_name) = $(round(init_var_range[i], digits = 2))"
     end
 
     return f
