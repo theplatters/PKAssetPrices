@@ -471,7 +471,7 @@ Dynα = @model begin
 end
 
 WorkingModel = @model begin
-    @time 0.0:1.0:100.0
+    @time 0.0:1.0:50.0
 
     @variables  begin
         Y = "Output"
