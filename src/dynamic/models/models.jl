@@ -542,7 +542,7 @@ WorkingModel = @model begin
         U == 1 - N / Nᶠ
         SD[t] == s0 - s1 * r - s2 * AP[t - 1] + s3 * (AP[t - 1] - AP[t - 2]) / AP[t - 2]
         AD == γ0 + (1 / (1 - γ)) * SD
-        AP == p1 * (AD / AS)
+        AP == max(p1 * (AD / AS), 0.0)
         AS == α * AQ
         AQ == (1 + gₐ) * AQ[t - 1]
 
