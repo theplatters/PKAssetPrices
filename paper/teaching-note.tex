@@ -12,6 +12,8 @@
 \usepackage{graphicx}
 \usepackage{diagbox}
 \usepackage{enumitem}
+\usepackage{todonotes}
+\usepackage{cancel}
 
 \geometry{margin=2.5cm}
 \onehalfspacing
@@ -27,9 +29,15 @@
 
 \section{Introduction}
 
-While Keynes is often credited with fundamentally changing the way economists think about money and finance, especially when it comes to the evaluating the link between financial market dynamics and real economic activity. However, Keynes himself was not fully consistent in his treatment of money, finance and speculation across his works and in the past decades different authors and traditions took up different aspects of his work. This leads to a fragmented reception of Keynes* ideas on money and finance, where later works often highlight specific takes on money and finance advanced by Keynes, but fail to provide a coherent picture of his overall view. In this teaching note we provide a simple model that captures the key insights of Keynes on money and speculation and show how it can be used to illustrate the impact of speculation on the real economy. We also discuss how this model can be used to introduce students to the concept of endogenous money and the role of speculation in shaping economic outcomes.
+\todo{create bibtex and bibliography in standard form}
+\todo{for creating the bibliography we could also draw on the AI comments in the txt}
 
-To provide a full picture of our argument we first trace Keynes' original arguments in the \textit{Treatise on Money} and the \textit{General Theory of Employment, Interest and Money} in section \ref{sec:historyofthought} and discuss how Keynes used these different approaches to discuss monetary policy under different historical and institutional conditions. Following the Keynesian adage that economists should focusing on "choosing models that are relevant to the contemporary world" (SOURCE), we suggest recombining different arguments made in both works to arrive at a rough description of the institutional underpinnings of contemporary monetary systems. On this basis, we then present a simple static model in section \ref{sec:model} that integrates key insights of Keynes on money and speculation. We use this model to illustrate the impact of speculation on the real economy in section \ref{sec:impact} under different model assumptions. As an outlook, we discuss real-world implications of the model for both policy-making (in section TODO) and financial markets (in section TODO) with a topical focus of notions on stability and instability.
+While Keynes is often credited with fundamentally changing the way economists think about money and finance, especially when it comes to the evaluating the link between financial market dynamics and real economic activity. However, Keynes himself was not fully consistent in his treatment of money, finance and speculation across his works and in the past decades different authors and traditions took up and emphasized different aspects of his core contributions. This leads to a fragmented reception of Keynes' ideas on money and finance, where later works often highlight specific takes advanced by Keynes, but fail to provide a coherent picture of his overall view. In this teaching note we provide a simple model that captures the key insights of Keynes on money, finance and speculation and illustrates the impact of different assumptions Keynes made on the role of the financial sector and the impact of speculation on the real economy. 
+
+Aside from its core purpose to rationally reconstruct key stances on money and finance developed by Keynes, we find that the resulting model can also be used to introduce students to the concept of endogenous money and the role of speculation in shaping real economic outcomes.
+
+To provide a coherent account, we first trace Keynes' original arguments in the \treatise and the \GT in section \ref{sec:historyofthought} and discuss how Keynes used these different approaches to discuss monetary policy under different historical and institutional conditions. Following the Keynesian adage that economists should focusing on "choosing models that are relevant to the contemporary world" (SOURCE), we suggest recombining different arguments made in both works to arrive at two rough distinctions relevant for describing institutional underpinnings of contemporary monetary systems. On this basis, we then present a simple static model in section \ref{sec:model} that integrates key insights of Keynes on money and speculation. We use this model to illustrate the impact of speculation on the real economy in section \ref{sec:impact} under different model assumptions. As an outlook, we discuss real-world implications of the model for both policy-making (in section TODO) and financial markets (in section TODO) with a topical focus of notions on stability and instability.
+\todo{Complete end of intro + references}
 
 %\begin{enumerate}[label=(\alph*)]
 %\item model provides a missing link between debates on financialization ond PK models that are mostly focused on the real economy.
@@ -39,11 +47,14 @@ To provide a full picture of our argument we first trace Keynes' original argume
 
 \section{Keynes on money and speculation} \label{sec:historyofthought}
 
-The relationship between financial speculation and real economic activity is one of the oldest questions in monetary theory. Within Keynes's own oeuvre, two different answers can be found. In the \treatise{} (1930), speculative activity is largely cordoned off from the real economy: money used for financial transactions circulates in a different ``sphere'' from money used for production and consumption. In the \GT{} (1936), this cordon is removed: through the speculative motive for liquidity preference, the demand for money originating in financial markets can affect the rate of interest, and thereby investment, output, and employment.
+It is a quite well-known fact (REFs) that the \GT and the \treatise do rest on fundamentally different conceptions of \emph{money itself}. The \treatise{} is more preoccupied with the mechanics of credit creation and provides a detailed classification of how bank credit eventually creates bank deposits so that the \treatise is effectively driven by a view of money as \emph{endogenous}: the banking system creates purchasing power through lending, and the supply of money responds to the needs of industry and finance. The \GT{}, in contrast, shelves this institutional apparatus. Money enters the analysis as a simple stock of base money $M=\bar{M}$, determined by the monetary authority, and the analytical effort shifts entirely to the demand side---the liquidity preference schedule. The banking system fades into the background; what matters is the portfolio choice between holding money and holding bonds.
+\todo{find REFs}
 
-But the two books differ not only in how they model the speculation--real-economy nexus. They also rest on fundamentally different conceptions of \emph{money itself}. The \treatise{} is preoccupied with the mechanics of credit creation. Its detailed classification of bank deposits---income-deposits, business-deposits A~and~B, savings-deposits---is driven by a view of money as \emph{endogenous}: the banking system creates purchasing power through lending, and the supply of money responds to the needs of industry and finance. The famous passage that ``there is no limit to the amount of bank money which the banks can safely create provided that they move forward in step''\footnote{Keynes, \emph{Treatise on Money}, Ch.~2, p.~23.} is a statement of endogenous money \emph{avant la lettre}. The \GT{} shelves this institutional apparatus. Money enters the analysis as a simple stock $M$, determined by the monetary authority, and the analytical effort shifts entirely to the demand side---the liquidity preference schedule. The banking system fades into the background; what matters is the portfolio choice between holding money and holding bonds.
+Such portfolio choice thereby also touches on the role of speculation, as such portfolios might also cover more speculative assets, that are held not because of their productive capacities, but because their owners expect (or, hope for) an increase of their underlying market price. Speculation is, thereby, distinct from investment as it channels liquidity into purposes that do not facilitate further economic activity. This separation of speculative activity from conventional GDP accounting often motivates bracketing out speculative behavior completely in both, teaching and research contexts. 
 
-The shift from the \treatise{} to the \GT{} is therefore not a single move but a \emph{double shift}: one along the speculation--real-economy dimension, another along the endogenous--exogenous money dimension. These two axes define a simple typology, shown in Table~\ref{tab:typology}.
+However, which exact relationship exists between financial speculation and real economic activity is one of the oldest questions in monetary theory. Again, within Keynes's own oeuvre, two different answers can be found. In the \treatise{} (1930), speculative activity is largely cordoned off from the real economy: money used for financial transactions circulates in a different ``sphere'' from money used for production and consumption. In the \GT{} (1936), however, this cordon is removed: through the speculative motive for liquidity preference, the demand for money depends on asset prices originating in financial markets, which in turn can affect the rate of interest, and thereby investment, output, and employment.
+
+The shift from the \treatise{} to the \GT{} is therefore not a single move but a \emph{double shift}: one along the speculation--real-economy dimension, another along the endogenous--exogenous money dimension. These two shifts can be represented by the simple typology, shown in Table~\ref{tab:typology}.
 
 \begin{table}[h]
 \centering
@@ -51,46 +62,40 @@ The shift from the \treatise{} to the \GT{} is therefore not a single move but a
 shift}\label{tab:typology}
 \begin{tabular}{lcc}
 \toprule
-& \makebox[3.5cm]{\hfill\textbf{Speculation isolated}\hfill}
-& \makebox[3.5cm]{\hfill\textbf{Speculation $\to$ real economy}\hfill} \\
-& \makebox[3.5cm]{\hfill(no feedback)}\hfill
-& \makebox[3.5cm]{\hfill(feedback)}\hfill \\
+& \shortstack{\textbf{Speculation $\xcancel{\to}$ real economy}\\(no feedback)}
+& \shortstack{\textbf{Speculation $\to$ real economy}\\(feedback)} \\
 \midrule
 \textbf{Exogenous money} &  (Neo)classical standard  &  \GT{} \\
 \hspace{1em}(base money or $M = \bar M$) &  case &\\
 \midrule
 \textbf{Endogenous money} &  \treatise{}  &  Our model \\
-\hspace{1em}(credit money, loans create deposits) & & (Post-Keynesian)\\
+\hspace{1em}(credit money, loans create deposits) & & \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The four cells of Table~\ref{tab:typology} represent four logically coherent positions, each of which corresponds to one of our four model variants in Section~4:
+The four cells of Table~\ref{tab:typology} represent four logically coherent positions. In the top left corner money is as ``neutral'' as it goes: here, base money is a policy-determined stock and financial markets are an intermediating sideshow that do not affect real activity, except by exogenously determined interest rates. In the top right corner, in contrast, speculative motives may influence exactly this variable -- the rate of interest -- and, hence, allow for a feedback of asset prices on real economic developments. Here, Keynes asserts that when asset prices are high, investors will tend to hold money -- the liquidity preference -- which drives up interest rates, and vice versa.
 
-\begin{enumerate}[leftmargin=*]
-\item \textbf{Top-left (Exogenous money, no feedback):}
-  Money is a policy-determined stock; financial markets are a sideshow that does not affect real activity. This is the (neo)classical baseline---the quantity theory stripped of Keynesian complications. In a model where the money supply is given exogenously and speculation has no channel to affect real spending, the classical dichotomy holds.
+In contrast, the \treatise conventionally proceeds on the assumption that such speculative activity, while relevant to for financial stability in an endogenous money context, does not directly impact on credit provided for investment (or consumption) purposes. Hence, as indicated in the bottom left cell of table \ref{tab:typology}, the link between speculation and real economic developments is cut and the focus is directed on the internal dynamics of the banking sector and the inflation and contraction of balance sheets of financial market actors. 
 
-\item \textbf{Top-right (Exogenous money, feedback):}
-  The \GT{} occupies this cell. Money is exogenously given; the rate of interest is determined by liquidity preference---including the speculative motive---interacting with the given stock $M$. Changes in speculative sentiment shift the liquidity preference schedule, alter the interest rate, and thereby affect investment and output. The feedback runs through the cost of capital, but the money stock itself remains passive.
+Finally, the bottom-right bracket poses a scenario, where we allow for both, enodgenous money and real-world impacts of speculative motives and tendencies. In principle, such an account resonates well with a Post-Keynesian stance, which is typically associated with both, the assumption of endogenous money and the conviction that financial markets are not neutral intermediaries. However, at the same time models in the Post-Keynesian tradition often avoid making the impact of speculation explicit, because modeling the impact of speculation on GDP and employment requires the introduction of additional assumptions that make this link explicit.\footnote{See, however, these REFs for some exceptions.}
+\todo{add REFs in footnote}
 
-\item \textbf{Bottom-left (Endogenous money, no feedback):}
-  The \treatise{} occupies this cell. Money is created endogenously by the banking system in response to demand for credit---including speculative credit---but the two circulations (industrial and financial) are independent. Speculation expands balance sheets without touching output or employment. Money matters, but only within its own sphere.
+In section \ref{sec:model} we provide a simple model that focuses on the bottom row of table \ref{tab:typology} and compares different variants of bringing endogenous money in a simple modeling framework that allows for making explicit the different channels and arguments, by which speculative behavior might indeed impact on the development of the real economy. However, before doing so we revisit key instances in the works addressed here to better substantiate the summary provided above in the original works.
 
-\item \textbf{Bottom-right (Endogenous money, feedback):}
-  This cell combines both Post-Keynesian premises: money is endogenous, created by bank lending, \emph{and} speculative activity affects the real economy through one or more feedback channels. This is the position we argue is most relevant for understanding the contemporary world, where financial markets are deep, heavily leveraged, and tightly coupled with the credit creation process. Our model operationalizes this cell: the endogenous money framework of the \treatise{} is retained, but one of the \GT{} feedback mechanisms (credit rationing or the asset-price channel) is added to close the loop.
-\end{enumerate}
+\todo{Wir könnten uns hier fragen: Wollen wir auch einen Variante für oben links und oben rechts als Modell haben – als nicht nur "bottom row" wie im text? Ich denke sowas haben wir in der genauen Form gerade nicht... -- man könnte aber dort ansetzen wo wir schon sind und verschiedene challenges darstellen, die so einen kanal aufmachen.}
 
-\subsection{Endogenous vs.\ Exogenous Money}
+\subsection{Keynes on endogenous vs.\ exogenous Money}
 \label{sec:endogenous-money}
 
-The \treatise{} develops one of the most meticulous accounts of credit-money in the history of economic thought. Chapter~2 opens with a famous statement of the endogenous money principle:
+The \treatise{} develops one of the most meticulous accounts of the origins and nature of credit-money in the history of economic thought, effectively emphasizing that banks create money (in the form of deposits) by providing credit, that is then channeled back to their own accounts. In principle, this money creation by private banks can operate stable, without limit when risks within the banking sector remain fairly evenly distributed. Chapter~2 of the \treatise summarizes this stance in a famous statement on the endogenous money principle:
 
 \begin{quote}
 There is no limit to the amount of bank money which the banks can safely create provided that they move forward in step.\footnote{Keynes, \emph{Treatise on Money}, Vol.~1, Ch.~2, p.~23.}
 \end{quote}
+\todo{recheck quotation and add reference}
 
-Keynes elaborates on this in Chapter~3 by classifying bank deposits into three categories according to their economic function: income-deposits (households' transaction balances), business-deposits (firms' working capital, further divided into A~and~B), and savings-deposits (interest-bearing savings accounts). The classification is reproduced in Table~\ref{tab:treatise-balance} and summarized in Chapter~15 under two broader headings.
+Keynes elaborates on this in Chapter~3 of the \treatise by classifying bank deposits into two main categories according to their economic function: income-deposits (households' transaction balances) and business-deposits (firms' working capital) for transactions to ensure daily production and provisioning, and savings-deposits (interest-bearing savings accounts) as well deposits  for financial transactions of firm dedicate to organize financial investments. The classification is reproduced in Table~\ref{tab:treatise-balance} and summarized in Chapter~15 under two broader headings, where real and financial circulation a are separated into two different spheres.
 
 \begin{table}[h]
 \centering
@@ -101,41 +106,49 @@ Ch.~3 and Ch.~15)}\label{tab:treatise-balance}
 Deposit type & Description & Circulation \\
 \midrule
 Income-deposits & Households' transaction balances & \\
-Business-deposits A & Firms' working capital & Industrial \\
+Operative Business-deposits & Firms' working capital & Industrial \\
 \midrule
-Business-deposits B & Financial transactions & \\
 Savings-deposits & Interest-bearing savings & Financial \\
+Speculative Business-deposits & Financial transactions & \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The detailed taxonomy itself embodies a theory of money creation. Deposits are not simply ``there'' in a fixed quantity; they arise from the lending activities of the banking system. Income-deposits and business-deposits A are created when banks extend credit for production and consumption; business-deposits B are created when banks lend for financial transactions; savings-deposits arise from the public's decision to hold idle balances. The total quantity of money is determined by the interaction of bank lending decisions and the public's willingness to hold deposits. There is no \emph{exogenous} money stock --- the central bank influences the process through the bank rate and open-market operations, but it does not set the quantity of money directly.
+The detailed taxonomy itself embodies a theory of money creation. Deposits are not simply ``there'' in a fixed quantity; they are endogenous to the lending activities of the banking system. Deposits corresponding to the \textit{industrial circulation} are created when banks extend credit for production and consumption, while deposits associated with \textit{financial circulation} are created when banks lend for financial transactions or when households decide to hold idle balances. The total quantity of money is determined by the interaction of bank lending decisions and the public's willingness to hold deposits. There is no \emph{exogenous} money stock --- the central bank influences the process through the bank rate and open-market operations, but it does not set the quantity of money directly.
 
-In the \GT{}, this institutional apparatus is set aside. Chapter~15 introduces the liquidity preference function as:
+In the \GT{}, this institutional apparatus is set aside. In Chapter~15, Keynes defines money demand and introduces introduces the liquidity preference function as:
 
 \begin{equation}
 M = M_1 + M_2 = L_1(Y) + L_2(r) \tag{GT, Ch.~15}
 \end{equation}
 
-The left-hand side \(M\) is the total quantity of money, now treated as a variable ``determined by the action of the central bank'' (Ch.~15) --- that is, as an exogenously given stock. The analytical effort shifts entirely to the right-hand side: the \emph{demand} for money, which is decomposed into the transactions motive \(L_1(Y)\) and the speculative motive \(L_2(r)\). The banking system as a credit-creating institution is essentially absent from the analysis; loans, deposits, and reserve management are no longer modelled. The famous classification of Chapter~3 of the \treatise{} is collapsed into a single sentence:
+The left-hand side \(M\) is the total quantity of money, now treated as a variable ``determined by the action of the central bank'' (Ch.~15) --- that is, as an exogenously given stock. The analytical effort shifts entirely to the right-hand side: the \emph{demand} for money, which is decomposed into the transactions motive \(L_1(Y)\) and the speculative motive \(L_2(r)\). The latter variable is thereby directly tied to asset prices, as the real interest rate $r$ is high when bond prices are low, and vice versa.
+
+As large parts of the \GT treat bonds as the main category of speculative assets, the interest rate $r$ and the price of speculative assets (as an alternative to holding liquidity) are directly tied to each other, where the price of speculative assets effectively drives the price of cash (in form of $r$). While such a channel from speculative to interest rate seems plausible in principle -- e.g., when central banks respond to speculative frenzies by financial market tightening --, this setups results in a very peculiar and specific scenario, where speculative dynamics are the sole main driver of real interest rates. At the same time high real interest rates might easily feed back on asset prices -- e.g., via lack of cheap credit to sustain high asset prices --, an aspect that is not directly incorporated in the above setup of the \GT. So while there seems to be some consensus that simultaneity is at work, when it comes to the relationship between interest rates and asset prices, the \GT provides a very specific interpretation of this causal channel: it effectively abstract from both, other forces impacting on the interest rate as well as possible feedback effects from the interest rate on asset prices. This specific construction, somewhat ironically, actually limits the generality of the \GT, which does not model the emergence of interest rates and their interplay with asset prices in great detail. In contrast, as we will show further below, the treatment found in the \treatise offers a more open and flexible starting point to model this simultanous relationship.
+
+\todo{Wir hatten eine Variante mit so einem interplay und eventuell sollten wir die auf Basis dieser Einfügung später auch mal bringen...}
+\todo{eventuell könnte man mit verweis auf die liquidity preference auch nochmal diese turnover sache besprechen. eventuell wäre es einfach sinnvoller zu sagen, die liquidty preference bestimmt \gamma im (dynamischen) modell... – das schiene mir an sich recht plausibel... im gegensatz zu dem was in der \GT so direkt steht..}
+
+A further consequence of this assumption is that the banking system as a credit-creating institution is essentially absent from the analysis; loans, deposits, and reserve management are no longer explicitly modeled. The famous classification of Chapter~3 of the \treatise{} is collapsed into a single sentence:
 
 \begin{quote}
 Money held for each of the three purposes forms, nevertheless, a single pool, which the holder is under no necessity to segregate into three water-tight compartments; for they need not be sharply divided even in his own mind, and the same sum can be held primarily for one purpose and secondarily for another.\footnote{Keynes, \emph{The General Theory of Employment, Interest and Money} (1936), Ch.~15.}
 \end{quote}
 
-The ``single pool'' formulation is an important analytical simplification --- it lets Keynes model portfolio choice parsimoniously --- but it also discards the \treatise's insight that the money stock is itself an outcome of the credit creation process. Where the \treatise{} asks ``how is money created?'' and answers ``through bank lending,'' the \GT{} asks ``how is money held?'' and answers ``as a portfolio choice between liquidity and earning assets.'' Both questions are legitimate, but they belong to different theoretical worlds --- the left and right columns of our typology.
+The ``single pool'' formulation is an important analytical simplification --- it lets Keynes model portfolio choice parsimoniously --- but it also discards the \treatise's insight that the money stock is itself an outcome of the credit creation process. Where the \treatise{} asks more macroscopic ``how is money created?'' and answers ``through bank lending,'', the \GT{} poses the more decision-focused question ``how is money held?'' and answers ``as a portfolio choice between liquidity and earning assets.'' In the second version of the \GT macro-properties of the monetary system are then presented as a corrolary to that questions. While both questions are legitimate in principle, they are anchored in different theoretical perspectives as represented --- the left and right columns of the typology shown in table \ref{tab:typology.
 
 \subsection{The Real Impacts of Speculation}
 
-The second dimension of the typology concerns whether speculative activity in financial markets can affect output, employment, and the price of current goods. Here again the two books give different answers. 
+The second cleavage identified when comparing the \treatise and the \GT concerns the question, whether speculative activity in financial markets can affect real economic activity, that is, output, employment, or productivity. Here again the two books give different answers. 
 
-In the \treatise{}, Keynes divides the total money stock into two \emph{circulations} that can, in principle, expand and contract independently. The distinction is drawn in Chapter~15:
+In the \treatise{}, Keynes divides the total money stock into two \emph{circulations} that can, in principle, operate without exogenous limits and, hence, expand and contract independently as long as they remain internally stable. The distinction is drawn in Chapter~15:
 
 \begin{quote}
-We must now... make yet a further classification... namely a division between the deposits used for the purposes of industry, which we shall call the \emph{Industrial Circulation}, and those used for the purposes of Finance, which we shall call the \emph{Financial Circulation}. By \emph{Industry} we mean the business of maintaining the normal process of current output, distribution and exchange and paying the factors of production their incomes for the various duties which they perform from the first beginning of production to the final satisfaction of the consumer. By \emph{Finance}, on the other hand, we mean the business of holding and exchanging existing titles to wealth (other than exchanges resulting from the specialisation of industry), including Stock Exchange and Money Market transactions, speculation and the process of conveying current savings and profits into the hands of entrepreneurs.\footnote{Keynes, \emph{Treatise on Money}, Vol.~1 (1930), Ch.~15, p.~243.}
+We must now... make yet a further classification... namely a division between the deposits used for the purposes of industry, which we shall call the \emph{Industrial Circulation}, and those used for the purposes of Finance, which we shall call the \emph{Financial Circulation}. By \emph{Industry} we mean the business of maintaining the normal process of current output, distribution and exchange [...]. By \emph{Finance}, on the other hand, we mean the business of holding and exchanging existing titles to wealth [...], including Stock Exchange and Money Market transactions, speculation and the process of conveying current savings and profits into the hands of entrepreneurs.\footnote{Keynes, \emph{Treatise on Money}, Vol.~1 (1930), Ch.~15, p.~243.}
 \end{quote}
+\todo{recheck quote and add reference}
 
-The causal claim is immediate: if money used for financial transactions circulates in a different loop from money used for production, then an expansion of the financial circulation --- driven by speculative lending --- need not touch the industrial circulation at all. Keynes drives this home in Chapter~17:
+The causal claim is immediate: if money used for financial transactions circulates in a different loop from money used for production, then an expansion of the financial circulation --- driven by speculative lending --- need not touch the industrial circulation at all. Keynes makes this very explicit in Chapter~17 of the \treatise and thereby also integrates the observation that speculative activity will not, as such, contribute to investment and, hence, GDP will remain unaffected from such speculative activity.
 
 \begin{quote}
 [R]ising prices of securities will cause a difference of opinion to develop between two sections of the financial community,---one section (the ``bulls'') believing in the continuance of the price-rise and willing to buy with borrowed money, the other section (the ``bears'') doubting the continuance and preferring to sell securities for cash or bills... So long as the new money is absorbed by [the Stock Exchange turnover and the enlargement of the bear position], without, however, stimulating the output of new investment, there will be no effect on the purchasing power of money.\footnote{Keynes, \emph{Treatise on Money}, Vol.~1, Ch.~17, pp.~270--71.}
@@ -143,80 +156,94 @@ The causal claim is immediate: if money used for financial transactions circulat
 
 This is the \emph{cordon sanitaire}: speculative activity can expand the financial circulation indefinitely --- the bull--bear dynamic absorbs new credit without transmitting it to the industrial circulation --- and real activity remains unchanged. The two circulations coexist but do not interact; money is fully endogenous, but the endogeneity operates in two independent channels.
 
-In the \GT{}, this separation is abandoned. The same money stock serves both the transactions and speculative motives, as the liquidity preference equation \(M = L_1(Y) + L_2(r)\) makes clear. Because the two motives draw on a common pool, any increase in speculative demand for money presses on the rate of interest:
+In the \GT{}, this separation is abandoned. The same money stock serves both the transactions and speculative motives, as the liquidity preference equation \(M = L_1(Y) + L_2(r)\) makes clear. However, because these two motives draw on a common pool, any increase in speculative demand for money also presses on the rate of interest:
 
 \begin{quote}
 It is by playing on the speculative-motive that monetary management (or, in the absence of management, chance changes in the quantity of money) is brought to bear on the economic system.\footnote{Keynes, \emph{General Theory}, Ch.~15.}
 \end{quote}
+\todo{recheck quote and REF}
 
-The interest rate, in turn, governs investment, and investment governs output and employment. The channel from speculation to the real economy runs through the cost of capital, not through balance-sheet crowding-out. And the famous passage from Chapter~12 captures the \emph{normative} implication:
+Hence, Keynes acknowledges the simultaneous nature of the speculation---interest-rate nexus and, especially, the fact that speculation als has an impact of the rate of interest, without making this complex recursive structure explicit in this modeling setup.\footnote{The most straightforward way to express this in the framework of the \GT would be to state $M = M_1 + M_2 = L_1(Y) + L_2(r(M_2))$}, which makes the recursive character explicit and would invite a more explicit consideration of time as also found in the simple model shown in section \ref{sec:model}.}. Notwithstanding this observation, this recursive structure is nonetheless decisive for understanding the feedback on macroeconomic dynamics as the interest rate also governs investment, and investment governs output and employment by means of the consumption multiplier. Thereby channel from speculation to the real economy in the \GT explicitly runs through the cost of capital, not through balance-sheet crowding-out. And the famous passage from Chapter~12 captures the \emph{normative} implication:
 
 \begin{quote}
 Speculators may do no harm as bubbles on a steady stream of enterprise. But the position is serious when enterprise becomes the bubble on a whirlpool of speculation. When the capital development of a country becomes a by-product of the activities of a casino, the job is likely to be ill-done.\footnote{Keynes, \emph{General Theory}, Ch.~12.}
 \end{quote}
 
-Speculation harms enterprise, in the \GT{} framework, \emph{only through the rate of interest}. A more leveraged financial sector that does not shift the liquidity preference schedule is, strictly speaking, harmless --- a logical possibility that the \treatise{} had already explored through the bull--bear mechanism.
-
-Comparing the two books along this dimension:
-\begin{itemize}[leftmargin=*]
-\item The \treatise{} treats the industrial and financial circulations
-as causally independent. Speculative activity can expand arbitrarily
-without real effects, provided the bull--bear dynamic absorbs the
-incoming credit. This corresponds to the \emph{left column} of
-Table~\ref{tab:typology}.
-\item The \GT{} unifies the two circulations through the single-pool
-assumption. Speculative activity affects the interest rate, which
-affects investment, which affects output. This corresponds to the
-\emph{right column} of Table~\ref{tab:typology}.
-\end{itemize}
-
-Together with the analysis of the money concept in Section~\ref{sec:endogenous-money}, this gives us the complete picture: the \treatise{} occupies the bottom-left cell (endogenous money, speculation isolated), the \GT{} the top-right cell (exogenous money, speculation affects the real economy). The two dimensions are independent --- a point that the sequential exposition of the two books often obscures, but that the cross-tabulation in Table~\ref{tab:typology} makes visible at a glance.
-
-What exactly must one assume to move from one position to the other? The next section answers this question with a simple formal model.
+Speculation, hence, can harm enterprise and economic development, in the \GT{} framework, \emph{only through the rate of interest}. A more leveraged financial sector is fine as long as it does not shift the liquidity preference schedule too much so that productive investment is left unconstrained. In such a situation speculation is, strictly speaking, harmless --- a logical possibility that the \treatise{} had already explored through the bull--bear mechanism. However, as soon as speculation may crowd out investment or directly impacting on investment behavior -- e.g. via higher interest rates or by providing outside options for liquid individuals -- this separation breaks and speculation can have \textit{real} consequences.
 
 \section{A simple teaching model} \label{sec:model}
 
-We begin with a standard Blecker-Setterfield-style endogenous money model, adapted from Fontana and Setterfield (2009) and implemented in the Julia package \texttt{PKAssetPrices}.\footnote{The package is available at \url{https://github.com/theplatters/PKAssetPrices} and reproduces the model from \url{https://macrosimulation.org/a_post_keynesian_macro_model_with_endogenous_money}.}
+In what follows we embed key arguments from the bottom row of table \ref{tab:typology} in a simple model of endogenous money. We thereby take the endogenous money model of Blecker and Setterfield (REFs, adapted from Fontana and Setterfield (2009)) as a starting point and extend this model with an explicit market for (speculative) assets. The model presentation draws on the exposition by Kohler and Prante (WEBSITE, REFs) and has been implemented in Julia\footnote{LINK TO GIT?}. We start by revisiting the key structure of the model, before adding the asset market module in a second step.
 
-MAYBE A WORD ABOUT C and I vs. D and ND AS THIS IS MORE USUAL IN TEACHING?????
+
+%package \texttt{PKAssetPrices}.\footnote{The package is available at \url{https://github.com/theplatters/PKAssetPrices} and reproduces the model from \url{https://macrosimulation.org/a_post_keynesian_macro_model_with_endogenous_money}.}
 
 \subsection{The basic model}
 
-The real side is described by a goods market and a wage-price system; the monetary side by an endogenous money creation process and a Taylor-style policy rule.
+The real side of the model is described by a goods market and a wage-price system to represent labor market dynamics. The monetary side, in contrast, is governed by an endogenous money creation process and a Taylor-style policy rule. While being modeled as an endogenous variable, the interest rate depends on a series of parameters that are (exogenously) set by the central bank, so that different impacts on interest rate dynamics can be modeled in such a setup. 
 
-\paragraph{Goods market}
+The key equations for the goods market are, hence, given by 
+
+\paragraph{Goods market I}
 \begin{align}
-  Y &= ND + c D \label{eq:y} \\
-  ND &= b Y \label{eq:nd} \\
-  D &= d_0 - d_1 r \label{eq:d}
+  Y &= ND + c D \label{eq:simple_y}, \\
+  ND &= b Y \label{eq:simple_nd}, \\
+  D &= d_0 - d_1 r \label{eq:simple_d},
 \end{align}
 
-Output \(Y\) is the sum of non-debt-financed demand \(ND\) and credit-rationed debt-financed demand \(cD\), where \(c\) is the credit rationing parameter. Non-debt-financed demand depends on income (Eq.~\ref{eq:nd}), and debt-financed demand depends negatively on the lending rate \(r\) (Eq.~\ref{eq:d}).
+where output \(Y\) is the sum of non-debt-financed demand \(ND\) and credit-rationed debt-financed demand \(cD\) with \(c\) serving as a credit rationing parameter. As non-debt-financed demand depends on income (Eq.~\ref{eq:nd}) and debt-financed demand depends negatively on the lending rate \(r\) (Eq.~\ref{eq:d}), there is a close conceptual correspondence between $ND$ and consumption ($C$ in conventional models) as well as $cD$ and $I$, where the former can be interpreted as credit lines dedicated to finance real investments (with $(1-c)$ giving the share of planned investments that could not be implement due to a lack of liquid funds).
 
-\paragraph{Monetary sector}
+Against this backdrop we would suggest to rewrite equations \ref{eq:simple_y} in teaching contexts as
+
+\paragraph{Goods market II}
 \begin{align}
-  i &= i_0 + i_1 P \label{eq:i} \\
-  r &= (1 + m) i \label{eq:r} \\
-  dL &= c D \label{eq:dl} \\
-  dM &= dL \label{eq:dm} \\
-  dR &= k dM \label{eq:dr}
+  Y &= C + I = ND + cD \label{eq:teaching_y}, \\
+  ND &= C = b Y \label{eq:teaching_nd}, \\
+  D &= I_P = d_0 - d_1 r \label{eq:teaching_d},
 \end{align}
 
-The central bank sets a policy rate \(i\) that responds to the price level \(P\) (Eq.~\ref{eq:i}); banks apply a markup \(m\) to arrive at the lending rate \(r\) (Eq.~\ref{eq:r}). New loans \(dL\) create new deposits \(dM\) (Eqs.~\ref{eq:dl}--\ref{eq:dm}); a fraction \(k\) is held as reserves \(dR\) (Eq.~\ref{eq:dr}). Money is purely endogenous: the supply of credit determines the money stock.
+to better align the presentation with conventional notation and assumptions typically employed in Keynesian-style models. This applies especially to the idea that consumption is governed by comparatively constant behavioral patterns (as given by equation \ref{eq:teaching_nd}), while investment is guided by animal spirits and financial markets conditions. In the above setup, the latter enter via $r$ as a general constraint and $c$, which depends on the portfolio choices of the banking sectors as well as the solvency of potential borrowers.
+\todo{hier könnte man vllt auch mal minsky reinzitieren?}
 
-\paragraph{Wage-price system}
+As already indicated the monetary sector is mainly governed by interest rates set by the central bank $i$ as well as bank markup $m$ as given below. The remaining equations do collect relevant transactions for accounting purposes.
+
+\todo{Eventuell sollten wir auch hier eine einfache Accounting Matrix aufstellen?? Die könnte man zB auch am Ende dieser Section präsentieren...}
+
+\paragraph{Monetary system}
 \begin{align}
-  P &= (1 + n) a W \label{eq:p} \\
-  W &= W_0 - h U \label{eq:w} \\
-  N &= a Y \label{eq:n} \\
-  U &= 1 - \frac{N}{N^f} \label{eq:u}
+  i &= i_0 + i_1 P \label{eq:simple_i} \\
+  r &= (1 + m) i \label{eq:simple_r} \\
+  dL &= c D \label{eq:simple_dl} \\
+  dM &= dL \label{eq:simple_dm} \\
+  dR &= k dM \label{eq:simple_dr}
 \end{align}
 
-Firms set prices as a markup on unit labour costs (Eq.~\ref{eq:p}). Nominal wages fall with unemployment (Eq.~\ref{eq:w}), reflecting workers' reduced bargaining power. Employment is proportional to output (Eq.~\ref{eq:n}) given fixed labour productivity \(a\), and unemployment is the gap between labour supply \(N^f\) and actual employment (Eq.~\ref{eq:u}).
+This version of the model features a minimal version of a Taylor-rule that neglects the output/employment term and focuses on price stability only. Similar to the rationale of the Blecker-Setterfield exposition this setup aims to implement a roughly accurate representation of the inner workings of contemporary monetary systems (REF, w.g. BankOfEngland) with a minimum of algebraic load.\footnote{While this reduces the standard Taylor-rule to a simple price-stability rule in the basic model, extensions of this aspect of the model can easily be added in later stages of the exposition.}
 
-This system of 12 equations in 12 unknowns can be solved for the equilibrium values of output, employment, the price level, the interest rate, and the endogenous money stock, where the latter .
+\todo{eventuell sollten wir uns mal anschauen was eine echte taylorrule bewirken würde -> aber vielleicht geht das im statischen modell gar nicht wg. rekursivität}
 
-SHOW PICTURES HERE? UPPER LEFT CASE – NO SEPCUAÖLTION AND PURE INTERMEDIARY
+Note that the accounting scheme is still taking reserves into account; however, in contrast to an exogenous money view these reserves are not a constraint on the monetary system, but, rather, arise as a residual determined from the operation of private banks. Specifically, new loans \(dL\) create new deposits \(dM\) (Eqs.~\ref{eq:simple_dl}--\ref{eq:simple_dm}) and a fraction \(k\) of these deposits is generated as reserves \(dR\) (Eq.~\ref{eq:simple_dr}). Money is, hence, purely endogenous: the supply of credit determines the money stock.\footnote{While the focus of this note is on models of endogenous money that seem to bear greater relevance for the description of contemporary economies, \textit{reserves} obviously could serve as key anchor for bringing exogenous notions of money back into the model.}
+
+The final component by this minimal macroeconomic model with endogenous money is given by the labor market conditions and corresponding trends in wages and prices as specified in the equations below.
+
+\paragraph{Labor markets and wage-price nexus}
+\begin{align}
+  P &= (1 + n) a W \label{eq:simple_p} \\
+  W &= W_0 - h U \label{eq:simple_w} \\
+  N &= a Y \label{eq:simple_n} \\
+  U &= 1 - \frac{N}{N^f} \label{eq:simple_u}
+\end{align}
+
+Firms set prices as a markup on unit labour costs (Eq.~\ref{eq:simple_p}). Nominal wages fall with unemployment (Eq.~\ref{eq:simple_w}), reflecting workers' reduced bargaining power. Employment is proportional to output (Eq.~\ref{eq:simple_n}) given fixed labour productivity \(a\), and unemployment is the gap between labour supply \(N^f\) and actual employment (Eq.~\ref{eq:simple_u}).
+
+This system of 12 equations in 12 unknowns can be solved for the equilibrium values of output, employment, the price level, the interest rate, and the endogenous money stock.
+% HIER DANN SOWAS SCHREIBEN WIE "OBGLEICH ES EIN MODELL MIT ENDOGENEM GELD IST; IST ES AUCH EINS OHNE FINANZMARKT; DAHER SIND ALLE BALANCE SHEET MOVEMENTS REAL INDUZIERT
+
+
+% DAS WAS HIER DRUNTERSTEHT STIMMT ERST WENN MAN DEN FINANZMARKT DAZUTUT. DAS KÖNNTE MAN DANN ALS ABGRENZUNG VERSTEHEN...
+% where the latter can be seen as a purely financial phenomenon -- the cordon sanitaire between both spheres remains intact so that real developments remain totally unaffected by financial market developments –– no matter how far the latter expands or contracts.
+
+\todo{SHOW PICTURES HERE? UPPER LEFT CASE – NO SEPCUAÖLTION AND PURE INTERMEDIARY --> könnte man vllt eh so machen, dass es direkt zum Absatz vorher passt??>
 
 SLOP
 In this variant, Eqs.~(\ref{eq:y})--(\ref{eq:dr}) and (\ref{eq:dl-extended})--(\ref{eq:as}) are solved simultaneously, with \(c\) fixed as an exogenous parameter. The asset market determines \(SD\), \(AD\), \(AP\), \(AS\) and inflates the balance sheet (loans and deposits both larger by \(SD\)), but none of the real variables are affected. Output, employment, the price level, and the interest rate are identical to the baseline model without an asset market.
