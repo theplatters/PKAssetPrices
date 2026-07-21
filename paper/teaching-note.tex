@@ -17,6 +17,7 @@
 \usepackage{cancel}
 \usepackage{xspace}
 \usepackage{makecell}
+\usepackage{multirow}
 
 \geometry{margin=2.5cm}
 \onehalfspacing
@@ -133,44 +134,28 @@ Keynes elaborates on this in the \treatise[Vol.~1, Ch.~3] by classifying bank de
 \centering
 \caption{Keynes's Classification of Bank Deposits (from
 \treatise[Vol.~1, Chs.~3 and 15])}\label{tab:treatise-balance}
-\begin{tabular}{lll}
-\toprule
-Deposit type & Description & Circulation \\
-\midrule
-Income-deposits & Households' transaction balances & \\
-Operative Business-deposits & Firms' working capital & Industrial \\
-\midrule
-Savings-deposits & Interest-bearing savings & Financial \\
-Speculative Business-deposits & Financial transactions & \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[h]
-\centering
-\caption{Keynes's Classification of Bank Deposits (from
-\treatise[Vol.~1, Chs.~3 and 15])}\label{tab:treatise-balance}
-\begin{tabular}{lll}
+\begin{tabular}{llc}
 \toprule
 & \shortstack{\textbf{Description}}
 & \shortstack{\textbf{Circulation}} \\
 \midrule
 \makecell[l]{\textbf{Income-deposits}}
  & Households' transaction balances
- & -- \\
+ & \multirow{2}{*}{Industrial} \\
 \makecell[l]{\textbf{Operative Business-deposits}}
  & Firms' working capital
- & Industrial \\
+ & \\
 \midrule
 \makecell[l]{\textbf{Savings-deposits}}
  & Interest-bearing savings
- & Financial \\
+ & \multirow{2}{*}{Financial} \\
 \makecell[l]{\textbf{Speculative Business-deposits}}
  & Financial transactions
- & -- \\
+ & \\
 \bottomrule
 \end{tabular}
 \end{table}
+
 
 The detailed taxonomy itself embodies a theory of money creation. Deposits are not simply ``there'' in a fixed quantity; they are endogenous to the lending activities of the banking system. Deposits corresponding to the \textit{industrial circulation} are created when banks extend credit for financing production (or consumption), while deposits associated with \textit{financial circulation} are created when banks lend for financial transactions or when households decide to hold idle balances. The total quantity of money is determined by the interaction of bank lending decisions and the public's willingness to hold deposits. There is no \emph{exogenous} money stock --- the central bank influences the process through the bank rate and open-market operations, but it does not set the quantity of money directly.
 
