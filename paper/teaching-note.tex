@@ -17,6 +17,7 @@
 \usepackage{cancel}
 \usepackage{xspace}
 \usepackage{makecell}
+\usepackage{multirow}
 
 \geometry{margin=2.5cm}
 \onehalfspacing
@@ -117,8 +118,7 @@ However, before doing so we revisit key instances in Keynes' original works to b
 \todo{Wir könnten uns hier fragen: Wollen wir auch einen Variante für oben links und oben rechts als Modell haben – als nicht nur "bottom row" wie im text? Ich denke sowas haben wir in der genauen Form gerade nicht...
 -- man könnte aber dort ansetzen wo wir schon sind und verschiedene challenges darstellen, die so einen kanal aufmachen. UPDATE: HABS MAL SO UMGESCHRIEBEN, DASS WIR DAS NICHT MACHEN SONDERN BEI ENDOGENEN SZEANRIEN BLEIBEN. WIR KÖNNEN JA NOCHMAL ÜBERLEGEN WENN WIR DAS SETUP FÜR DIE GRAPHS HABEN}
 
-\subsection{Keynes on endogenous vs.\ exogenous Money}
-\label{sec:endogenous-money}
+\subsection{Keynes on endogenous vs.\ exogenous Money} \label{subsec:endogenous-money}
 
 The \treatise{} develops one of the most meticulous accounts of the origins and nature of credit-money in the history of economic thought, effectively emphasizing that banks create money (in the form of deposits) by providing credit, that is then channeled back to their own accounts.
 In principle, this money creation by private banks can operate stable, without limit when risks within the banking sector remain fairly evenly distributed. The \treatise[Vol.~1, Ch.~2] summarizes this stance in a famous statement on the endogenous money principle:
@@ -136,44 +136,28 @@ Keynes elaborates on this in the \treatise[Vol.~1, Ch.~3] by classifying bank de
 \centering
 \caption{Keynes's Classification of Bank Deposits (from
 \treatise[Vol.~1, Chs.~3 and 15])}\label{tab:treatise-balance}
-\begin{tabular}{lll}
-\toprule
-Deposit type & Description & Circulation \\
-\midrule
-Income-deposits & Households' transaction balances & \\
-Operative Business-deposits & Firms' working capital & Industrial \\
-\midrule
-Savings-deposits & Interest-bearing savings & Financial \\
-Speculative Business-deposits & Financial transactions & \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[h]
-\centering
-\caption{Keynes's Classification of Bank Deposits (from
-\treatise[Vol.~1, Chs.~3 and 15])}\label{tab:treatise-balance}
-\begin{tabular}{lll}
+\begin{tabular}{llc}
 \toprule
 & \shortstack{\textbf{Description}}
 & \shortstack{\textbf{Circulation}} \\
 \midrule
 \makecell[l]{\textbf{Income-deposits}}
  & Households' transaction balances
- & -- \\
+ & \multirow{2}{*}{Industrial} \\
 \makecell[l]{\textbf{Operative Business-deposits}}
  & Firms' working capital
- & Industrial \\
+ & \\
 \midrule
 \makecell[l]{\textbf{Savings-deposits}}
  & Interest-bearing savings
- & Financial \\
+ & \multirow{2}{*}{Financial} \\
 \makecell[l]{\textbf{Speculative Business-deposits}}
  & Financial transactions
- & -- \\
+ & \\
 \bottomrule
 \end{tabular}
 \end{table}
+
 
 The detailed taxonomy itself embodies a theory of money creation. Deposits are not simply ``there'' in a fixed quantity; they are endogenous to the lending activities of the banking system. Deposits corresponding to the \textit{industrial circulation} are created when banks extend credit for financing production (or consumption), while deposits associated with \textit{financial circulation} are created when banks lend for financial transactions or when households decide to hold idle balances. The total quantity of money is determined by the interaction of bank lending decisions and the public's willingness to hold deposits. There is no \emph{exogenous} money stock --- the central bank influences the process through the bank rate and open-market operations, but it does not set the quantity of money directly.
 
@@ -203,7 +187,7 @@ Money held for each of the three purposes forms, nevertheless, a single pool, wh
 The ``single pool'' formulation is an important analytical simplification --- it lets Keynes model portfolio choice parsimoniously --- but it also discards the \treatise's insight that the money stock is itself an outcome of the credit creation process.
 In sum, the \treatise{} asks more macroscopic question ``how is money created?'' and answers ``through bank lending,'', while the \GT{} poses the more decision-focused question ``how is money held?'' and answers ``as a portfolio choice between liquidity and earning assets.'' In the second version of the \GT macro-properties of the monetary system are then presented as a corrollary to that questions. While both questions provide legitimate vantage points in principle, they are anchored in different theoretical perspectives as represented --- the left and right columns of the typology shown in table \ref{tab:typology}.
 
-\subsection{The Real Impacts of Speculation}
+\subsection{The Real Impacts of Speculation} \label{subsec:speculation}
 
 The second cleavage identified when comparing the \treatise and the \GT concerns the question, whether speculative activity in financial markets can affect real economic activity, that is, output, employment, or productivity. Here again the two books give different answers. 
 
@@ -316,34 +300,44 @@ Here we reproduce a simple standard setup: firms set prices as a markup on unit 
 
 %This system of 12 equations in 12 unknowns can be solved for the equilibrium values of output, employment, the price level, the interest rate, and the endogenous money stock. -- BRAUCHEN WIR DAS?
 %HIER DANN SOWAS SCHREIBEN WIE "OBGLEICH ES EIN MODELL MIT ENDOGENEM GELD IST; IST ES AUCH EINS OHNE FINANZMARKT; DAHER SIND ALLE BALANCE SHEET MOVEMENTS REAL INDUZIERT
+%Eventuell macht es sinn sich einen konstanten shift zu überlöegen, also was sich ändert damit man zwei szenarien in einer abbildung unterbringt. Zinssenkung/-erhöhung könnte ein Kandidat sein...
 
 \todo{MACHT ES SINN HIER BILDER ZU ZEIGEN? MAN MÜSSTE SICH VLLT SOWIESO EINEN SCHOCK ÜBERLEGEN, ZB EINE ÄNDERUNG DES ZINSSATZES? SHOW PICTURES HERE? UPPER LEFT CASE – NO SPECULATION AND PURE INTERMEDIARY --> könnte man vllt eh so machen, dass es direkt zum Absatz vorher passt??}
 
 
-\subsection{Extending the Model with an Asset Market}
+\subsection{Adding an Asset Market}
 
-We now introduce four new variables---speculative-financed debt \(SD\), asset demand \(AD\), asset supply \(AS\), and the asset price \(AP\)---and the associated equations:
+In a next step we introduce a market for speculative assets in this framework, which serves as a key instantiation of a financial market with the model setup. For doing so, we introduce four new variables: credit taken up for speculative purposes, that is, speculative debt $SD$, asset demand $AD$, number of (homogenous) speculative assets supplied $AS$, and the asset price $AP$, that emerges from the interplay of the liquidity that fuels the demand for assets and the supply of real or financial assets. Hence, asset supply can be interpreted as urban real estate, bonds, shares, pieces of art, bitcoins or some conglomerate of those.
 
+\paragraph{Asset markets}
 \begin{align}
-  SD &= s_0 - s_1 r \label{eq:sd} \\
-  AD &= \gamma_0 + \frac{1}{1 - \gamma} \frac{SD}{AP} \label{eq:ad} \\
-  AP &= p_1 \frac{AD}{AS} \label{eq:ap} \\
-  AS &= AQ (\alpha + g_\alpha) \label{eq:as}
+  SD &= (s_0 - s_1 r) / AP  \label{eq:sd} \\
+  AD &= \frac{1}{1 - \gamma} SD \label{eq:ad} \\
+  AP &= \frac{AD}{AS} \label{eq:ap} \\
+  AS &= \bar{AS} %AQ (\alpha + g_\alpha) \label{eq:as} (ICH HÄTTE HIER MAL AUF ALPHA VERZICHTET)
 \end{align}
 
-Speculative debt \(SD\) depends negatively on the interest rate (Eq.~\ref{eq:sd}): higher rates raise the cost of carry for speculative positions.
-Asset demand \(AD\) is driven by speculative borrowing scaled by a turnover parameter \(\gamma\) (Eq.~\ref{eq:ad}); \(1/(1-\gamma)\) acts as a \emph{speculative multiplier}---the higher the turnover rate, the more asset demand responds to a given volume of speculative borrowing.
-The asset price \(AP\) is determined by the ratio of demand to supply (Eq.~\ref{eq:ap}), and supply is a fixed stock \(AQ\) times a turnover rate \(\alpha + g_\alpha\) (Eq.~\ref{eq:as}).
+% note on gamma_zero: I dropped gamma_0 here, as it would have led to a third channel of influence and as it is zero anyway it does not matter much. I also reorganized the other equations in search for a simple and plausible narrative.
 
-Crucially, the balance sheet of the private sector now includes speculative debt.
-The equation for new loans becomes:
+In this formulation the total purchasing power devoted to speculative purposes is given by $AD$, which, conceptually, has two main components: credit-financed speculative demand $SD$, which depends negatively on the interest rate (which makes credit-financed speculation more costly) and the level of asset prices $AP$. Both assumptions go back directly to the \GT (as discussed in section \ref{subsec:endogenous-money), where the latter takes up the notion that a ``liquidity preference'' for holding money becomes more pertinent wenn asset prices are high. However, in contrast to the \GT (and its strong focus on the bonds market), we consider the impact of interest rates and asset prices and two separate channels (which are deterministically tied together in the framework of the \GT).
+
+To provide a realistic account of speculative activity, it is important to see that buying assets involves shifting liquidity to those parties that sell the speculative assets. In case this purchasing power is used to buy other assets \textit{within the same period}, a dynamics akin to the classical Keynesian multiplier is emerging: if we assume that some share $gamma_1$ of funds is reinvested after each transaction the total amount of asset demand $AD$ with a given period is equal to $\frac{1}{1 - \gamma} SD$ as made explicit by equation \ref{eq:ad}.
+
+As can be inferred from equations \ref{eq:sd}---\ref{eq:ap}, the formulation already lead to a recursive setup, where $SD$ and $AP$ show a simultaneous relationship that is mediated via $AD$. % [HERE WE HAVE TO WRITE SOMETHING ABOUT WHETHER THIS CAN BE SOLVED AND HOW CONVOLUTE THIS LOOKS] 
+
+However, and notwithstanding these complications, a simple static model nonetheless has difficulties to represent the full spectrum of factors influencing speculative demand. A key variable, for instance, that is missing in our setup is a reference to changes of asset prices (either past or expected), which are typically said to matter for speculation decision in a direction opposed to the impact of levels (i.e., high prices tend to reduce demand, but rising prices will increase demand). Against this backdrop, one could interpret $gamma_1$ as being influenced by such expectation: if speculators expect rising asset prices a $gamma_1$ comparably close to 1 would be a plausible assumption leading to a corresponding boom, whereas in cases of asset market pessimism $gamma_1$ will shrink as agents will be reluctant to reinvest liquidity if the current outlook is bleak. Such an interpretation would resonate with the approach of the \treatise, which assigns a strong roll to the dominance of either `bullish'' or ``bearish'' expectations of market participants (as indicated in section \ref{subsec:speculation}). 
+	
+
+The asset price $AP$ is eventually determined by the ratio of demand to supply (Eq.~\ref{eq:ap}), where supply is, also for reasons of simplicity, a fixed stock $\bar{AS}$ 
+
+% times a turnover rate \(\alpha + g_\alpha\) (Eq.~\ref{eq:as}). HÄTTE ICH WIE GESAGT OBEN MAL RAUSGENOMMEN UND DANN UNTEN WIEDER EINGEFÜHRT. DIE FRAGE WÄRE OB WIE HIER DEN TURNOVER ANSPRECHEN WOLLEN.
+
+Crucially, the balance sheet of the private sector now includes speculative debt as the stock of speculative debt $SD$ enters the banking system's assets alongside productive loans $cD$ so that $dM = dL$ now also reflects liquidity provided for speculative purposes (i.e. Keynes' claim that the expansion of bank money accommodates speculative positions).
 
 \begin{equation}
-  dL = c D + SD \label{eq:dl-extended}
+  dL = c D + SD \label{eq:dl-extended} 
+%das hat in der alten formulierung dann eigentlich eh nicht gestimmt wenn AP eine behavioral variable ist. ist erst mit der umstellung oben richtig geworden, as far as I can see.
 \end{equation}
-
-The stock of speculative debt \(SD\) in Eq.~(\ref{eq:dl-extended}) enters the banking system's assets alongside productive loans \(cD\), and the corresponding deposits \(dM = dL\) include money created for speculative purposes.
-This is the formal analogue of Keynes's financial circulation: the expansion of bank money to accommodate speculative positions.
 
 SHOW PICTURES HERE? \treatise{} CASE: SPECUALTION EXPANDS MONEY BASE BUT REAL WORLD IS UNTOUCHED
 
@@ -369,16 +363,17 @@ we could compare this with a scenario of rising inequality.
 should give a result similar to (b) that is better explained.
 %\end{enumerate}
 
-\subsection{Real economic impacts of financial speculation}
+\section{Real economic impacts of financial speculation}
 
 (SHOW TWO WAYS AS IN CODE? SLOP!)
 
-\subsubsection{PQC: The Credit Rationing Channel (General Theory I)} \label{sec:pqc}
+\subsection{The Credit Rationing Channel (General Theory I)}
 
 In this variant, we replace the exogenous credit rationing parameter
 \(c\) with an endogenous function of asset demand:
 \begin{equation}
   c = c_0 - c_1 AD \label{eq:c-ad}
+  %hier müsste dann doch eher sowas wie SD stehen?
 \end{equation}
 
 When asset demand \(AD\) rises, the banking sector reduces the share of
@@ -396,13 +391,15 @@ balance-sheet crowding-out rather than the interest rate channel of the
 depress real activity. The financial circulation is no longer a cordon
 sanitaire---it draws resources away from the industrial circulation.
 
-\subsubsection{PQCr: The Asset-Price Channel (General Theory II)}
+\subsection{The Asset-Price Channel (General Theory II)}
 
 In this variant, we return \(c\) to its exogenous value but let the
 central bank respond to asset prices as well as goods prices:
 \begin{equation}
   i = i_0 + i_1 P + i_2 AP \label{eq:i-ap}
 \end{equation}
+
+%third alternative: share of speculative assets relative to balance sheet?? or better size of balance sheet relative to GDP? eventuell kann man noch einen dritten pfad fornulieren
 
 When \(AP\) rises, the policy rate \(i\) rises, raising the lending
 rate \(r\), and thereby reducing debt-financed demand \(D\) and output
@@ -420,11 +417,15 @@ The model typically exhibits more complex, and potentially unstable,
 dynamics under this parametrization---as one would expect from a system
 where the policy rate and the asset price chase each other.
 
+\section{Some extensions of the basic model}
+
+HIER BIN NOCH UNSICHER WAS WIR GENAU MACHEN; EVENTUELL AUCH MAL EIN BEISPIEL mit GAMMA_1 und ERWARTUNGEN?
+
 \subsection{Endogenizing $\alpha$ - towards an endogenous asset turnover rate}
 
 \subsection{Endogenizing $c$ - credit constrains through speculation}
 
-\section{Real world analysis: Economic Policy}
+\section{Real world analysis: An Economic Policy Example}
 
 \subsection{PQCrDIFF: Dual Interest Rates (A Modern Extension)}
 
@@ -435,7 +436,9 @@ Finally, we introduce separate lending rates for productive and speculative borr
 where \(i_{AP}\) is a penalty multiplier on speculative lending. This connects to the macroprudential policy debates that followed the 2008 crisis, and to the institutional separation between business banks and financial banks that Jespersen (2009) derives from the \treatise{}. It also echoes Keynes's own observation in the \treatise[Vol.~1, Ch.~2, p.~23] that a banking system that moves ``forward in step'' is capable of almost unlimited expansion---and that this very capacity is a source of ``inherent instability,'' because ``any event which tended to influence the behaviour of the majority of banks in the same direction... would be capable of setting up a violent movement of the whole system.'' A dual-rate regime imposes a friction on the ``forward-in-step'' expansion of speculative lending.
 
 
-\section{Real world analysis: How speculative activity depends on financial market conditions and monetary policy}
+\section{Real world analysis: Understanding financial market dynamics as decisions under uncertainty}
+
+%hier macht es ggf. sinn eine oder zwei gleichungen zu erfinden, die das ganze aus sicht der speculators darstellen – eventuell mit einer normalverteilten Erwartung über die preissteigerungen. Im Grunde ist es ein Spiel gegen eine unbekannte exogene Variable --> Zentralbankverhalten – so könnte amn den Wettcharakter herausarbeiten.
 
 The mechanisms captured by our four model variants are not merely theoretical artefacts. The period 2020--2023 provides a natural experiment in the real-financial nexus that maps directly onto the channels formalized above.
 
