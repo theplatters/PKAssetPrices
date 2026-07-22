@@ -21,6 +21,8 @@
 \geometry{margin=2.5cm}
 \onehalfspacing
 
+\DeclareMathOperator{\ND}{ND}
+
 \DeclareCiteCommand{\treatisecite}
   {}
   {\printtext[bibhyperref]{\mkbibemph{Treatise on Money}}}
@@ -258,27 +260,26 @@ The key equations for the goods market are, hence, given by
 
 \paragraph{Goods market I}
 \begin{align}
-  Y &= ND + c D \label{eq:simple_y}, \\
-  ND &= b Y \label{eq:simple_nd}, \\
+  Y &= \ND + c D \label{eq:simple_y}, \\
+  \ND &= b Y \label{eq:simple_nd}, \\
   D &= d_0 - d_1 r \label{eq:simple_d},
 \end{align}
 
-where output $Y$ is the sum of non-debt-financed demand $ND$ and credit-rationed debt-financed demand $cD$ with $c$ serving as a credit rationing parameter.
-As non-debt-financed demand depends on income (Eq.~\ref{eq:simple_nd}) and debt-financed demand depends negatively on the lending rate $r$(Eq.~\ref{eq:simple_d}), there is a close conceptual correspondence between $ND$ and consumption ($C$ in conventional models) as well as $cD$ and $I$, where the former can be interpreted as credit lines dedicated to finance real investments (with $(1-c)$ giving the share of planned investments $I_P$ that could not be implement due to a lack of liquid funds).
+where output $Y$ is the sum of non-debt-financed demand $\ND$ and credit-rationed debt-financed demand $cD$ with $c$ serving as a credit rationing parameter.
+As non-debt-financed demand depends on income (Eq.~\ref{eq:simple_nd}) and debt-financed demand depends negatively on the lending rate $r$(Eq.~\ref{eq:simple_d}), there is a close conceptual correspondence between $\ND$ and consumption ($C$ in conventional models) as well as $cD$ and $I$, where the former can be interpreted as credit lines dedicated to finance real investments (with $(1-c)$ giving the share of planned investments $I_P$ that could not be implement due to a lack of liquid funds).
 
 Against this backdrop we would suggest to rewrite equations \ref{eq:simple_y} in teaching contexts as
 
 \paragraph{Goods market II}
 \begin{align}
-  Y &= C + I = ND + cD \label{eq:teaching_y}, \\
-  ND &= C = b Y \label{eq:teaching_nd}, \\
+  Y &= C + I = \ND + cD \label{eq:teaching_y}, \\
+  \ND &= C = b Y \label{eq:teaching_nd}, \\
   D &= I_P = d_0 - d_1 r \label{eq:teaching_d},
 \end{align}
 
 to better align the presentation with conventional notation and assumptions typically employed in Keynesian-style models.
 This applies especially to the idea that consumption is governed by comparatively constant behavioral patterns (see equation \ref{eq:teaching_nd}), while investment is guided by animal spirits and financial markets conditions.
-In the above setup, the latter enter via $r$ as a general constraint and $c$, which depends on the portfolio choices of the banking sectors as well as the solvency of potential borrowers.
-\todo{hier könnte man vllt auch mal minsky reinzitieren?}
+In the above setup, the latter enter via $r$ as a general constraint and $c$, which depends on the portfolio choices of the banking sector as well as the solvency of potential borrowers.\footnote{In Minskyan terms, $c$ can be interpreted as a reduced-form representation of borrower's and lender's risk, which constrain the volume of debt-financed investment \parencite[Ch.~8]{minskyStabilizingUnstableEconomy1986}. While $c$ is taken as given in the baseline model, Section~\ref{sec:pqc} subsequently endogenizes it with respect to asset demand. The model nevertheless remains static and therefore does not capture the intertemporal transition from hedge to speculative and Ponzi finance central to Minsky's financial instability hypothesis \parencite{minskyFinancialInstabilityHypothesis1992}.}
 
 As already indicated the monetary sector is mainly governed by interest rates $r$, which are jointly determined by the central bank's policy rate $i$ as well as bank markup $m$. The remaining equations do collect relevant transactions for accounting purposes.
 
@@ -372,7 +373,7 @@ should give a result similar to (b) that is better explained.
 
 (SHOW TWO WAYS AS IN CODE? SLOP!)
 
-\subsubsection{PQC: The Credit Rationing Channel (General Theory I)}
+\subsubsection{PQC: The Credit Rationing Channel (General Theory I)} \label{sec:pqc}
 
 In this variant, we replace the exogenous credit rationing parameter
 \(c\) with an endogenous function of asset demand:
