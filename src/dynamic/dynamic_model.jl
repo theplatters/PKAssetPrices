@@ -42,10 +42,21 @@ include("model_macros.jl")
 
 
 function build_context(dp::DynamicParametrization{F, G, T, U}, t::Int, paths) where {F, G, T, U <: Real}
-    # base params (β, α, …), scalar or vector[t]
-    lag_pairs = isone(t) ?
-        [Symbol(s.name, :[t - 1]) => get!(dp.init, s.name, 0.0) for s in dp.model.variables] :
-        [Symbol(s.name, :[t - 1]) => paths[s.name][t - 1] for s in dp.model.variables]
+    lag_pairs = Pair{Symbol, Any}[]
+    for variable in dp.model.variables
+        name = variable.name
+        initial = get(dp.init, name, zero(U))
+        val_t1 = isone(t) ? initial : paths[name][t - 1]
+        val_t2 = if isone(t)
+            zero(initial)
+        elseif t == 2
+            initial
+        else
+            paths[name][t - 2]
+        end
+        push!(lag_pairs, Symbol(name, "[t - 1]") => val_t1)
+        push!(lag_pairs, Symbol(name, "[t - 2]") => val_t2)
+    end
     lag_nt = (; lag_pairs...)
     return merge(NamedTuple(dp.params), lag_nt)
 end

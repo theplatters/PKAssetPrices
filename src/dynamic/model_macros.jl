@@ -59,7 +59,6 @@ function _parse_init!(init, body)
     for line in body.args
         line isa LineNumberNode && continue
         if line isa Expr && line.head == :(=)
-            @info line
             name = line.args[1]
             value = line.args[2]
             init[name] = vcat(eval(value))
@@ -81,20 +80,23 @@ function _contains_time_index(expr, syms::Set{Symbol})
     return any(_contains_time_index(a, syms) for a in expr.args)
 end
 
+function _time_lag(idx)
+    idx == :t && return 0
+    if idx isa Expr && idx.head == :call && length(idx.args) == 3 &&
+            idx.args[1] == :- && idx.args[2] == :t && idx.args[3] in (1, 2)
+        return idx.args[3]
+    end
+    return nothing
+end
+
 function check_expr(ex)
     ex isa Expr || return
     if ex.head == :ref
         base = ex.args[1]
         base isa Symbol || error("Invalid time indexing: $ex")
 
-        # Only allow [t] and [t-1]
         idx = ex.args[2]
-        ok = (idx == :t) ||
-            (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == 1) ||
-            (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == :(1)) ||
-            (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == 2) ||
-            (idx isa Expr && idx.head == :call && idx.args[1] == :- && idx.args[2] == :t && idx.args[3] == :(2))
-        ok || error("Only [t] and [t-1] are allowed for variables. Found: $ex")
+        isnothing(_time_lag(idx)) && error("Only [t], [t-1], and [t-2] are allowed for variables. Found: $ex")
     end
     for a in ex.args
         check_expr(a)
@@ -102,7 +104,7 @@ function check_expr(ex)
     return
 end
 
-"Check that only stocks are indexed, and only with [t] or [t-1]."
+"Check that variables are indexed only with [t], [t-1], or [t-2]."
 function _validate_time_indexing!(eqs::Vector{Equation})
     for eq in eqs
         check_expr(eq.lhs)
@@ -115,6 +117,7 @@ end
 Rewrite stock refs:
 - x[t]    -> x       (current stocks are unknowns in u)
 - x[t-1]  -> (Symbol(\"x[t - 1]\"))  (lookup from p as key :(x[t - 1]))
+- x[t-2]  -> (Symbol(\"x[t - 2]\"))  (lookup from p as key :(x[t - 2]))
 """
 function _rewrite_time_refs(expr, stockset::Set{Symbol})
     # If it's a stock variable without indexing, treat it as [t]
@@ -127,15 +130,40 @@ function _rewrite_time_refs(expr, stockset::Set{Symbol})
     if expr.head == :ref && expr.args[1] isa Symbol && (expr.args[1] in stockset)
         x = expr.args[1]
         idx = expr.args[2]
-        if idx == :t
+        lag = _time_lag(idx)
+        if lag == 0
             return x
-        else
-            # treat anything not :t (we validated) as t-1
-            return Symbol(x, "[t - 1]")
         end
+        isnothing(lag) && error("Invalid time index in $expr")
+        return Symbol(x, "[t - $lag]")
     end
 
     return Expr(expr.head, (_rewrite_time_refs(a, stockset) for a in expr.args)...)
+end
+
+function _collect_symbols!(symbols::Set{Symbol}, expr)
+    if expr isa Symbol
+        push!(symbols, expr)
+    elseif expr isa Expr
+        for arg in expr.args
+            _collect_symbols!(symbols, arg)
+        end
+    end
+    return symbols
+end
+
+function _required_lag_symbols(equations::Vector{Equation}, variable_syms::Vector{Symbol})
+    used = Set{Symbol}()
+    for eq in equations
+        _collect_symbols!(used, eq.lhs)
+        _collect_symbols!(used, eq.rhs)
+    end
+
+    candidates = Symbol[]
+    for variable in variable_syms, lag in 1:2
+        push!(candidates, Symbol(variable, "[t - $lag]"))
+    end
+    return filter(in(used), candidates)
 end
 
 # -------- nulls generation for DynamicModel --------
@@ -152,7 +180,7 @@ function _generate_nulls(variables::Vector{DynVar}, params::Vector{DynVar}, eqs:
 
     # rewrite equations to:
     # - current stocks as symbols in u
-    # - lagged stocks as Symbol("x[t - 1]") that will be destructured from p
+    # - lagged values as synthetic symbols that will be destructured from p
     rewritten = Equation[]
     for eq in eqs
         push!(
@@ -163,11 +191,8 @@ function _generate_nulls(variables::Vector{DynVar}, params::Vector{DynVar}, eqs:
         )
     end
 
-    # collect lag symbols we need to destructure from p
-    lag_syms = Symbol[]
-    for s in variable_syms
-        push!(lag_syms, Symbol(string(s), "[t - 1]"))
-    end
+    # Destructure only the lagged values referenced by this model.
+    lag_syms = _required_lag_symbols(rewritten, variable_syms)
 
     residuals = [:($(eq.lhs) - $(eq.rhs)) for eq in rewritten]
 
@@ -190,6 +215,7 @@ function _generate_eval(variables::Vector{DynVar}, params::Vector{DynVar}, eqs::
     # rewrite equations:
     # - x[t]   -> x
     # - x[t-1] -> Symbol("x[t - 1]")
+    # - x[t-2] -> Symbol("x[t - 2]")
     rewritten = Equation[]
     for eq in eqs
         push!(
@@ -201,8 +227,8 @@ function _generate_eval(variables::Vector{DynVar}, params::Vector{DynVar}, eqs::
         )
     end
 
-    # lagged variable symbols expected in p
-    lag_syms = [Symbol(string(s), "[t - 1]") for s in variable_syms]
+    # Lagged variable symbols expected in p.
+    lag_syms = _required_lag_symbols(rewritten, variable_syms)
 
     # for evaluation, return rhs expressions
     values = [eq.rhs for eq in rewritten]
@@ -327,4 +353,3 @@ macro scenario(model, body)
         end
     )
 end
-
