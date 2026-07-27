@@ -38,6 +38,11 @@ const DP = PKAssetPrices.DynamicPlotting
     @test asset_panel isa Figure
     @test size(asset_panel.scene) == (1200, 1000)
     @test count(content -> content isa Axis, asset_panel.content) == 3
+    asset_market_axis = only(
+        content for content in asset_panel.content
+        if content isa Axis && content.title[] == "Asset market"
+    )
+    @test asset_market_axis.xlabel[] == "Base-price-equivalent quantity"
 
     baseline = PKAssetPrices.solve_model(S.SimplePK)
     @test_throws ArgumentError SP.panel(baseline, SP.AssetMarketPanel())

@@ -49,6 +49,17 @@ end
     end
 end
 
+@testset "Speculative debt enters bank loans" begin
+    for name in (:PQCr, :PQCrDIFF)
+        solution = PKAssetPrices.solve_model(getproperty(S, name))
+        variables = solution.variables
+
+        @testset "$name" begin
+            @test variables[:dL] ≈ variables[:c] * variables[:D] + variables[:SD]
+        end
+    end
+end
+
 @testset "All dynamic models solve" begin
     for name in DYNAMIC_MODELS
         parametrization = getproperty(D, name)

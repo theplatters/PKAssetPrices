@@ -296,7 +296,7 @@ The final component of this minimal macroeconomic model with endogenous money is
   U &= 1 - \frac{N}{N^f} \label{eq:simple_u}
 \end{align}
 
-Here we reproduce a simple standard setup: firms set prices as a markup on unit labour costs (Eq.~\ref{eq:simple_p}), nominal wages fall with unemployment (Eq.~\ref{eq:simple_w}), reflecting workers' reduced bargaining power and labour productivity $a$ is fixed. As a consequence, employment is proportional to output (Eq.~\ref{eq:simple_n}) and unemployment is the gap between labour supply \(N^f\) and actual employment (Eq.~\ref{eq:simple_u}).
+Here we reproduce a simple standard setup: firms set prices as a markup on unit labour costs (Eq.~\ref{eq:simple_p}), while nominal wages fall with unemployment (Eq.~\ref{eq:simple_w}), reflecting workers' reduced bargaining power. In the implemented equations, \(a\) is a fixed unit labour requirement, not labour productivity: \(N=aY\), so productivity is \(1/a\). Employment is therefore proportional to output (Eq.~\ref{eq:simple_n}) and unemployment is the gap between labour supply \(N^f\) and actual employment (Eq.~\ref{eq:simple_u}).
 
 Figure~\ref{fig:simplepk-equilibrium} summarizes the baseline equilibrium. The
 left panel shows the intersection of the goods-market schedule and the
@@ -316,46 +316,42 @@ requirements create equal reserve assets and central-bank liabilities.
 
 \subsection{Adding an Asset Market}
 
-In a next step we introduce a market for speculative assets in this framework, which serves as a key instantiation of a financial market with the model setup. For doing so, we introduce four new variables: credit taken up for speculative purposes, that is, speculative debt $SD$, asset demand $AD$, number of (homogenous) speculative assets supplied $AS$, and the asset price $AP$, that emerges from the interplay of the liquidity that fuels the demand for assets and the supply of real or financial assets. Hence, asset supply can be interpreted as urban real estate, bonds, shares, pieces of art, bitcoins or some conglomerate of those.
+In a next step we introduce a market for speculative assets. The implementation adds four variables: the nominal amount of speculative borrowing \(SD\), the gross quantity of asset purchases \(AD\), the quantity of homogeneous assets offered during the period \(AS\), and the asset price \(AP\). Asset supply can represent transactions in urban real estate, bonds, shares, pieces of art, bitcoins, or a composite of such assets.
 
 \paragraph{Asset markets}
 \begin{align}
-  SD &= (s_0 - s_1 r) / AP  \label{eq:sd} \\
-  AD &= \frac{1}{1 - \gamma} SD \label{eq:ad} \\
-  AP &= \frac{AD}{AS} \label{eq:ap} \\
-  AS &= \bar{AS} %AQ (\alpha + g_\alpha) \label{eq:as} (ICH HÄTTE HIER MAL AUF ALPHA VERZICHTET)
+  SD &= s_0 - s_1 r, \label{eq:sd} \\
+  AD &= \gamma_0 + \frac{1}{1-\gamma}\frac{SD}{AP}, \label{eq:ad} \\
+  AP &= p_1\frac{AD}{AS}, \label{eq:ap} \\
+  AS &= AQ(\alpha+g_\alpha). \label{eq:as}
 \end{align}
 
-% note on gamma_zero: I dropped gamma_0 here, as it would have led to a third channel of influence and as it is zero anyway it does not matter much. I also reorganized the other equations in search for a simple and plausible narrative.
+Speculative borrowing falls with the lending rate. At price \(AP\), the initial loan finances \(SD/AP\) asset units. If sellers reinvest a share \(\gamma\), with \(0\leq\gamma<1\), of their receipts within the same period, repeated transactions produce the gross-purchase multiplier \(1/(1-\gamma)\) in Eq.~\ref{eq:ad}. Thus a higher \(\gamma\) raises gross asset demand. The autonomous term \(\gamma_0\) is included in the code but set to zero in the reported calibration.
 
-In this formulation the total purchasing power devoted to speculative purposes is given by $AD$, which, conceptually, has two main components: credit-financed speculative demand $SD$, which depends negatively on the interest rate (which makes credit-financed speculation more costly) and the level of asset prices $AP$. Both assumptions go back directly to the \GT (as discussed in section \ref{subsec:endogenous-money}), where the latter takes up the notion that a ``liquidity preference'' for holding money becomes more pertinent wenn asset prices are high. However, in contrast to the \GT (and its strong focus on the bonds market), we consider the impact of interest rates and asset prices and two separate channels (which are deterministically tied together in the framework of the \GT).
+Equations~\ref{eq:ad} and \ref{eq:ap} determine \(AD\) and \(AP\) simultaneously. Equation~\ref{eq:ap} is a reduced-form price-pressure rule: the price equals the base price \(p_1\) multiplied by the ratio of demand to supply. Supply is an exogenous transaction flow, obtained from the asset stock \(AQ\), the turnover rate \(\alpha\), and the asset-creation rate \(g_\alpha\).
 
-To provide a realistic account of speculative activity, it is important to see that buying assets involves shifting liquidity to those parties that sell the speculative assets. In case this purchasing power is used to buy other assets \textit{within the same period}, a dynamics akin to the classical Keynesian multiplier is emerging: if we assume that some share $gamma_1$ of funds is reinvested after each transaction the total amount of asset demand $AD$ with a given period is equal to $\frac{1}{1 - \gamma} SD$ as made explicit by equation \ref{eq:ad}.
-
-As can be inferred from equations \ref{eq:sd}---\ref{eq:ap}, the formulation already lead to a recursive setup, where $SD$ and $AP$ show a simultaneous relationship that is mediated via $AD$. % [HERE WE HAVE TO WRITE SOMETHING ABOUT WHETHER THIS CAN BE SOLVED AND HOW CONVOLUTE THIS LOOKS] 
-
-However, and notwithstanding these complications, a simple static model nonetheless has difficulties to represent the full spectrum of factors influencing speculative demand. A key variable, for instance, that is missing in our setup is a reference to changes of asset prices (either past or expected), which are typically said to matter for speculation decision in a direction opposed to the impact of levels (i.e., high prices tend to reduce demand, but rising prices will increase demand). Against this backdrop, one could interpret $gamma_1$ as being influenced by such expectation: if speculators expect rising asset prices a $gamma_1$ comparably close to 1 would be a plausible assumption leading to a corresponding boom, whereas in cases of asset market pessimism $gamma_1$ will shrink as agents will be reluctant to reinvest liquidity if the current outlook is bleak. Such an interpretation would resonate with the approach of the \treatise, which assigns a strong roll to the dominance of either `bullish'' or ``bearish'' expectations of market participants (as indicated in section \ref{subsec:speculation}). 
+The static specification does not include past or expected asset-price changes. It only captures the negative level effect of the current price on the quantity that a given amount of borrowing can purchase. One could interpret \(\gamma\) as expectation-sensitive: optimism would support a value closer to one and high gross turnover, whereas pessimism would reduce reinvestment. Such an interpretation resonates with the \treatise{} emphasis on “bullish” and “bearish” market sentiment discussed in Section~\ref{subsec:speculation}.
 	
 
-The asset price $AP$ is eventually determined by the ratio of demand to supply (Eq.~\ref{eq:ap}), where supply is, also for reasons of simplicity, a fixed stock $\bar{AS}$ 
-
-% times a turnover rate \(\alpha + g_\alpha\) (Eq.~\ref{eq:as}). HÄTTE ICH WIE GESAGT OBEN MAL RAUSGENOMMEN UND DANN UNTEN WIEDER EINGEFÜHRT. DIE FRAGE WÄRE OB WIE HIER DEN TURNOVER ANSPRECHEN WOLLEN.
-
-Crucially, the balance sheet of the private sector now includes speculative debt as the stock of speculative debt $SD$ enters the banking system's assets alongside productive loans $cD$ so that $dM = dL$ now also reflects liquidity provided for speculative purposes (i.e. Keynes' claim that the expansion of bank money accommodates speculative positions).
+Crucially, nominal speculative borrowing \(SD\) enters the banking system's assets alongside productive loans \(cD\). Consequently, \(dM=dL\) also reflects deposits created to finance speculative positions.
 
 \begin{equation}
   dL = c D + SD \label{eq:dl-extended} 
 %das hat in der alten formulierung dann eigentlich eh nicht gestimmt wenn AP eine behavioral variable ist. ist erst mit der umstellung oben richtig geworden, as far as I can see.
 \end{equation}
 
-In this variant, Eqs.~(\ref{eq:y})--(\ref{eq:dr}) and (\ref{eq:dl-extended})--(\ref{eq:as}) are solved simultaneously, with \(c\) fixed as an exogenous parameter.
-The asset market determines \(SD\), \(AD\), \(AP\), \(AS\) and inflates the balance sheet (loans and deposits both larger by \(SD\)), but none of the real variables are affected.
-Output, employment, the price level, and the interest rate are identical to the baseline model without an asset market.
+In the PQ variant, Eqs.~\ref{eq:simple_y}--\ref{eq:simple_u} and \ref{eq:sd}--\ref{eq:dl-extended} are solved with \(c\) fixed. The asset block determines \(SD\), \(AD\), \(AP\), and \(AS\), while no asset-market variable enters the real-side equations. Conditional on identical real-side parameters, adding this block therefore leaves output, employment, the price level, and the interest rate unchanged. The figures are not a direct numerical counterfactual, however: the current Julia calibration uses \(N^f=12\) in \texttt{SimplePK} and \(N^f=6\) in \texttt{PQ}.
 
 Figure~\ref{fig:pq-equilibrium} displays this separation in the PQ variant. The
 asset-market equilibrium adds speculative lending to sector balance sheets,
 while the goods-market equilibrium remains governed by the baseline real-side
-equations.
+equations. In the asset-market panel, demand is reported in
+base-price-equivalent units. With the reported \(p_1=1\), the PQ curve is
+\(AMD=AD/AP\); the other asset variants implement the general normalization
+\(AMD=(p_1/AP)AD\). This price adjustment makes demand comparable with the fixed
+asset quantity \(AS\): the price-setting equation implies \(AMD=AS\) in
+equilibrium. The blue schedule therefore represents demand valued at the base
+price, rather than the unadjusted model variable \(AD\).
 
 \begin{figure}[htbp]
   \centering
@@ -367,44 +363,31 @@ equations.
 
 This corresponds precisely to the \treatise{} position.
 As Keynes wrote, speculative expansion of bank money can be contained within the financial circulation: ``there will be no effect on the purchasing power of money'' \citep[Vol.~1, Ch.~17, pp.~270--271]{johnmaynardkeynesTreatiseMoneyTwo2011}.
-The financial circulation can expand arbitrarily (within the limits set by the interest rate and the turnover parameters) without affecting the industrial circulation.
+Higher autonomous speculative borrowing \(s_0\) expands loans and deposits without affecting the industrial circulation. A higher \(\gamma\) raises gross asset transactions and the asset price, but does not itself create additional bank debt because the same liquidity is being reinvested.
 Speculation is a side-show---``bubbles on a steady stream of enterprise.''
 
 
-Three versions:
-
-%\begin{enumerate}[label=(\alph*)]
- % \item  In the first one just speculation is added and it is shown how this inflates balance sheets.
-  %\item  In the second one we impoase the link via c to show this has real impact.
-we could compare this with a scenario of rising inequality.
-  %\item  we do the same as in c with a different notion of causality,
-%where increasing totals bank balance sheets constrain lending to that the reaction of the banking sector is modeled in greater detaill.
-should give a result similar to (b) that is better explained.
-%\end{enumerate}
-
 \section{Real economic impacts of financial speculation}
 
-(SHOW TWO WAYS AS IN CODE? SLOP!)
-
-\subsection{The Credit Rationing Channel (General Theory I)}
+\subsection{The Credit Rationing Channel (General Theory I)} \label{sec:pqc}
 
 In this variant, we replace the exogenous credit rationing parameter
 \(c\) with an endogenous function of asset demand:
 \begin{equation}
   c = c_0 - c_1 AD \label{eq:c-ad}
-  %hier müsste dann doch eher sowas wie SD stehen?
 \end{equation}
 
-When asset demand \(AD\) rises, the banking sector reduces the share of
-credit available for productive purposes. This captures a credit
-crowding-out mechanism: bank lending capacity is finite, so speculative
-lending reduces the availability of loans for consumption and
-investment.
+When gross asset demand \(AD\) rises, the banking sector reduces the share of
+credit available for productive purposes. This is the reduced-form behavioral
+rule implemented in PQC; bank balance-sheet exposure itself continues to be
+measured by nominal speculative debt \(SD\). The linear rule is not clipped in
+the code, so its economic interpretation requires parameter values that keep
+\(0\leq c\leq1\).
 
 This yields a \GT{} result: an increase in speculative
-activity (a rise in \(s_0\), say, or a fall in \(\gamma\)) raises
+activity (a rise in \(s_0\), say, or a rise in \(\gamma\)) raises
 \(AD\), which lowers \(c\), which contracts \(Y\) through
-Eqs.~(\ref{eq:y}) and (\ref{eq:nd}). The mechanism is
+Eqs.~\ref{eq:simple_y} and \ref{eq:simple_nd}. The mechanism is
 balance-sheet crowding-out rather than the interest rate channel of the
 \GT{}, but the qualitative conclusion is the same: speculation can
 depress real activity. The financial circulation is no longer a cordon
@@ -433,9 +416,12 @@ central bank respond to asset prices as well as goods prices:
 
 %third alternative: share of speculative assets relative to balance sheet?? or better size of balance sheet relative to GDP? eventuell kann man noch einen dritten pfad fornulieren
 
-When \(AP\) rises, the policy rate \(i\) rises, raising the lending
-rate \(r\), and thereby reducing debt-financed demand \(D\) and output
-\(Y\).
+Holding the other arguments of the policy rule fixed, a rise in \(AP\) raises
+the policy rate \(i\), the lending rate \(r\), and therefore reduces
+debt-financed demand \(D\). In the simultaneous equilibrium, the credit-rationing
+channel remains active as well, so the net effect on output depends on the shock.
+With the reported calibration, an increase in autonomous speculative borrowing
+\(s_0\) raises \(AP\) and \(r\) and lowers \(Y\).
 This is a closer analogue to the \GT{}'s liquidity preference
 channel: the link runs from the asset market to the rate of interest,
 and from there to real activity.
@@ -445,9 +431,10 @@ on the economic system'' is operationalized directly: the speculative
 motive determines asset prices, asset prices feed into the policy rate,
 the policy rate governs investment.
 
-The model typically exhibits more complex, and potentially unstable,
-dynamics under this parametrization---as one would expect from a system
-where the policy rate and the asset price chase each other.
+The model is static and therefore does not establish dynamic stability or
+instability. The contemporaneous policy feedback is stabilizing in its immediate
+direction: a higher asset price raises the lending rate, which reduces
+speculative borrowing and asset demand.
 
 Figure~\ref{fig:pqcr-equilibrium} summarizes the PQCr solution. The asset-market
 price now enters the policy rule, linking the financial equilibrium to the
@@ -463,21 +450,27 @@ interest rate and output shown in the upper-left panel.
 
 \section{Some extensions of the basic model}
 
-HIER BIN NOCH UNSICHER WAS WIR GENAU MACHEN; EVENTUELL AUCH MAL EIN BEISPIEL mit $\gamma_1$ und ERWARTUNGEN?
-
-\subsection{Endogenizing $\alpha$ - towards an endogenous asset turnover rate}
-
-\subsection{Endogenizing $c$ - credit constrains through speculation}
+The repository additionally contains experimental variants that endogenize the
+asset turnover rate \(\alpha\). They are not used for the equilibrium figures or
+comparative claims in this note.
 
 \section{Real world analysis: An Economic Policy Example}
 
 \subsection{PQCrDIFF: Dual Interest Rates (A Modern Extension)}
 
-Finally, we introduce separate lending rates for productive and speculative borrowers:
+Finally, PQCrDIFF applies a penalty multiplier to the lending rate faced by
+speculative borrowers. Defining the effective speculative rate as
+\(r_{AP}=i_{AP}r\), the implemented schedules are
 \begin{equation}
-  SD = s_0 - s_1 (r \cdot i_{AP}) \label{eq:sd-diff}
+\begin{aligned}
+  i &= i_0+i_1P, &
+  r &= (1+m)i, &
+  SD &= s_0-s_1r_{AP}, &
+  c &= c_0-c_1SD.
+\end{aligned}
+\label{eq:sd-diff}
 \end{equation}
-where \(i_{AP}\) is a penalty multiplier on speculative lending. This connects to the macroprudential policy debates that followed the 2008 crisis, and to the institutional separation between business banks and financial banks that Jespersen (2009) derives from the \treatise{}. It also echoes Keynes's own observation in the \treatise[Vol.~1, Ch.~2, p.~23] that a banking system that moves ``forward in step'' is capable of almost unlimited expansion---and that this very capacity is a source of ``inherent instability,'' because ``any event which tended to influence the behaviour of the majority of banks in the same direction... would be capable of setting up a violent movement of the whole system.'' A dual-rate regime imposes a friction on the ``forward-in-step'' expansion of speculative lending.
+The productive lending rate remains \(r\). Relative to PQCr, this variant also removes the \(i_2AP\) term from the policy rule and makes credit rationing depend on \(SD\) rather than \(AD\). It should therefore be read as an alternative policy specification, not as a one-parameter extension of PQCr. The penalty connects to macroprudential proposals that differentiate financing conditions for productive and speculative borrowing.
 
 Figure~\ref{fig:pqcrdiff-equilibrium} illustrates the equilibrium with the
 speculative-rate penalty. The three panels make the policy transmission visible
@@ -486,9 +479,9 @@ simultaneously in asset demand, macroeconomic activity, and bank balance sheets.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../plots/pqcrdiff_equilibrium_panel.pdf}
-  \caption{Equilibrium in the PQCrDIFF model. A differentiated financing rate
-  penalizes speculative borrowing while productive lending retains the standard
-  lending rate.}
+  \caption{Equilibrium in the PQCrDIFF model. An effective speculative rate
+  \(r_{AP}=i_{AP}r\) reduces speculative borrowing, while productive lending
+  retains the standard rate \(r\). Credit rationing depends on \(SD\).}
   \label{fig:pqcrdiff-equilibrium}
 \end{figure}
 

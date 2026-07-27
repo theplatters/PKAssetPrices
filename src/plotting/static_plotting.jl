@@ -84,7 +84,13 @@ function plot_is_lm(sol::Static.Solution, ax::Makie.Axis)
   return ax
 end
 
-"""Plot asset demand and supply as functions of the asset price."""
+"""
+Plot base-price-equivalent demand and asset supply against the asset price.
+
+The model curve `AMD = p₁ AD / AP` values demand in units of the asset at its
+base price. It is therefore comparable with the fixed quantity `AS`; it is not
+the model variable `AD` itself.
+"""
 function plot_asset_market(sol::Static.Solution, ax::Makie.Axis)
   required_variables = (:AP, :AD, :AS)
   all(haskey(sol.variables, variable) for variable in required_variables) ||
@@ -118,7 +124,7 @@ function plot_asset_market(sol::Static.Solution, ax::Makie.Axis)
     asset_price_range;
     color=IS_COLOR,
     linewidth=3,
-    label="Asset demand",
+    label="Demand at base price",
   )
   lines!(
     ax,
@@ -330,7 +336,7 @@ function panel(sol::Static.Solution, ::AssetMarketPanel; size=nothing)
   asset_market_axis = Axis(
     figure[2, 2];
     title="Asset market",
-    xlabel="Asset-market quantity",
+    xlabel="Base-price-equivalent quantity",
     ylabel="Asset price (AP)",
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
