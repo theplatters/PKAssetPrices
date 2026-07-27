@@ -298,11 +298,20 @@ The final component of this minimal macroeconomic model with endogenous money is
 
 Here we reproduce a simple standard setup: firms set prices as a markup on unit labour costs (Eq.~\ref{eq:simple_p}), nominal wages fall with unemployment (Eq.~\ref{eq:simple_w}), reflecting workers' reduced bargaining power and labour productivity $a$ is fixed. As a consequence, employment is proportional to output (Eq.~\ref{eq:simple_n}) and unemployment is the gap between labour supply \(N^f\) and actual employment (Eq.~\ref{eq:simple_u}).
 
-%This system of 12 equations in 12 unknowns can be solved for the equilibrium values of output, employment, the price level, the interest rate, and the endogenous money stock. -- BRAUCHEN WIR DAS?
-%HIER DANN SOWAS SCHREIBEN WIE "OBGLEICH ES EIN MODELL MIT ENDOGENEM GELD IST; IST ES AUCH EINS OHNE FINANZMARKT; DAHER SIND ALLE BALANCE SHEET MOVEMENTS REAL INDUZIERT
-%Eventuell macht es sinn sich einen konstanten shift zu überlöegen, also was sich ändert damit man zwei szenarien in einer abbildung unterbringt. Zinssenkung/-erhöhung könnte ein Kandidat sein...
+Figure~\ref{fig:simplepk-equilibrium} summarizes the baseline equilibrium. The
+left panel shows the intersection of the goods-market schedule and the
+interest-rate rule. The right panel records the corresponding transaction-flow
+balance sheets: newly created loans generate matching deposits, while reserve
+requirements create equal reserve assets and central-bank liabilities.
 
-\todo{MACHT ES SINN HIER BILDER ZU ZEIGEN? MAN MÜSSTE SICH VLLT SOWIESO EINEN SCHOCK ÜBERLEGEN, ZB EINE ÄNDERUNG DES ZINSSATZES? SHOW PICTURES HERE? UPPER LEFT CASE – NO SPECULATION AND PURE INTERMEDIARY --> könnte man vllt eh so machen, dass es direkt zum Absatz vorher passt??}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{../plots/simplepk_equilibrium_panel.pdf}
+  \caption{Baseline equilibrium and sector balance sheets in the simple
+  endogenous-money model. Liabilities are shown to the left of zero and assets
+  to the right.}
+  \label{fig:simplepk-equilibrium}
+\end{figure}
 
 
 \subsection{Adding an Asset Market}
@@ -319,7 +328,7 @@ In a next step we introduce a market for speculative assets in this framework, w
 
 % note on gamma_zero: I dropped gamma_0 here, as it would have led to a third channel of influence and as it is zero anyway it does not matter much. I also reorganized the other equations in search for a simple and plausible narrative.
 
-In this formulation the total purchasing power devoted to speculative purposes is given by $AD$, which, conceptually, has two main components: credit-financed speculative demand $SD$, which depends negatively on the interest rate (which makes credit-financed speculation more costly) and the level of asset prices $AP$. Both assumptions go back directly to the \GT (as discussed in section \ref{subsec:endogenous-money), where the latter takes up the notion that a ``liquidity preference'' for holding money becomes more pertinent wenn asset prices are high. However, in contrast to the \GT (and its strong focus on the bonds market), we consider the impact of interest rates and asset prices and two separate channels (which are deterministically tied together in the framework of the \GT).
+In this formulation the total purchasing power devoted to speculative purposes is given by $AD$, which, conceptually, has two main components: credit-financed speculative demand $SD$, which depends negatively on the interest rate (which makes credit-financed speculation more costly) and the level of asset prices $AP$. Both assumptions go back directly to the \GT (as discussed in section \ref{subsec:endogenous-money}), where the latter takes up the notion that a ``liquidity preference'' for holding money becomes more pertinent wenn asset prices are high. However, in contrast to the \GT (and its strong focus on the bonds market), we consider the impact of interest rates and asset prices and two separate channels (which are deterministically tied together in the framework of the \GT).
 
 To provide a realistic account of speculative activity, it is important to see that buying assets involves shifting liquidity to those parties that sell the speculative assets. In case this purchasing power is used to buy other assets \textit{within the same period}, a dynamics akin to the classical Keynesian multiplier is emerging: if we assume that some share $gamma_1$ of funds is reinvested after each transaction the total amount of asset demand $AD$ with a given period is equal to $\frac{1}{1 - \gamma} SD$ as made explicit by equation \ref{eq:ad}.
 
@@ -419,7 +428,7 @@ where the policy rate and the asset price chase each other.
 
 \section{Some extensions of the basic model}
 
-HIER BIN NOCH UNSICHER WAS WIR GENAU MACHEN; EVENTUELL AUCH MAL EIN BEISPIEL mit GAMMA_1 und ERWARTUNGEN?
+HIER BIN NOCH UNSICHER WAS WIR GENAU MACHEN; EVENTUELL AUCH MAL EIN BEISPIEL mit $\gamma_1$ und ERWARTUNGEN?
 
 \subsection{Endogenizing $\alpha$ - towards an endogenous asset turnover rate}
 
