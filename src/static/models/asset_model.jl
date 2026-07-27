@@ -261,17 +261,17 @@ PQC = @model begin
     end
 
     @curves begin
-        IS(r) = -(1 / (2 * (-1 + b) * p1)) *
-            p1 * (d0 - d1 * r) * (2 * c0 - c1 * γ0) +
-            sqrt(
+        IS(r) = (d0 - d1 * r) / (1 - b) *
             (
-                c1^2 * p1 *
-                    (
-                    -4 * AQ * (s0 - r * s1) * (gₐ + α) +
-                        p1 * (-1 + γ) * γ0^2
+            c0 - c1 / 2 *
+                (
+                γ0 + sqrt(
+                    γ0^2 +
+                        4 * (s0 - s1 * r) * AQ * (gₐ + α) /
+                        ((1 - γ) * p1)
                 )
-            ) / (-1 + γ)
-        ) * abs(d0 - d1 * r)
+            )
+        )
 
         IR(Y) = (1 + m) * (i0 + a * i1 * (1 + n) * (W0 + h * (-1 + (a * Y) / Nᶠ)))
         AMS(AP) = AQ * (gₐ + α)
@@ -371,39 +371,29 @@ PQCr = @model begin
     end
 
     @curves begin
-        IS(r) = 1 / (1 - b) * (d0 - d1 * r) * (c0 - c1 * s0 + c1 * s1 * r)
-        IR(Y) = (
-            c0 * d1 * i2 * (1 + m) * Nᶠ +
-                AQ * c1 * (
-                d0 * Nᶠ +
-                    d1 * (1 + m) * (
-                    i0 * Nᶠ +
-                        a * i1 * (1 + n) * (-h * Nᶠ + Nᶠ * W0 + a * h * Y)
+        IS(r) = (d0 - d1 * r) / (1 - b) *
+            (
+            c0 - c1 / 2 *
+                (
+                γ0 + sqrt(
+                    γ0^2 +
+                        4 * (s0 - s1 * r) * AQ * (gₐ + α) /
+                        ((1 - γ) * p1)
                 )
-            ) * (gₐ + α)
-                +
-                sqrt(
-                -4 * AQ * c1 * d1 * (1 + m) * Nᶠ * (gₐ + α) *
-                    (
-                    i2 * Nᶠ * (c0 * d0 + (-1 + b) * Y) +
-                        AQ * c1 * d0 * (
-                        i0 * Nᶠ +
-                            a * i1 * (1 + n) * (-h * Nᶠ + Nᶠ * W0 + a * h * Y)
-                    ) * (gₐ + α)
-                )
-                    +
-                    (
-                    c0 * d1 * i2 * (1 + m) * Nᶠ +
-                        AQ * c1 * (
-                        d0 * Nᶠ +
-                            d1 * (1 + m) * (
-                            i0 * Nᶠ +
-                                a * i1 * (1 + n) * (-h * Nᶠ + Nᶠ * W0 + a * h * Y)
-                        )
-                    ) * (gₐ + α)
-                )^2
             )
-        ) / (2 * AQ * c1 * d1 * Nᶠ * (gₐ + α))
+        )
+        IR(Y) = let
+            price_level = (1 + n) * a * (W0 - h * (1 - a * Y / Nᶠ))
+            base_rate = (1 + m) * (i0 + i1 * price_level)
+            feedback = (1 + m) * i2
+            supply = AQ * (gₐ + α)
+            quadratic = supply / p1
+            linear = -γ0 + s1 * feedback / (1 - γ)
+            constant = (s1 * base_rate - s0) / (1 - γ)
+            asset_price = (-linear + sqrt(linear^2 - 4 * quadratic * constant)) /
+                          (2 * quadratic)
+            base_rate + feedback * asset_price
+        end
         AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
         AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
         AMS(AP) = AQ * (gₐ + α)
@@ -504,7 +494,8 @@ PQCrDIFF = @model begin
     end
 
     @curves begin
-        IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
+        IS(r) = (1 / (1 - b)) *
+            ((c₀ - c₁ * (s0 - s1 * r * iAP)) * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
         AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
         AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))

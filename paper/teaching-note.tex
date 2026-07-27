@@ -348,12 +348,22 @@ Crucially, the balance sheet of the private sector now includes speculative debt
 %das hat in der alten formulierung dann eigentlich eh nicht gestimmt wenn AP eine behavioral variable ist. ist erst mit der umstellung oben richtig geworden, as far as I can see.
 \end{equation}
 
-SHOW PICTURES HERE? \treatise{} CASE: SPECUALTION EXPANDS MONEY BASE BUT REAL WORLD IS UNTOUCHED
-
-SLOP
 In this variant, Eqs.~(\ref{eq:y})--(\ref{eq:dr}) and (\ref{eq:dl-extended})--(\ref{eq:as}) are solved simultaneously, with \(c\) fixed as an exogenous parameter.
 The asset market determines \(SD\), \(AD\), \(AP\), \(AS\) and inflates the balance sheet (loans and deposits both larger by \(SD\)), but none of the real variables are affected.
 Output, employment, the price level, and the interest rate are identical to the baseline model without an asset market.
+
+Figure~\ref{fig:pq-equilibrium} displays this separation in the PQ variant. The
+asset-market equilibrium adds speculative lending to sector balance sheets,
+while the goods-market equilibrium remains governed by the baseline real-side
+equations.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{../plots/pq_equilibrium_panel.pdf}
+  \caption{Equilibrium in the PQ model: an asset market expands financial
+  balance sheets without feeding back into output or the interest rate.}
+  \label{fig:pq-equilibrium}
+\end{figure}
 
 This corresponds precisely to the \treatise{} position.
 As Keynes wrote, speculative expansion of bank money can be contained within the financial circulation: ``there will be no effect on the purchasing power of money'' \citep[Vol.~1, Ch.~17, pp.~270--271]{johnmaynardkeynesTreatiseMoneyTwo2011}.
@@ -400,9 +410,22 @@ balance-sheet crowding-out rather than the interest rate channel of the
 depress real activity. The financial circulation is no longer a cordon
 sanitaire---it draws resources away from the industrial circulation.
 
+Figure~\ref{fig:pqc-equilibrium} shows the resulting PQC equilibrium. Compared
+with the PQ case, speculative demand now lowers available productive credit and
+therefore shifts the goods-market outcome.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{../plots/pqc_equilibrium_panel.pdf}
+  \caption{Equilibrium in the PQC model with endogenous credit rationing. Asset
+  demand affects the real economy through the availability of productive
+  credit.}
+  \label{fig:pqc-equilibrium}
+\end{figure}
+
 \subsection{The Asset-Price Channel (General Theory II)}
 
-In this variant, we return \(c\) to its exogenous value but let the
+In this variant, we retain endogenous credit rationing and additionally let the
 central bank respond to asset prices as well as goods prices:
 \begin{equation}
   i = i_0 + i_1 P + i_2 AP \label{eq:i-ap}
@@ -426,6 +449,18 @@ The model typically exhibits more complex, and potentially unstable,
 dynamics under this parametrization---as one would expect from a system
 where the policy rate and the asset price chase each other.
 
+Figure~\ref{fig:pqcr-equilibrium} summarizes the PQCr solution. The asset-market
+price now enters the policy rule, linking the financial equilibrium to the
+interest rate and output shown in the upper-left panel.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{../plots/pqcr_equilibrium_panel.pdf}
+  \caption{Equilibrium in the PQCr model with an asset-price term in the policy
+  rule. Asset prices affect output through the lending rate.}
+  \label{fig:pqcr-equilibrium}
+\end{figure}
+
 \section{Some extensions of the basic model}
 
 HIER BIN NOCH UNSICHER WAS WIR GENAU MACHEN; EVENTUELL AUCH MAL EIN BEISPIEL mit $\gamma_1$ und ERWARTUNGEN?
@@ -443,6 +478,19 @@ Finally, we introduce separate lending rates for productive and speculative borr
   SD = s_0 - s_1 (r \cdot i_{AP}) \label{eq:sd-diff}
 \end{equation}
 where \(i_{AP}\) is a penalty multiplier on speculative lending. This connects to the macroprudential policy debates that followed the 2008 crisis, and to the institutional separation between business banks and financial banks that Jespersen (2009) derives from the \treatise{}. It also echoes Keynes's own observation in the \treatise[Vol.~1, Ch.~2, p.~23] that a banking system that moves ``forward in step'' is capable of almost unlimited expansion---and that this very capacity is a source of ``inherent instability,'' because ``any event which tended to influence the behaviour of the majority of banks in the same direction... would be capable of setting up a violent movement of the whole system.'' A dual-rate regime imposes a friction on the ``forward-in-step'' expansion of speculative lending.
+
+Figure~\ref{fig:pqcrdiff-equilibrium} illustrates the equilibrium with the
+speculative-rate penalty. The three panels make the policy transmission visible
+simultaneously in asset demand, macroeconomic activity, and bank balance sheets.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{../plots/pqcrdiff_equilibrium_panel.pdf}
+  \caption{Equilibrium in the PQCrDIFF model. A differentiated financing rate
+  penalizes speculative borrowing while productive lending retains the standard
+  lending rate.}
+  \label{fig:pqcrdiff-equilibrium}
+\end{figure}
 
 
 \section{Real world analysis: Understanding financial market dynamics as decisions under uncertainty}

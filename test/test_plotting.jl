@@ -16,6 +16,8 @@ const DP = PKAssetPrices.DynamicPlotting
     @test SP.plot_is_lm(solution, axis) === axis
     balance_axis = Axis(figure[1, 2])
     @test SP.plot_balance_sheets(solution, balance_axis) === balance_axis
+    asset_axis = Axis(figure[1, 3])
+    @test SP.plot_asset_market(solution, asset_axis) === asset_axis
 
     data = SP.balance_sheet_plot_data(solution)
     @test length(data.positions) == sum(
@@ -30,6 +32,15 @@ const DP = PKAssetPrices.DynamicPlotting
     panel = SP.panel(solution; size = (1200, 800))
     @test panel isa Figure
     @test size(panel.scene) == (1200, 800)
+    @test count(content -> content isa Axis, panel.content) == 2
+
+    asset_panel = SP.panel(solution, SP.AssetMarketPanel(); size = (1200, 1000))
+    @test asset_panel isa Figure
+    @test size(asset_panel.scene) == (1200, 1000)
+    @test count(content -> content isa Axis, asset_panel.content) == 3
+
+    baseline = PKAssetPrices.solve_model(S.SimplePK)
+    @test_throws ArgumentError SP.panel(baseline, SP.AssetMarketPanel())
 end
 
 @testset "Dynamic plotting" begin

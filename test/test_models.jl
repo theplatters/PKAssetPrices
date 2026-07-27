@@ -36,6 +36,19 @@ const DYNAMIC_MODELS = (
     end
 end
 
+@testset "Static market curves meet at equilibrium" begin
+    for name in (:PQ, :PQC, :PQCr, :PQCrDIFF)
+        solution = PKAssetPrices.solve_model(getproperty(S, name))
+        curves = S.eval_curve(solution)
+
+        @testset "$name" begin
+            @test curves.IS ≈ solution.variables[:Y] atol = 1.0e-8
+            @test curves.IR ≈ solution.variables[:r] atol = 1.0e-8
+            @test curves.AMD ≈ curves.AMS atol = 1.0e-8
+        end
+    end
+end
+
 @testset "All dynamic models solve" begin
     for name in DYNAMIC_MODELS
         parametrization = getproperty(D, name)

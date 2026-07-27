@@ -6,7 +6,7 @@
 
 ##
 *.pdf
-!plots/simplepk_equilibrium_panel.pdf
+!plots/*_equilibrium_panel.pdf
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
