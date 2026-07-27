@@ -177,13 +177,19 @@ function to_html(b::BalanceSheetFilled)
     """
 
     body = "<tbody>"
-    for (asset, liability) in zip(b.assets, b.liabilities)
+    for i in 1:max(length(b.assets), length(b.liabilities))
+        asset = i <= length(b.assets) ? b.assets[i] : nothing
+        liability = i <= length(b.liabilities) ? b.liabilities[i] : nothing
+        asset_name = isnothing(asset) ? "" : title_from_snake(asset[1])
+        asset_value = isnothing(asset) ? "" : round(asset[2], digits = 2)
+        liability_name = isnothing(liability) ? "" : title_from_snake(liability[1])
+        liability_value = isnothing(liability) ? "" : round(liability[2], digits = 2)
         body *= """
           <tr>
-            <td> $(title_from_snake(asset[1]))</td>
-            <td> $(round(asset[2], digits = 2)) </td>
-            <td> $(title_from_snake(liability[1]))</td>
-            <td> $(round(liability[2], digits = 2)) </td>
+            <td> $asset_name</td>
+            <td> $asset_value </td>
+            <td> $liability_name</td>
+            <td> $liability_value </td>
           </tr>
         """
     end
@@ -267,13 +273,13 @@ function eval_curve(sol::Solution, variable, iter_range, curve)
     vars = copy(sol.variables)
     for item in iter_range
         vars[variable] = item
-        push!(evaluated, sol.model.model.curve_eval(sol.variables, sol.model.params)[curve])
+        push!(evaluated, sol.model.model.curve_eval(vars, sol.model.params)[curve])
     end
     return evaluated
 end
 
 
-function bar_chart(sols::OrderedDict{String, Solution}, variables::Vector{Symbol})
+function bar_chart(sols::AbstractDict{String, <:Solution}, variables::Vector{Symbol})
     colors = Makie.wong_colors()
     sol_values = (
         key => [getproperty(sol, variable) / getproperty(first(values(sols)), variable) for variable in variables] for (key, sol) in sols
@@ -395,7 +401,10 @@ function ad_as_component(solution::Static.Solution)
     return fig
 end
 
-function ad_as_comparison_component(solutions::Vector{Static.Solution}, labels::Vector{String})
+function ad_as_comparison_component(
+        solutions::AbstractVector{<:Static.Solution},
+        labels::AbstractVector{<:AbstractString},
+    )
     fig = Figure(size = (800, 480))
     ax = Axis(
         fig[1, 1];

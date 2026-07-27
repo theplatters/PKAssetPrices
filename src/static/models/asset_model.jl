@@ -267,7 +267,7 @@ PQC = @model begin
             (
                 c1^2 * p1 *
                     (
-                    -4 * AQ * (s0 - r * s1) * (g_a + α) +
+                    -4 * AQ * (s0 - r * s1) * (gₐ + α) +
                         p1 * (-1 + γ) * γ0^2
                 )
             ) / (-1 + γ)
@@ -373,23 +373,23 @@ PQCr = @model begin
     @curves begin
         IS(r) = 1 / (1 - b) * (d0 - d1 * r) * (c0 - c1 * s0 + c1 * s1 * r)
         IR(Y) = (
-            c0 * d1 * i2 * (1 + m) * Nf +
+            c0 * d1 * i2 * (1 + m) * Nᶠ +
                 AQ * c1 * (
-                d0 * Nf +
+                d0 * Nᶠ +
                     d1 * (1 + m) * (
-                    i0 * Nf +
+                    i0 * Nᶠ +
                         a * i1 * (1 + n) * (-h * Nᶠ + Nᶠ * W0 + a * h * Y)
                 )
             ) * (gₐ + α)
                 +
                 sqrt(
-                -4 * AQ * c1 * d1 * (1 + m) * Nᶠ * (g_a + α) *
+                -4 * AQ * c1 * d1 * (1 + m) * Nᶠ * (gₐ + α) *
                     (
                     i2 * Nᶠ * (c0 * d0 + (-1 + b) * Y) +
                         AQ * c1 * d0 * (
                         i0 * Nᶠ +
                             a * i1 * (1 + n) * (-h * Nᶠ + Nᶠ * W0 + a * h * Y)
-                    ) * (g_a + α)
+                    ) * (gₐ + α)
                 )
                     +
                     (
@@ -403,7 +403,7 @@ PQCr = @model begin
                     ) * (gₐ + α)
                 )^2
             )
-        ) / (2 * AQ * c1 * d1 * Nᶠ * (g_a + α))
+        ) / (2 * AQ * c1 * d1 * Nᶠ * (gₐ + α))
         AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
         AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
         AMS(AP) = AQ * (gₐ + α)

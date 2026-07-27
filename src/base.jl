@@ -1,5 +1,6 @@
 module BaseModels
 export AbstractModel
+import Base: show
 abstract type AbstractModel end
 
 struct Equation

@@ -216,7 +216,7 @@ function _eval_calc(x, vars::Dict{Symbol, Float64}, params::Dict{Symbol, Float64
         )
 
         return Base.eval(
-            PKAssetPrices, quote
+            @__MODULE__, quote
                 let
                     $(assigns...)
                     $(x)
@@ -324,7 +324,7 @@ function parse_parameters!(parameters, descriptions, body)
             rhs = line.args[2]
 
             # Check if lhs has a description
-            if rhs.head == :tuple
+            if rhs isa Expr && rhs.head == :tuple
                 # Pattern: param  = value, "description"
                 param_name = lhs
                 param_desc = rhs.args[2]
