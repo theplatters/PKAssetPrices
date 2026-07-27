@@ -1,7 +1,7 @@
 module PKAssetPrices
 
 
-export Dashboard, Dynamic, Static, Plotting
+export Dashboard, Dynamic, Static, DynamicPlotting, StaticPlotting
 export solve_model
 
 function solve_model() end
@@ -11,9 +11,20 @@ include("static/static_model.jl")
 include("dynamic/dynamic_model.jl")
 include("dash/Dashboard.jl")
 include("plotting/dynamic_plotting.jl")
+include("plotting/static_plotting.jl")
+
+function dashboard_models()
+    return Dict{String, Static.Parametrization}(
+        "PQ" => Static.PQ,
+        "PQA" => Static.PQA,
+        "PQC" => Static.PQC,
+        "PQCr" => Static.PQCr,
+        "PQCrDIFF" => Static.PQCrDIFF,
+    )
+end
 
 function @main(args)
-    models = Dict("PQ" => Static.AssetPKPQ, "PQA" => Static.AssetPKPQA, "PQC"=> Static.AssetPKPQC, "PQCr"=> Static.AssetPKPQCr, "PQCrDIFF"=> Static.AssetPKPQCrDIFF)
+    models = dashboard_models()
     app = Dashboard.get_app(models)
     Dashboard.register_callbacks!(app, models )
 

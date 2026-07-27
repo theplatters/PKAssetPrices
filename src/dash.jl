@@ -1,6 +1,6 @@
 using PKAssetPrices
 
-models = Dict("PQ" => Static.AssetPKPQ, "PQA" => Static.AssetPKPQA, "PQC"=> Static.AssetPKPQC, "PQCr"=> Static.AssetPKPQCr, "PQCrDIFF"=> Static.AssetPKPQCrDIFF)
+models = PKAssetPrices.dashboard_models()
 app = Dashboard.get_app(models)
 Dashboard.register_callbacks!(app, models )
 
