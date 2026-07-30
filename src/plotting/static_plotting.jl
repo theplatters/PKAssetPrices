@@ -140,13 +140,18 @@ function plot_asset_market(sol::Static.Solution, ax::Makie.Axis)
   return ax
 end
 
-"""Collect positive balance-sheet bars, leaving space between sectors."""
+"""Collect instrument segments for one asset and one liability bar per sector."""
 function balance_sheet_plot_data(sol::Static.Solution)
   positions = Float64[]
   values = Float64[]
   labels = String[]
+  instruments = String[]
   sides = Symbol[]
+  stacks = Int[]
   raw_values = Float64[]
+  tick_positions = Float64[]
+  tick_labels = String[]
+  totals = Float64[]
   position = 1.0
 
   for sheet in sol.sheets
@@ -155,19 +160,37 @@ function balance_sheet_plot_data(sol::Static.Solution)
       (:asset, sheet.assets),
       (:liability, sheet.liabilities),
     )
-      for (name, value) in entries
+      side_label = side == :asset ? "Assets" : "Liabilities"
+      push!(tick_positions, position)
+      push!(tick_labels, "$sector\n$side_label")
+      push!(totals, sum(abs(value) for (_, value) in entries; init=0.0))
+
+      for (stack, (name, value)) in enumerate(entries)
         push!(positions, position)
         push!(values, abs(value))
         push!(labels, "$sector · $(display_name(name))")
+        push!(instruments, display_name(name))
         push!(sides, side)
+        push!(stacks, stack)
         push!(raw_values, value)
-        position += 1.0
       end
+      position += 1.0
     end
     position += 0.65
   end
 
-  return (; positions, values, labels, sides, raw_values)
+  return (;
+    positions,
+    values,
+    labels,
+    instruments,
+    sides,
+    stacks,
+    raw_values,
+    tick_positions,
+    tick_labels,
+    totals,
+  )
 end
 
 """Plot sector balance sheets as grouped vertical asset and liability bars."""
@@ -182,36 +205,43 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
     ax,
     data.positions[asset_indices],
     data.values[asset_indices];
+    stack=data.stacks[asset_indices],
+    width=0.82,
     color=ASSET_COLOR,
     strokecolor=(:black, 0.18),
     strokewidth=1,
+    bar_labels=[
+      "$(replace(data.instruments[index], ' ' => '\n'))\n$(round(data.raw_values[index]; sigdigits=4))" for
+      index in asset_indices
+    ],
+    label_position=:center,
+    label_color=:white,
+    label_size=9,
     label="Assets",
   )
   barplot!(
     ax,
     data.positions[liability_indices],
     data.values[liability_indices];
+    stack=data.stacks[liability_indices],
+    width=0.82,
     color=LIABILITY_COLOR,
     strokecolor=(:black, 0.18),
     strokewidth=1,
+    bar_labels=[
+      "$(replace(data.instruments[index], ' ' => '\n'))\n$(round(data.raw_values[index]; sigdigits=4))" for
+      index in liability_indices
+    ],
+    label_position=:center,
+    label_color=:black,
+    label_size=9,
     label="Liabilities",
   )
   hlines!(ax, [0.0]; color=(:black, 0.55), linewidth=1.5)
 
-  value_labels = string.(round.(data.raw_values; sigdigits=4))
-  text!(
-    ax,
-    data.positions,
-    data.values;
-    text=value_labels,
-    align=(:center, :bottom),
-    offset=(0, 6),
-    fontsize=12,
-  )
-
-  ax.xticks = (data.positions, data.labels)
-  xlims!(ax, first(data.positions) - 0.7, last(data.positions) + 0.7)
-  limit = max(maximum(data.values), 1.0) * 1.25
+  ax.xticks = (data.tick_positions, data.tick_labels)
+  xlims!(ax, first(data.tick_positions) - 0.7, last(data.tick_positions) + 0.7)
+  limit = max(maximum(data.totals), 1.0) * 1.18
   ylims!(ax, 0.0, limit)
   axislegend(
     ax;
@@ -267,7 +297,7 @@ function panel(sol::Static.Solution, ::StandardPanel; size=nothing)
   balance_axis = Axis(
     figure[2, 2];
     title="Sector balance sheets",
-    xlabel="Sector · instrument",
+    xlabel="Sector · balance-sheet side",
     ylabel="Amount",
     xgridvisible=false,
     ygridcolor=(:black, 0.08),
@@ -332,7 +362,7 @@ function panel(sol::Static.Solution, ::AssetMarketPanel; size=nothing)
   balance_axis = Axis(
     figure[3, 1:2];
     title="Sector balance sheets",
-    xlabel="Sector · instrument",
+    xlabel="Sector · balance-sheet side",
     ylabel="Amount",
     xgridvisible=false,
     ygridcolor=(:black, 0.08),

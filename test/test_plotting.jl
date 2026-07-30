@@ -24,8 +24,11 @@ const DP = PKAssetPrices.DynamicPlotting
     @test length(data.positions) == sum(
         length(sheet.assets) + length(sheet.liabilities) for sheet in solution.sheets
     )
+    @test length(data.tick_positions) == 2 * length(solution.sheets)
+    @test length(unique(data.positions)) == 2 * length(solution.sheets)
     @test all(data.values[data.sides .== :asset] .>= 0)
     @test all(data.values[data.sides .== :liability] .>= 0)
+    @test all(data.totals .>= 0)
     @test "Central Bank · Central Bank Credit" in data.labels
     @test extrema(SP.equilibrium_range(0.0)) == (-1.0, 1.0)
     @test extrema(SP.equilibrium_range(-2.0)) == (-6.0, -0.4)
