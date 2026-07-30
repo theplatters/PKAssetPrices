@@ -7,6 +7,8 @@ const IS_COLOR = :royalblue
 const IR_COLOR = :crimson
 const ASSET_COLOR = Makie.wong_colors()[1]
 const LIABILITY_COLOR = Makie.wong_colors()[2]
+const IS_IR_X_LIMITS = (0.0, 0.20)
+const IS_IR_Y_LIMITS = (0.0, 15.0)
 
 abstract type PanelVariant end
 
@@ -33,12 +35,10 @@ function display_name(name::Symbol)
   return titlecase(words)
 end
 
-"""Plot the IS and interest-rate-rule curves and mark their equilibrium."""
+"""Plot the IS and interest-rate-rule curves on the presentation range."""
 function plot_is_lm(sol::Static.Solution, ax::Makie.Axis)
-  r_eq = sol.variables[:r]
-  y_eq = sol.variables[:Y]
-  r_range = equilibrium_range(r_eq)
-  y_range = equilibrium_range(y_eq)
+  r_range = range(IS_IR_X_LIMITS...; length=200)
+  y_range = range(IS_IR_Y_LIMITS...; length=200)
 
   vars = copy(sol.variables)
   is_values = map(r_range) do r
@@ -68,18 +68,8 @@ function plot_is_lm(sol::Static.Solution, ax::Makie.Axis)
     linewidth=3,
     label="IR curve",
   )
-  vlines!(ax, [r_eq]; color=(:black, 0.25), linestyle=:dot, linewidth=1.5)
-  hlines!(ax, [y_eq]; color=(:black, 0.25), linestyle=:dot, linewidth=1.5)
-  scatter!(
-    ax,
-    [r_eq],
-    [y_eq];
-    color=:black,
-    markersize=14,
-    strokecolor=:white,
-    strokewidth=2,
-    label="Equilibrium",
-  )
+  xlims!(ax, IS_IR_X_LIMITS...)
+  ylims!(ax, IS_IR_Y_LIMITS...)
   axislegend(ax; position=:rt, framevisible=false, labelsize=14)
   return ax
 end
@@ -150,7 +140,7 @@ function plot_asset_market(sol::Static.Solution, ax::Makie.Axis)
   return ax
 end
 
-"""Collect mirrored balance-sheet bars, leaving space between sectors."""
+"""Collect positive balance-sheet bars, leaving space between sectors."""
 function balance_sheet_plot_data(sol::Static.Solution)
   positions = Float64[]
   values = Float64[]
@@ -161,13 +151,13 @@ function balance_sheet_plot_data(sol::Static.Solution)
 
   for sheet in sol.sheets
     sector = display_name(sheet.sector_name)
-    for (side, entries, direction) in (
-      (:asset, sheet.assets, 1.0),
-      (:liability, sheet.liabilities, -1.0),
+    for (side, entries) in (
+      (:asset, sheet.assets),
+      (:liability, sheet.liabilities),
     )
       for (name, value) in entries
         push!(positions, position)
-        push!(values, direction * abs(value))
+        push!(values, abs(value))
         push!(labels, "$sector · $(display_name(name))")
         push!(sides, side)
         push!(raw_values, value)
@@ -180,7 +170,7 @@ function balance_sheet_plot_data(sol::Static.Solution)
   return (; positions, values, labels, sides, raw_values)
 end
 
-"""Plot sector balance sheets with liabilities left and assets right of zero."""
+"""Plot sector balance sheets as grouped vertical asset and liability bars."""
 function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
   data = balance_sheet_plot_data(sol)
   isempty(data.positions) && return ax
@@ -192,7 +182,6 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
     ax,
     data.positions[asset_indices],
     data.values[asset_indices];
-    direction=:x,
     color=ASSET_COLOR,
     strokecolor=(:black, 0.18),
     strokewidth=1,
@@ -202,34 +191,28 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
     ax,
     data.positions[liability_indices],
     data.values[liability_indices];
-    direction=:x,
     color=LIABILITY_COLOR,
     strokecolor=(:black, 0.18),
     strokewidth=1,
     label="Liabilities",
   )
-  vlines!(ax, [0.0]; color=(:black, 0.55), linewidth=1.5)
+  hlines!(ax, [0.0]; color=(:black, 0.55), linewidth=1.5)
 
   value_labels = string.(round.(data.raw_values; sigdigits=4))
-  for side in (:liability, :asset)
-    indices = findall(==(side), data.sides)
-    isempty(indices) && continue
-    text!(
-      ax,
-      data.values[indices],
-      data.positions[indices];
-      text=value_labels[indices],
-      align=side == :liability ? (:right, :center) : (:left, :center),
-      offset=side == :liability ? (-7, 0) : (7, 0),
-      fontsize=12,
-    )
-  end
+  text!(
+    ax,
+    data.positions,
+    data.values;
+    text=value_labels,
+    align=(:center, :bottom),
+    offset=(0, 6),
+    fontsize=12,
+  )
 
-  ax.yticks = (data.positions, data.labels)
-  limit = max(maximum(abs, data.values), 1.0) * 1.32
-  xlims!(ax, -limit, limit)
-  # Reserve a band above the first bar for the horizontal legend.
-  ylims!(ax, maximum(data.positions) + 0.8, -0.9)
+  ax.xticks = (data.positions, data.labels)
+  xlims!(ax, first(data.positions) - 0.7, last(data.positions) + 0.7)
+  limit = max(maximum(data.values), 1.0) * 1.25
+  ylims!(ax, 0.0, limit)
   axislegend(
     ax;
     position=:rt,
@@ -284,14 +267,16 @@ function panel(sol::Static.Solution, ::StandardPanel; size=nothing)
   balance_axis = Axis(
     figure[2, 2];
     title="Sector balance sheets",
-    xlabel="Liabilities  ←  amount  →  assets",
-    ylabel="Sector · instrument",
-    xgridcolor=(:black, 0.08),
-    ygridvisible=false,
+    xlabel="Sector · instrument",
+    ylabel="Amount",
+    xgridvisible=false,
+    ygridcolor=(:black, 0.08),
     titlesize=19,
     xlabelsize=16,
     ylabelsize=16,
-    yticklabelsize=13,
+    xticklabelsize=12,
+    xticklabelrotation=pi / 4,
+    xticklabelalign=(:right, :center),
   )
 
   plot_is_lm(sol, curve_axis)
@@ -347,14 +332,16 @@ function panel(sol::Static.Solution, ::AssetMarketPanel; size=nothing)
   balance_axis = Axis(
     figure[3, 1:2];
     title="Sector balance sheets",
-    xlabel="Liabilities  ←  amount  →  assets",
-    ylabel="Sector · instrument",
-    xgridcolor=(:black, 0.08),
-    ygridvisible=false,
+    xlabel="Sector · instrument",
+    ylabel="Amount",
+    xgridvisible=false,
+    ygridcolor=(:black, 0.08),
     titlesize=19,
     xlabelsize=16,
     ylabelsize=16,
-    yticklabelsize=13,
+    xticklabelsize=12,
+    xticklabelrotation=pi / 4,
+    xticklabelalign=(:right, :center),
   )
 
   plot_is_lm(sol, curve_axis)

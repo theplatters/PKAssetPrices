@@ -14,6 +14,7 @@ const DP = PKAssetPrices.DynamicPlotting
     figure = Figure()
     axis = Axis(figure[1, 1])
     @test SP.plot_is_lm(solution, axis) === axis
+    @test axis.limits[] == ((0.0, 0.20), (0.0, 15.0))
     balance_axis = Axis(figure[1, 2])
     @test SP.plot_balance_sheets(solution, balance_axis) === balance_axis
     asset_axis = Axis(figure[1, 3])
@@ -24,7 +25,7 @@ const DP = PKAssetPrices.DynamicPlotting
         length(sheet.assets) + length(sheet.liabilities) for sheet in solution.sheets
     )
     @test all(data.values[data.sides .== :asset] .>= 0)
-    @test all(data.values[data.sides .== :liability] .<= 0)
+    @test all(data.values[data.sides .== :liability] .>= 0)
     @test "Central Bank · Central Bank Credit" in data.labels
     @test extrema(SP.equilibrium_range(0.0)) == (-1.0, 1.0)
     @test extrema(SP.equilibrium_range(-2.0)) == (-6.0, -0.4)
