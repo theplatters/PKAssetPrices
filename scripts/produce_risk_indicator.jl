@@ -1,4 +1,4 @@
-using PKAssetPrices.Static: Baseline, PQC, PQCr, PQCrDIFF, SimplePK, solve_model
+using PKAssetPrices.Static: Baseline, FirmsRation, PQC, PQCr, PQCrDIFF, SimplePK, solve_model
 using CSV
 using DataFrames
 using PKAssetPrices
@@ -24,6 +24,7 @@ function (@main)(ARGS)
     ("pqc", PQC),
     ("pqcr", PQCr),
     ("pqcrdiff", PQCrDIFF),
+    ("firmsration", FirmsRation),
   )
 
   results = DataFrame(model=String[], risk_indicator=Float64[])

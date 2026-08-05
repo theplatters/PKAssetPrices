@@ -455,9 +455,55 @@ interest rate and output shown in the upper-left panel.
   \label{fig:pqcr-equilibrium}
 \end{figure}
 
+\subsection{The Firms' Investment-Rationing Channel}
+
+The preceding variants locate the real effects of speculation in the banking
+sector or in the policy-rate rule. A further channel arises when firms condition
+planned productive investment directly on the valuation of speculative assets.
+The \texttt{FirmsRation} variant retains the standard policy rule and an
+exogenous credit-rationing parameter \(c\), but replaces the investment-demand
+schedule with
+\begin{equation}
+\begin{aligned}
+  I_p &= D, &
+  D &= d_0-d_1r-d_2AP, \qquad d_2>0.
+\end{aligned}
+\label{eq:firms-ration}
+\end{equation}
+Thus a higher asset price lowers planned productive investment even if banks do
+not change the fraction of credit they grant and the central bank does not react
+directly to asset prices. The coefficient \(d_2\) is a reduced-form measure of
+firms' sensitivity to financial valuations. It can represent a higher outside
+option from financial investment, a rise in the opportunity cost of productive
+projects, or greater caution when firms perceive asset valuations as a signal of
+financial risk.
+
+This channel closes the real--financial loop directly. The interest rate affects
+speculative borrowing and therefore \(AP\); the resulting asset price enters
+Eq.~\eqref{eq:firms-ration}, changes \(D\), and feeds through to output and
+employment. Unlike PQC, the mechanism does not operate through endogenous bank
+credit rationing. Unlike PQCr, it does not require an asset-price term in the
+policy rule. Because \(AP\) and speculative demand are jointly determined, the
+IS and aggregate-demand schedules shown in the figure use the positive solution
+of the asset-market equilibrium at each interest rate or goods price.
+
+Figure~\ref{fig:firmsration-equilibrium} reports the calibrated equilibrium. The
+IS--IR and AD--AS plots show the direct contractionary effect of asset-price
+rationing, while the asset-market plot and sector balance sheets display the
+financial position that generates it.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{../plots/firmsration_equilibrium_panel.pdf}
+  \caption{Equilibrium in the \texttt{FirmsRation} model. Firms reduce planned
+  productive investment when asset prices rise, creating a direct transmission
+  channel from the asset market to output and employment.}
+  \label{fig:firmsration-equilibrium}
+\end{figure}
+
 \section{Some extensions of the basic model}
 
-HIER BIN NOCH UNSICHER WAS WIR GENAU MACHEN; EVENTUELL AUCH MAL EIN BEISPIEL mit GAMMA_1 und ERWARTUNGEN?
+HIER BIN NOCH UNSICHER WAS WIR GENAU MACHEN; EVENTUELL AUCH MAL EIN BEISPIEL mit \(\gamma_1\) und ERWARTUNGEN?
 
 The repository additionally contains experimental variants that endogenize the
 asset turnover rate \(\alpha\). They are not used for the equilibrium figures or

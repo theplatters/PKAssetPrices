@@ -1,4 +1,4 @@
-using PKAssetPrices.Static: Baseline, PQC, PQCr, PQCrDIFF, SimplePK, solve_model
+using PKAssetPrices.Static: Baseline, FirmsRation, PQC, PQCr, PQCrDIFF, SimplePK, solve_model
 using CairoMakie
 using PKAssetPrices
 
@@ -18,6 +18,7 @@ function (@main)(ARGS)
     ("pqc", PQC),
     ("pqcr", PQCr),
     ("pqcrdiff", PQCrDIFF),
+    ("firmsration", FirmsRation),
   )
   for (name, model) in asset_market_models
     solution = solve_model(model)
