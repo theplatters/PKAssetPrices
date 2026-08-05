@@ -35,8 +35,34 @@ function display_name(name::Symbol)
   return titlecase(words)
 end
 
-"""Plot the IS and interest-rate-rule curves on the presentation range."""
-function plot_is_lm(sol::Static.Solution, ax::Makie.Axis)
+"""Return a copy of a parametrization with a lower autonomous policy rate."""
+function lower_autonomous_policy_rate(
+  parametrization::Static.Parametrization;
+  factor::Real=0.5,
+)
+  0 <= factor < 1 || throw(ArgumentError("factor must satisfy 0 ≤ factor < 1"))
+  rate_parameters = (:i0, :i₀, :i_0)
+  rate_parameter_index = findfirst(key -> haskey(parametrization.params, key), rate_parameters)
+  isnothing(rate_parameter_index) &&
+    throw(ArgumentError("the model does not define an autonomous policy-rate parameter"))
+  rate_parameter = rate_parameters[rate_parameter_index]
+
+  params = copy(parametrization.params)
+  params[rate_parameter] *= factor
+  return Static.Parametrization(parametrization.model, params, copy(parametrization.u0))
+end
+
+"""
+Plot the IS and interest-rate-rule curves on the presentation range.
+
+A subdued counterfactual IR curve shows the effect of multiplying the
+autonomous policy rate by `lower_i0_factor`.
+"""
+function plot_is_lm(
+  sol::Static.Solution,
+  ax::Makie.Axis;
+  lower_i0_factor::Real=0.5,
+)
   output_range = range(IS_IR_X_LIMITS...; length=200)
   rate_range = range(IS_IR_Y_LIMITS...; length=200)
 
@@ -50,6 +76,13 @@ function plot_is_lm(sol::Static.Solution, ax::Makie.Axis)
   ir_values = map(output_range) do y
     vars[:Y] = y
     return Static.eval_curve(sol.model, vars).IR
+  end
+
+  lower_rate_model = lower_autonomous_policy_rate(sol.model; factor=lower_i0_factor)
+  vars = copy(sol.variables)
+  lower_ir_values = map(output_range) do y
+    vars[:Y] = y
+    return Static.eval_curve(lower_rate_model, vars).IR
   end
 
   lines!(
@@ -68,6 +101,15 @@ function plot_is_lm(sol::Static.Solution, ax::Makie.Axis)
     linewidth=3,
     label="IR curve",
   )
+  lines!(
+    ax,
+    output_range,
+    lower_ir_values;
+    color=(IR_COLOR, 0.38),
+    linewidth=2,
+    linestyle=:dash,
+    label="IR curve (lower i₀)",
+  )
   xlims!(ax, IS_IR_X_LIMITS...)
   ylims!(ax, IS_IR_Y_LIMITS...)
   axislegend(ax; position=:rt, framevisible=false, labelsize=14)
@@ -81,7 +123,11 @@ The model curve `AMD = p₁ AD / AP` values demand in units of the asset at its
 base price. It is therefore comparable with the fixed quantity `AS`; it is not
 the model variable `AD` itself.
 """
-function plot_asset_market(sol::Static.Solution, ax::Makie.Axis)
+function plot_asset_market(
+  sol::Static.Solution,
+  ax::Makie.Axis;
+  lower_i0_factor::Real=0.5,
+)
   required_variables = (:AP, :AD, :AS)
   all(haskey(sol.variables, variable) for variable in required_variables) ||
     throw(ArgumentError("the solution does not contain an asset market"))
@@ -101,6 +147,14 @@ function plot_asset_market(sol::Static.Solution, ax::Makie.Axis)
     return Static.eval_curve(sol.model, vars).AMD
   end
 
+  lower_rate_model = lower_autonomous_policy_rate(sol.model; factor=lower_i0_factor)
+  lower_rate_solution = Static.solve_model(lower_rate_model)
+  vars = copy(lower_rate_solution.variables)
+  lower_demand_values = map(asset_price_range) do asset_price
+    vars[:AP] = asset_price
+    return Static.eval_curve(lower_rate_solution.model, vars).AMD
+  end
+
   vars = copy(sol.variables)
   supply_values = map(asset_price_range) do asset_price
     vars[:AP] = asset_price
@@ -115,6 +169,15 @@ function plot_asset_market(sol::Static.Solution, ax::Makie.Axis)
     color=IS_COLOR,
     linewidth=3,
     label="Demand at base price",
+  )
+  lines!(
+    ax,
+    lower_demand_values,
+    asset_price_range;
+    color=(IS_COLOR, 0.38),
+    linewidth=2,
+    linestyle=:dash,
+    label="Demand (lower i₀)",
   )
   lines!(
     ax,
