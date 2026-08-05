@@ -64,5 +64,4 @@ include("helper_functions.jl")
 include("models/asset_model.jl")
 include("models/end_alpha.jl")
 include("models/pc_model.jl")
-include("models/simple_model.jl")
 end
