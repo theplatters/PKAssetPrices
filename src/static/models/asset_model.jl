@@ -4,6 +4,7 @@ SimplePK = @model begin
   @variables begin
     Y = "Output"
     ND = "Non debt-financed demand"
+    Iₚ = "Planned investments"
     D = "debt-financed demand"
     r = "interest rate"
     i = "policy rate"
@@ -36,6 +37,7 @@ SimplePK = @model begin
     Y == ND + c * D
     ND == b * Y
     D == d₀ - d₁ * r
+    Iₚ == D
     r == (1 + m) * i
     i == i₀ + i₁ * P
     dL == c * D
@@ -80,6 +82,7 @@ Baseline = @model begin
     Y = "Output"
     ND = "Non debt-financed demand"
     D = "debt-financed demand"
+    Iₚ = "Planned investments"
     i = "policy rate"
     r = "interest rate"
     P = "price level"
@@ -123,6 +126,7 @@ Baseline = @model begin
     Y == ND + c * D
     ND == b * Y
     D == d0 - d1 * r
+    Iₚ == D
     i == i0 + i1 * P
     r == (1 + m) * i
     dL == c * D + SD
@@ -176,6 +180,7 @@ PQCold = @model begin
     Y = "Output"
     ND = "Non debt-financed demand"
     D = "debt-financed demand"
+    Iₚ = "Planned investments"
     c = "credit rationing"
     i = "policy rate"
     r = "interest rate"
@@ -221,6 +226,7 @@ PQCold = @model begin
     Y == ND + c * D
     ND == b * Y
     D == d0 - d1 * r
+    Iₚ == D
     i == i0 + i1 * P
     r == (1 + m) * i
     dL == c * D + SD
@@ -274,6 +280,7 @@ PQC = @model begin
     Y = "Output"
     ND = "Non debt-financed demand"
     D = "debt-financed demand"
+    Iₚ = "Planned investments"
     c = "credit rationing"
     i = "policy rate"
     r = "interest rate"
@@ -319,6 +326,7 @@ PQC = @model begin
     Y == ND + c * D
     ND == b * Y
     D == d0 - d1 * r
+    Iₚ == D
     i == i0 + i1 * P
     r == (1 + m) * i
     dL == c * D + SD
@@ -383,6 +391,7 @@ PQCr = @model begin
     Y = "Output"
     ND = "Non debt-financed demand"
     D = "debt-financed demand"
+    Iₚ = "Planned investments"
     c = "credit rationing"
     i = "policy rate"
     r = "interest rate"
@@ -429,6 +438,7 @@ PQCr = @model begin
     Y == ND + c * D
     ND == b * Y
     D == d0 - d1 * r
+    Iₚ == D
     i == i0 + i1 * P + i2 * AP
     r == (1 + m) * i
     dL == c * D + SD
@@ -507,6 +517,7 @@ PQCrDIFF = @model begin
     Y = "Output"
     ND = "Non debt-financed demand"
     D = "debt-financed demand"
+    Iₚ = "Planned investments"
     c = "credit rationing"
     i = "policy rate"
     r = "interest rate"
@@ -553,6 +564,7 @@ PQCrDIFF = @model begin
     Y == ND + c * D
     ND == b * Y
     D == d0 - d1 * r
+    Iₚ == D
     i == i0 + i1 * P
     r == (1 + m) * i
     dL == c * D + SD
