@@ -1,4 +1,5 @@
 # AP influences AS
+# Figure 1 == SimplePK
 
 SimplePK = @model begin
   @variables begin
@@ -36,8 +37,8 @@ SimplePK = @model begin
   @equations begin
     Y == ND + c * D
     ND == b * Y
-    D == d₀ - d₁ * r
-    Iₚ == D
+    Iₚ == d₀ - d₁ * r
+    D == Iₚ
     r == (1 + m) * i
     i == i₀ + i₁ * P
     dL == c * D
@@ -75,6 +76,8 @@ SimplePK = @model begin
     end
   end
 end
+
+# FIgure 2 == Baseline
 
 Baseline = @model begin
 
@@ -125,8 +128,8 @@ Baseline = @model begin
   @equations begin
     Y == ND + c * D
     ND == b * Y
-    D == d0 - d1 * r
-    Iₚ == D
+    Iₚ == d0 - d1 * r
+    D == Iₚ
     i == i0 + i1 * P
     r == (1 + m) * i
     dL == c * D + SD
