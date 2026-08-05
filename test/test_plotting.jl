@@ -14,7 +14,7 @@ const DP = PKAssetPrices.DynamicPlotting
     figure = Figure()
     axis = Axis(figure[1, 1])
     @test SP.plot_is_lm(solution, axis) === axis
-    @test axis.limits[] == ((0.0, 0.20), (0.0, 15.0))
+    @test axis.limits[] == ((0.0, 15.0), (0.0, 0.20))
     balance_axis = Axis(figure[1, 2])
     @test SP.plot_balance_sheets(solution, balance_axis) === balance_axis
     asset_axis = Axis(figure[1, 3])
@@ -37,6 +37,12 @@ const DP = PKAssetPrices.DynamicPlotting
     @test panel isa Figure
     @test size(panel.scene) == (1200, 800)
     @test count(content -> content isa Axis, panel.content) == 2
+    curve_axis = only(
+        content for content in panel.content
+        if content isa Axis && content.title[] == "Goods market and interest-rate rule"
+    )
+    @test curve_axis.xlabel[] == "Output (Y)"
+    @test curve_axis.ylabel[] == "Interest rate (r)"
 
     asset_panel = SP.panel(solution, SP.AssetMarketPanel(); size = (1200, 1000))
     @test asset_panel isa Figure

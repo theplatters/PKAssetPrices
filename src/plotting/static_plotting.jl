@@ -7,8 +7,8 @@ const IS_COLOR = :royalblue
 const IR_COLOR = :crimson
 const ASSET_COLOR = Makie.wong_colors()[1]
 const LIABILITY_COLOR = Makie.wong_colors()[2]
-const IS_IR_X_LIMITS = (0.0, 0.20)
-const IS_IR_Y_LIMITS = (0.0, 15.0)
+const IS_IR_X_LIMITS = (0.0, 15.0)
+const IS_IR_Y_LIMITS = (0.0, 0.20)
 
 abstract type PanelVariant end
 
@@ -37,33 +37,33 @@ end
 
 """Plot the IS and interest-rate-rule curves on the presentation range."""
 function plot_is_lm(sol::Static.Solution, ax::Makie.Axis)
-  r_range = range(IS_IR_X_LIMITS...; length=200)
-  y_range = range(IS_IR_Y_LIMITS...; length=200)
+  output_range = range(IS_IR_X_LIMITS...; length=200)
+  rate_range = range(IS_IR_Y_LIMITS...; length=200)
 
   vars = copy(sol.variables)
-  is_values = map(r_range) do r
+  is_values = map(rate_range) do r
     vars[:r] = r
     return Static.eval_curve(sol.model, vars).IS
   end
 
   vars = copy(sol.variables)
-  ir_values = map(y_range) do y
+  ir_values = map(output_range) do y
     vars[:Y] = y
     return Static.eval_curve(sol.model, vars).IR
   end
 
   lines!(
     ax,
-    r_range,
-    is_values;
+    is_values,
+    rate_range;
     color=IS_COLOR,
     linewidth=3,
     label="IS curve",
   )
   lines!(
     ax,
-    ir_values,
-    y_range;
+    output_range,
+    ir_values;
     color=IR_COLOR,
     linewidth=3,
     label="IR curve",
@@ -286,8 +286,8 @@ function panel(sol::Static.Solution, ::StandardPanel; size=nothing)
   curve_axis = Axis(
     figure[2, 1];
     title="Goods market and interest-rate rule",
-    xlabel="Interest rate (r)",
-    ylabel="Output (Y)",
+    xlabel="Output (Y)",
+    ylabel="Interest rate (r)",
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
     titlesize=19,
@@ -340,8 +340,8 @@ function panel(sol::Static.Solution, ::AssetMarketPanel; size=nothing)
   curve_axis = Axis(
     figure[2, 1];
     title="Goods market and interest-rate rule",
-    xlabel="Interest rate (r)",
-    ylabel="Output (Y)",
+    xlabel="Output (Y)",
+    ylabel="Interest rate (r)",
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
     titlesize=19,

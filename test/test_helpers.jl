@@ -57,7 +57,12 @@ end
     sweep = S.eval_curve(baseline, :r, [0.01, 0.02, 0.03], :IS)
     @test length(unique(sweep)) == 3
     @test S.bar_chart(solutions, [:Y, :AP]) isa Figure
-    @test S.is_ir_component(baseline) isa Figure
+    is_ir = S.is_ir_component(baseline)
+    @test is_ir isa Figure
+    is_ir_axis = only(content for content in is_ir.content if content isa Axis)
+    @test is_ir_axis.xlabel[] == "Output (Y)"
+    @test is_ir_axis.ylabel[] == "Interest rate (r)"
+    @test is_ir_axis.limits[] == ((0.0, 15.0), (0.0, 0.20))
     @test S.ad_as_component(baseline) isa Figure
     @test S.ad_as_comparison_component([baseline, changed], ["Baseline", "Changed"]) isa Figure
 end

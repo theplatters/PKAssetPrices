@@ -118,7 +118,15 @@ function curve_component(data, layout)
     end
 end
 
-function get_layout(; title, xaxis_title, yaxis_title, x_annotation, y_annotation, annotatation_text)
+function get_layout(;
+    title,
+    xaxis_title,
+    yaxis_title,
+    x_annotation,
+    y_annotation,
+    annotatation_text,
+    show_annotation = true,
+)
     return Dict(
         "title" => Dict(
             "text" => title,
@@ -150,7 +158,7 @@ function get_layout(; title, xaxis_title, yaxis_title, x_annotation, y_annotatio
         "paper_bgcolor" => "#fff",
         "margin" => Dict("l" => 60, "r" => 24, "t" => 60, "b" => 50),
         "hovermode" => "x unified",
-        "annotations" => [
+        "annotations" => show_annotation ? [
             Dict(
                 "x" => x_annotation,
                 "y" => y_annotation,
@@ -163,38 +171,27 @@ function get_layout(; title, xaxis_title, yaxis_title, x_annotation, y_annotatio
                 "ay" => -30,
                 "font" => Dict("size" => 12, "color" => "#2c3e50"),
             ),
-        ],
+        ] : Any[],
     )
 end
 
 
 function is_ir_component(solution::Static.Solution)
-    # Get the equilibrium values
-    r_eq = solution.variables[:r]
-    y_eq = solution.variables[:Y]
+    output_range = range(0.0, 15.0; length = 200)
+    rate_range = range(0.0, 0.20; length = 200)
 
-    # Build a range of r values around the equilibrium for IS
-    r_min = r_eq * 0.2
-    r_max = r_eq * 3.0
-    r_range = range(r_min, r_max; length = 200)
-
-    # Build a range of Y values around the equilibrium for IR
-    y_min = y_eq * 0.2
-    y_max = y_eq * 3.0
-    y_range = range(y_min, y_max; length = 200)
-
-    # IS curve: r → Y  (plot as x=r, y=IS(r))
+    # IS curve: r → Y, plotted in literature-standard (Y, r)-space.
     is_values = Float64[]
-    for r in r_range
+    for r in rate_range
         vars = copy(solution.variables)
         vars[:r] = r
         curves = Static.eval_curve(solution.model, vars)
         push!(is_values, curves.IS)
     end
 
-    # IR curve: Y → r  (plot as x=IR(Y), y=Y so both axes match)
+    # IR curve: Y → r, plotted in literature-standard (Y, r)-space.
     ir_r_values = Float64[]
-    for y in y_range
+    for y in output_range
         vars = copy(solution.variables)
         vars[:Y] = y
         curves = Static.eval_curve(solution.model, vars)
@@ -203,8 +200,8 @@ function is_ir_component(solution::Static.Solution)
 
     # ── Plotly traces ──
     is_trace = (
-        x = collect(r_range),
-        y = is_values,
+        x = is_values,
+        y = collect(rate_range),
         type = "scatter",
         mode = "lines",
         name = "IS",
@@ -214,10 +211,9 @@ function is_ir_component(solution::Static.Solution)
         ),
     )
 
-    # IR: x = IR(Y) (the r values), y = Y
     ir_trace = (
-        x = ir_r_values,
-        y = collect(y_range),
+        x = collect(output_range),
+        y = ir_r_values,
         type = "scatter",
         mode = "lines",
         name = "IR",
@@ -227,37 +223,20 @@ function is_ir_component(solution::Static.Solution)
         ),
     )
 
-    eq_trace = (
-        x = [r_eq],
-        y = [y_eq],
-        type = "scatter",
-        mode = "markers",
-        name = "Equilibrium",
-        marker = Dict(
-            "color" => "#2c3e50",
-            "size" => 12,
-            "symbol" => "circle",
-            "line" => Dict(
-                "color" => "#fff",
-                "width" => 2,
-            ),
-        ),
-        showlegend = true,
-    )
-
     # ── Layout ──
     layout = get_layout(
         title = "IS – IR Curves",
-        xaxis_title = Dict("text" => "Interest rate (r)"),
-        yaxis_title = Dict("text" => "Output (Y)"),
-        x_annotation = r_eq,
-        y_annotation = y_eq,
-        annotatation_text = "r* = $(round(r_eq; digits = 4)),
-                        Y* = $(round(y_eq; digits = 2))"
+        xaxis_title = Dict("text" => "Output (Y)"),
+        yaxis_title = Dict("text" => "Interest rate (r)"),
+        x_annotation = 0.0,
+        y_annotation = 0.0,
+        annotatation_text = "",
+        show_annotation = false,
     )
+    layout["xaxis"]["range"] = [0.0, 15.0]
+    layout["yaxis"]["range"] = [0.0, 0.20]
 
-
-    return curve_component([is_trace, ir_trace, eq_trace], layout)
+    return curve_component([is_trace, ir_trace], layout)
 
 end
 

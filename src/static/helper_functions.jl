@@ -304,19 +304,11 @@ function bar_chart(sols::AbstractDict{String, <:Solution}, variables::Vector{Sym
 end
 
 function is_ir_component(solution::Static.Solution)
-    r_eq = solution.variables[:r]
-    y_eq = solution.variables[:Y]
-
-    r_min = r_eq * 0.2
-    r_max = r_eq * 3.0
-    r_range = range(r_min, r_max; length = 200)
-
-    y_min = y_eq * 0.2
-    y_max = y_eq * 3.0
-    y_range = range(y_min, y_max; length = 200)
+    output_range = range(0.0, 15.0; length = 200)
+    rate_range = range(0.0, 0.20; length = 200)
 
     is_values = Float64[]
-    for r in r_range
+    for r in rate_range
         vars = copy(solution.variables)
         vars[:r] = r
         curves = Static.eval_curve(solution.model, vars)
@@ -324,7 +316,7 @@ function is_ir_component(solution::Static.Solution)
     end
 
     ir_r_values = Float64[]
-    for y in y_range
+    for y in output_range
         vars = copy(solution.variables)
         vars[:Y] = y
         curves = Static.eval_curve(solution.model, vars)
@@ -335,22 +327,15 @@ function is_ir_component(solution::Static.Solution)
     ax = Axis(
         fig[1, 1];
         title = "IS – IR Curves",
-        xlabel = "Interest rate (r)",
-        ylabel = "Output (Y)",
+        xlabel = "Output (Y)",
+        ylabel = "Interest rate (r)",
         backgroundcolor = :white,
     )
 
-    lines!(ax, collect(r_range), is_values; color = :royalblue, linewidth = 3, label = "IS")
-    lines!(ax, ir_r_values, collect(y_range); color = :crimson, linewidth = 3, label = "IR")
-    scatter!(
-        ax, [r_eq], [y_eq];
-        color = :black,
-        markersize = 14,
-        strokecolor = :white,
-        strokewidth = 2,
-        label = "Equilibrium",
-    )
-
+    lines!(ax, is_values, collect(rate_range); color = :royalblue, linewidth = 3, label = "IS")
+    lines!(ax, collect(output_range), ir_r_values; color = :crimson, linewidth = 3, label = "IR")
+    xlims!(ax, 0.0, 15.0)
+    ylims!(ax, 0.0, 0.20)
 
     axislegend(ax; position = :rt, framevisible = false)
 
