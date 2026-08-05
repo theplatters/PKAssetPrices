@@ -14,11 +14,20 @@ const DP = PKAssetPrices.DynamicPlotting
     figure = Figure()
     axis = Axis(figure[1, 1])
     @test SP.plot_is_lm(solution, axis) === axis
+    @test length(axis.scene.plots) == 3
     @test axis.limits[] == ((0.0, 15.0), (0.0, 0.20))
+    lower_rate_model = SP.lower_autonomous_policy_rate(solution.model)
+    @test lower_rate_model.params[:i0] == 0.5 * solution.model.params[:i0]
+    @test solution.model.params[:i0] == S.Baseline.params[:i0]
+    @test_throws ArgumentError SP.lower_autonomous_policy_rate(solution.model; factor=1.0)
     balance_axis = Axis(figure[1, 2])
     @test SP.plot_balance_sheets(solution, balance_axis) === balance_axis
     asset_axis = Axis(figure[1, 3])
     @test SP.plot_asset_market(solution, asset_axis) === asset_axis
+    @test length(asset_axis.scene.plots) == 6
+    ad_as_axis = Axis(figure[2, 1])
+    @test SP.plot_ad_as(solution, ad_as_axis) === ad_as_axis
+    @test length(ad_as_axis.scene.plots) == 5
 
     data = SP.balance_sheet_plot_data(solution)
     @test length(data.positions) == sum(
@@ -36,18 +45,23 @@ const DP = PKAssetPrices.DynamicPlotting
     panel = SP.panel(solution; size = (1200, 800))
     @test panel isa Figure
     @test size(panel.scene) == (1200, 800)
-    @test count(content -> content isa Axis, panel.content) == 2
+    @test count(content -> content isa Axis, panel.content) == 3
     curve_axis = only(
         content for content in panel.content
         if content isa Axis && content.title[] == "Goods market and interest-rate rule"
     )
     @test curve_axis.xlabel[] == "Output (Y)"
     @test curve_axis.ylabel[] == "Interest rate (r)"
+    aggregate_axis = only(
+        content for content in panel.content
+        if content isa Axis && content.title[] == "Aggregate demand and supply"
+    )
+    @test aggregate_axis.ylabel[] == "Price level (P)"
 
     asset_panel = SP.panel(solution, SP.AssetMarketPanel(); size = (1200, 1000))
     @test asset_panel isa Figure
     @test size(asset_panel.scene) == (1200, 1000)
-    @test count(content -> content isa Axis, asset_panel.content) == 3
+    @test count(content -> content isa Axis, asset_panel.content) == 4
     asset_market_axis = only(
         content for content in asset_panel.content
         if content isa Axis && content.title[] == "Asset market"
@@ -55,6 +69,8 @@ const DP = PKAssetPrices.DynamicPlotting
     @test asset_market_axis.xlabel[] == "Base-price-equivalent quantity"
 
     baseline = PKAssetPrices.solve_model(S.SimplePK)
+    lower_simple_rate = SP.lower_autonomous_policy_rate(baseline.model)
+    @test lower_simple_rate.params[:i₀] == 0.5 * baseline.model.params[:i₀]
     @test_throws ArgumentError SP.panel(baseline, SP.AssetMarketPanel())
 end
 

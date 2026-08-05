@@ -27,6 +27,15 @@ end
     @test all(model -> model isa PKAssetPrices.Static.Parametrization, values(models))
     @test models["Baseline"] === PKAssetPrices.Static.Baseline
     @test models["PQA"] === PKAssetPrices.Static.PQA
+
+    dynamic_models = PKAssetPrices.dashboard_dynamic_models()
+    @test first(PKAssetPrices.Dashboard.ordered_dynamic_model_names(dynamic_models)) == "Working model"
+    @test length(dynamic_models) == 5
+    @test all(
+        model -> model isa PKAssetPrices.Dynamic.DynamicParametrization,
+        values(dynamic_models),
+    )
+    @test dynamic_models["Working model"] === PKAssetPrices.Dynamic.WorkingModel
 end
 
 end

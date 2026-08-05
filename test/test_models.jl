@@ -59,6 +59,18 @@ end
     end
 end
 
+@testset "Static AD and AS curves meet at equilibrium" begin
+    for name in (:SimplePK, :Baseline, :PQCold, :PQC, :PQCr, :PQCrDIFF)
+        solution = PKAssetPrices.solve_model(getproperty(S, name))
+        curves = S.eval_curve(solution)
+
+        @testset "$name" begin
+            @test curves.AD ≈ solution.variables[:Y] atol = 1.0e-8
+            @test curves.AS ≈ solution.variables[:P] atol = 1.0e-8
+        end
+    end
+end
+
 @testset "Speculative debt enters bank loans" begin
     for name in (:PQCr, :PQCrDIFF)
         solution = PKAssetPrices.solve_model(getproperty(S, name))
