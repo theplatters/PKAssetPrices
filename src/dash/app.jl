@@ -1,184 +1,75 @@
-const SOLVE_CACHE = Dict{UInt, Solution}()
-const COMPONENT_CACHE = Dict{UInt, Dash.Component}()
+const SOLVE_CACHE = Dict{UInt, Static.Solution}()
+const SOLVE_CACHE_LOCK = ReentrantLock()
+const SOLVE_CACHE_LIMIT = 128
 
-
-function get_app(model_options::Dict{String, Static.Parametrization})
-
-    @async for p in values(model_options)
-        solve_cached(p)
+function solve_cached(parametrization::Static.Parametrization)
+    key = hash((parametrization.model.equations, parametrization.params, parametrization.u0))
+    return lock(SOLVE_CACHE_LOCK) do
+        if !haskey(SOLVE_CACHE, key) && length(SOLVE_CACHE) >= SOLVE_CACHE_LIMIT
+            delete!(SOLVE_CACHE, first(keys(SOLVE_CACHE)))
+        end
+        get!(SOLVE_CACHE, key) do
+            Static.solve_model(parametrization)
+        end
     end
+end
 
+function app_layout(model_options, dynamic_model_options)
+    parameter_store = Dict(
+        name => parameter_names(parametrization)
+        for (name, parametrization) in model_options
+    )
+    dynamic_parameter_store = Dict(
+        name => dynamic_parameter_names(parametrization)
+        for (name, parametrization) in dynamic_model_options
+    )
 
+    return html_div(className = "app-frame") do
+        workbook_header(),
+        html_nav(className = "workbook-navigation", aria_label = "Workbook sections") do
+            dcc_tabs(
+                id = "tabs-model",
+                value = "explorer",
+                className = "workbook-tabs",
+                parent_className = "workbook-tabs-parent",
+                children = [
+                    dcc_tab(
+                        label = "Static explorer",
+                        value = "explorer",
+                        className = "workbook-tab",
+                        selected_className = "workbook-tab--selected",
+                    ),
+                    dcc_tab(
+                        label = "Static comparison",
+                        value = "comparisons",
+                        className = "workbook-tab",
+                        selected_className = "workbook-tab--selected",
+                    ),
+                    dcc_tab(
+                        label = "Dynamics lab",
+                        value = "dynamics",
+                        className = "workbook-tab dynamic-tab",
+                        selected_className = "workbook-tab--selected dynamic-tab--selected",
+                    ),
+                ],
+            )
+        end,
+        html_div(id = "tabs-content"),
+        dcc_store(id = "param-names-store", data = parameter_store),
+        dcc_store(id = "dynamic-param-names-store", data = dynamic_parameter_store)
+    end
+end
+
+function get_app(
+    model_options::Dict{String, Static.Parametrization},
+    dynamic_model_options = default_dynamic_models(),
+)
     app = dash(
         suppress_callback_exceptions = true,
+        assets_folder = joinpath(@__DIR__, "assets"),
+        update_title = "Solving model…",
     )
-
-    app.layout = html_div(
-        [
-            dcc_tabs(
-                id = "tabs-model", value = "tab-1", children = [
-                    dcc_tab(label = "Model explorer", value = "tab-1"),
-                    dcc_tab(label = "Comparisons", value = "tab-2"),
-                ]
-            ),
-            html_div(id = "tabs-content"),
-            dcc_store(
-                id = "param-names-store",
-                data = Dict(name => keys(v.params) for (name, v) in model_options),
-            ),
-        ]
-    )
-
+    app.title = "PK Asset Prices · Model Workbook"
+    app.layout = app_layout(model_options, dynamic_model_options)
     return app
-
-end
-
-function solve_cached(p::Static.Parametrization)
-    key = hash((p.model.equations, p.params, p.u0))
-    return get!(SOLVE_CACHE, key) do
-        Static.solve_model(p)
-    end
-end
-
-
-function register_comparison_callbacks!(app, model_options)
-    # ── 1. Add-model button: increase counter & re-render columns ──
-    callback!(
-        app,
-        Output("cmp-columns-container", "children"),
-        Output("cmp-num-models", "data"),
-        Input("cmp-add-model-btn", "n_clicks"),
-        State("cmp-num-models", "data"),
-    ) do n_clicks, current_n
-        n = current_n + (n_clicks > 0 ? 1 : 0)
-        # Guard: at least 2, cap at 6
-        n = clamp(n, 2, 6)
-        cols = [model_column(model_options, i) for i in 1:n]
-        push!(cols, add_model_button())
-        return cols, n
-    end
-
-    # ── 2. Per-column: when model dropdown changes → render param inputs ──
-    callback!(
-        app,
-        Output((type = "cmp-param-container", index = MATCH), "children"),
-        Input((type = "cmp-model-dropdown", index = MATCH), "value"),
-        State((type = "cmp-model-dropdown", index = MATCH), "id"),
-        State("param-names-store", "data"),
-    ) do model_name, model_id, param_names_all
-        isnothing(model_name) && return ([], [])
-        model = model_options[model_name]
-        params = model.params
-        param_names = param_names_all[model_name]
-
-
-        param_inputs(
-            param_names,
-            params,
-            model.model.parameter_descriptions,
-            id = pname -> (type = "cmp-param-input", model = model_id["index"], index = "$pname")
-        )
-    end
-
-    # ── 3. Master solve callback: collect ALL model selections + params → render tables & graphs ──
-    callback!(
-        app,
-        Output("cmp-results-output", "children"),
-        Input((type = "cmp-param-container", index = ALL), "children"),
-        Input((type = "cmp-model-dropdown", index = ALL), "value"),
-        Input((type = "cmp-param-input", model = ALL, index = ALL), "value"),
-        State((type = "cmp-param-input", model = ALL, index = ALL), "id"),
-        State("param-names-store", "data"),
-        State("cmp-num-models", "data"),
-    ) do _, model_names, all_param_values, all_param_ids, all_param_names, num_models
-        # ── Solve each model ──
-        solutions = []
-        labels = String[]
-
-        new_params = [copy(model_options[mname].params) for mname in model_names]
-        for (id, val) in zip(all_param_ids, all_param_values)
-            new_params[id.model][Symbol(id.index)] = val
-        end
-
-        for i in 1:num_models
-            mname = model_names[i]
-            isnothing(mname) && continue
-
-            p = model_options[mname]
-            pnames = all_param_names[mname]
-            # Slice the flat param values for this column
-            # (Each column's MATCH params are grouped by index order)
-            if !isnothing(pnames) && !isempty(pnames)
-                p = Static.Parametrization(p.model, new_params[i], p.u0)
-            end
-
-            sol = solve_cached(p)
-            push!(solutions, sol)
-            push!(labels, "$mname (#$i)")
-        end
-
-        isempty(solutions) && return html_p("Select models above to compare.")
-
-        return comparison_results(solutions, labels)
-    end
-
-    return nothing
-end
-
-
-function register_callbacks!(app, model_options)
-    callback!(
-        app,
-        Output("tabs-content", "children"),
-        Input("tabs-model", "value")
-    ) do tab
-        if tab == "tab-1"
-            return model_explore(model_options)
-        elseif tab == "tab-2"
-            return comparisons(model_options)
-        end
-    end
-
-    callback!(
-        app,
-        Output("param-container", "children"),
-        Input("model-dropdown", "value"),
-        State("param-names-store", "data"),
-    ) do model_name, param_names_store
-        model = model_options[model_name]
-        param_names = param_names_store[model_name]
-        params = model.params
-
-
-        return get_param_input(param_names, params, model.model.parameter_descriptions)
-    end
-
-
-    callback!(
-        app,
-        Output("solution-output", "children"),
-        Input("model-dropdown", "value"),
-        Input((type = "param-input", index = ALL), "value"),
-        Input("param-container", "children"),  # ensures ordering
-        State("param-names-store", "data"),
-    ) do model_name, param_values, _, param_names_store
-        # On initial load or when model just changed, param_names may be nothing
-        # or param_values may be empty — solve with defaults in that case
-        p = model_options[model_name]
-        param_names = param_names_store[model_name]
-
-
-        if !isnothing(param_names) && !isempty(param_values) && length(param_names) == length(param_values)
-            # Check that all values are valid numbers (not nothing/missing)
-            if all(v -> v isa Number, param_values)
-                new_params = Dict(Symbol(k) => Float64(v) for (k, v) in zip(param_names, param_values))
-                p::Static.Parametrization = Static.Parametrization(p.model, new_params, p.u0)
-            end
-        end
-
-        solve_cached(p) |> solution_component
-    end
-
-    register_comparison_callbacks!(app, model_options)
-    return nothing
 end

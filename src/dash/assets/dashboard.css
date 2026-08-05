@@ -1,0 +1,1060 @@
+:root {
+    --canvas: #f3f1eb;
+    --paper: #fffefa;
+    --paper-muted: #f8f7f2;
+    --ink: #172033;
+    --muted: #647084;
+    --faint: #8993a3;
+    --line: #d9dfe1;
+    --line-strong: #b9c4c9;
+    --primary: #315b7d;
+    --primary-soft: #e5edf1;
+    --accent: #b56a45;
+    --teal: #3e8179;
+    --success: #38715d;
+    --shadow: 0 12px 32px rgba(30, 42, 55, 0.07);
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --serif: Iowan Old Style, Palatino Linotype, Book Antiqua, Palatino, Georgia, serif;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    background: var(--canvas);
+}
+
+body {
+    min-width: 320px;
+    margin: 0;
+    background:
+        linear-gradient(rgba(49, 91, 125, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(49, 91, 125, 0.025) 1px, transparent 1px),
+        var(--canvas);
+    background-size: 24px 24px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+.app-frame {
+    min-height: 100vh;
+}
+
+.workbook-masthead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 76px;
+    padding: 14px clamp(20px, 4vw, 64px);
+    background: var(--ink);
+    color: #fff;
+    border-bottom: 3px solid var(--accent);
+}
+
+.brand-lockup,
+.masthead-meta,
+.model-card-heading,
+.parameter-label-row,
+.comparison-setup-heading,
+.solution-summary {
+    display: flex;
+    align-items: center;
+}
+
+.brand-lockup {
+    gap: 14px;
+}
+
+.brand-mark {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.brand-name {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.brand-subtitle {
+    margin-top: 1px;
+    color: #adb8c7;
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.masthead-meta {
+    gap: 8px;
+    color: #c2cad4;
+    font-size: 12px;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #75b89c;
+    box-shadow: 0 0 0 4px rgba(117, 184, 156, 0.12);
+}
+
+.workbook-navigation {
+    position: sticky;
+    z-index: 20;
+    top: 0;
+    padding: 0 clamp(20px, 4vw, 64px);
+    background: rgba(255, 254, 250, 0.96);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(10px);
+}
+
+.workbook-tabs-parent,
+.workbook-tabs {
+    max-width: 1720px;
+    margin: 0 auto;
+}
+
+.workbook-tabs {
+    border: 0 !important;
+}
+
+.workbook-tab,
+.workbook-tab--selected {
+    width: auto !important;
+    min-width: 150px;
+    padding: 15px 20px 13px !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 2px solid transparent !important;
+    color: var(--muted) !important;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.workbook-tab--selected {
+    border-bottom-color: var(--primary) !important;
+    color: var(--primary) !important;
+}
+
+.dynamic-tab--selected {
+    border-bottom-color: var(--accent) !important;
+    color: var(--accent) !important;
+}
+
+.dashboard-view {
+    width: min(1720px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: clamp(28px, 4vw, 54px) 0 72px;
+}
+
+.view-heading {
+    max-width: 820px;
+    margin-bottom: 32px;
+}
+
+.eyebrow {
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.view-heading h1,
+.section-heading h2,
+.section-heading h3,
+.control-panel-heading h2,
+.comparison-setup-heading h2,
+.balance-sheet-heading h3,
+.comparison-result-heading h3,
+.model-card-heading h3,
+.empty-state h3 {
+    font-family: var(--serif);
+    font-weight: 600;
+    line-height: 1.15;
+}
+
+.view-heading h1 {
+    margin: 7px 0 8px;
+    font-size: clamp(34px, 4vw, 50px);
+    letter-spacing: -0.025em;
+}
+
+.view-heading p,
+.section-heading p,
+.control-panel-heading p,
+.comparison-setup-heading p,
+.empty-state p {
+    color: var(--muted);
+}
+
+/* Dynamic workspace ------------------------------------------------------- */
+
+.dynamic-view {
+    --dynamic-accent: var(--accent);
+    --dynamic-soft: #f3e9e1;
+}
+
+.dynamic-view > .view-heading .eyebrow {
+    color: var(--dynamic-accent);
+}
+
+.dynamic-view > .view-heading h1 {
+    font-style: italic;
+}
+
+.dynamic-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+}
+
+.dynamic-control-panel {
+    border-top-color: var(--dynamic-accent);
+}
+
+.dynamic-control-panel .eyebrow,
+.dynamic-workbook .eyebrow {
+    color: var(--dynamic-accent);
+}
+
+.dynamic-model-dropdown .Select-control:hover,
+.dynamic-model-dropdown.is-focused > .Select-control,
+.dynamic-variable-dropdown .Select-control:hover,
+.dynamic-variable-dropdown.is-focused > .Select-control {
+    border-color: var(--dynamic-accent);
+    box-shadow: 0 0 0 3px rgba(181, 106, 69, 0.1);
+}
+
+.horizon-input {
+    margin-bottom: 24px;
+    border-left: 3px solid var(--dynamic-accent);
+}
+
+.dynamic-parameter-divider {
+    border-bottom-color: rgba(181, 106, 69, 0.45);
+}
+
+.dynamic-output-column {
+    min-width: 0;
+}
+
+.series-selector-panel {
+    display: grid;
+    grid-template-columns: minmax(190px, 0.45fr) minmax(280px, 1fr);
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 22px;
+    padding: 18px 20px;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 47px,
+            rgba(181, 106, 69, 0.045) 48px
+        ),
+        var(--paper);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--dynamic-accent);
+    box-shadow: 0 5px 20px rgba(30, 42, 55, 0.045);
+}
+
+.series-selector-panel h2 {
+    margin: 4px 0 0;
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.dynamic-variable-dropdown {
+    min-width: 0;
+}
+
+.dynamic-variable-dropdown .Select-control {
+    min-height: 42px;
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+}
+
+.dynamic-variable-dropdown .Select-value {
+    background: var(--dynamic-soft) !important;
+    border-color: rgba(181, 106, 69, 0.24) !important;
+    border-radius: 2px !important;
+    color: #80492f !important;
+    font-size: 11px;
+}
+
+.dynamic-variable-dropdown .Select-menu-outer {
+    z-index: 50;
+}
+
+.dynamic-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 34px;
+    background:
+        linear-gradient(90deg, rgba(181, 106, 69, 0.1), transparent 42%),
+        #242a31;
+    color: #fff;
+    border-top: 3px solid var(--dynamic-accent);
+}
+
+.dynamic-summary > div {
+    display: flex;
+    min-width: 0;
+    padding: 18px 20px;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.dynamic-summary > div:last-child {
+    border-right: 0;
+}
+
+.dynamic-time-value {
+    color: #e2a887;
+    font-family: var(--mono);
+    font-size: 16px;
+}
+
+.dynamic-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.dynamic-chart-card {
+    min-width: 0;
+    padding: 0 8px 8px;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 39px,
+            rgba(181, 106, 69, 0.035) 40px
+        ),
+        var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: 0 5px 20px rgba(30, 42, 55, 0.05);
+}
+
+.trajectory-rule {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 8px;
+    padding: 8px 2px 6px;
+    border-bottom: 1px solid var(--line);
+    color: var(--faint);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.04em;
+}
+
+.dynamic-graph {
+    width: 100%;
+    height: 350px;
+}
+
+.dynamic-chart-card .modebar {
+    opacity: 0;
+    transition: opacity 160ms ease;
+}
+
+.dynamic-chart-card:hover .modebar {
+    opacity: 0.75;
+}
+
+.dynamic-ledger {
+    padding: 0;
+    border-top: 3px solid var(--dynamic-accent);
+}
+
+.dynamic-endpoint-table {
+    min-width: 680px;
+}
+
+.dynamic-endpoint-table thead th {
+    background: var(--dynamic-soft);
+    color: #80492f;
+}
+
+.simulation-error {
+    padding: 34px;
+    background: #fff8f3;
+    border: 1px solid #dfb59d;
+    border-left: 4px solid var(--dynamic-accent);
+}
+
+.simulation-error h3 {
+    margin: 5px 0;
+    font-family: var(--serif);
+    font-size: 21px;
+}
+
+.simulation-error p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.view-heading p {
+    max-width: 720px;
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+}
+
+.explorer-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+}
+
+.control-panel,
+.comparison-setup,
+.paper-panel,
+.balance-sheet-card,
+.comparison-result-card,
+.curve-comparison-card,
+.chart-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+}
+
+.control-panel {
+    position: sticky;
+    top: 78px;
+    max-height: calc(100vh - 104px);
+    padding: 24px;
+    overflow-y: auto;
+    border-top: 3px solid var(--primary);
+}
+
+.control-panel-heading {
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+}
+
+.control-panel-heading h2,
+.comparison-setup-heading h2 {
+    margin: 4px 0 5px;
+    font-size: 24px;
+}
+
+.control-panel-heading p,
+.comparison-setup-heading p {
+    margin: 0;
+    font-size: 12px;
+}
+
+.control-label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+}
+
+.model-dropdown {
+    margin-bottom: 22px;
+}
+
+.model-dropdown .Select-control {
+    min-height: 40px;
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    box-shadow: none;
+}
+
+.model-dropdown.is-focused > .Select-control,
+.model-dropdown .Select-control:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(49, 91, 125, 0.1);
+}
+
+.model-dropdown .Select-menu-outer {
+    z-index: 50;
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow);
+}
+
+.parameter-divider {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line-strong);
+    color: var(--faint);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.parameter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.control-panel .parameter-grid,
+.comparison-model-card .parameter-grid {
+    grid-template-columns: 1fr;
+}
+
+.parameter-field {
+    min-width: 0;
+}
+
+.parameter-label-row {
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.parameter-label-row label {
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.parameter-help {
+    color: var(--faint);
+    cursor: help;
+    font-size: 10px;
+}
+
+.parameter-input {
+    width: 100%;
+    min-height: 36px;
+    padding: 7px 9px;
+    background: var(--paper-muted);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    outline: none;
+}
+
+.parameter-input:focus {
+    background: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(49, 91, 125, 0.1);
+}
+
+.output-column {
+    min-width: 0;
+}
+
+.loading-container {
+    min-height: 260px;
+}
+
+.solution-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 34px;
+    background: var(--ink);
+    color: #fff;
+}
+
+.solution-summary > div {
+    display: flex;
+    min-width: 0;
+    padding: 18px 20px;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.solution-summary > div:last-child {
+    border-right: 0;
+}
+
+.summary-value {
+    font-family: var(--serif);
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.summary-status {
+    color: #92ceb5;
+}
+
+.summary-label {
+    margin-top: 2px;
+    color: #aeb8c5;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+}
+
+.workbook-section + .workbook-section {
+    margin-top: 46px;
+}
+
+.section-heading {
+    margin-bottom: 16px;
+}
+
+.section-heading h2,
+.section-heading h3 {
+    margin: 4px 0 3px;
+}
+
+.section-heading h2 {
+    font-size: 25px;
+}
+
+.section-heading h3 {
+    font-size: 18px;
+}
+
+.section-heading p {
+    margin: 0;
+    font-size: 12px;
+}
+
+.results-ledger-grid {
+    display: grid;
+    grid-template-columns: minmax(240px, 0.7fr) minmax(440px, 1.3fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.paper-panel {
+    min-width: 0;
+    padding: 20px;
+}
+
+.balance-sheet-column,
+.balance-sheet-grid {
+    min-width: 0;
+}
+
+.balance-sheet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
+    gap: 16px;
+}
+
+.balance-sheet-card {
+    min-width: 0;
+    box-shadow: 0 4px 16px rgba(30, 42, 55, 0.045);
+}
+
+.balance-sheet-heading,
+.comparison-result-heading {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--line);
+}
+
+.balance-sheet-heading h3,
+.comparison-result-heading h3,
+.model-card-heading h3 {
+    margin: 3px 0 0;
+    font-size: 16px;
+}
+
+.table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.data-table thead th {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.data-table tbody th {
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.data-table tbody tr:nth-child(even) td,
+.data-table tbody tr:nth-child(even) th {
+    background: var(--paper-muted);
+}
+
+.data-table tbody tr:hover td,
+.data-table tbody tr:hover th {
+    background: #eef3f4;
+}
+
+.data-table tfoot th,
+.data-table tfoot td {
+    padding-top: 10px;
+    background: var(--ink);
+    border: 0;
+    color: #fff;
+    font-weight: 700;
+}
+
+.data-table .numeric-cell {
+    text-align: right;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.chart-card {
+    min-width: 0;
+    padding: 8px;
+    box-shadow: 0 5px 20px rgba(30, 42, 55, 0.05);
+}
+
+.workbook-graph {
+    width: 100%;
+    height: 430px;
+}
+
+.modebar {
+    opacity: 0;
+    transition: opacity 160ms ease;
+}
+
+.chart-card:hover .modebar {
+    opacity: 0.75;
+}
+
+.comparison-setup {
+    margin-bottom: 42px;
+    padding: 24px;
+    border-top: 3px solid var(--primary);
+}
+
+.comparison-setup-heading {
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+}
+
+.add-model-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 7px 14px;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.add-model-button:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.button-icon {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.comparison-model-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 14px;
+}
+
+.comparison-model-card {
+    min-width: 0;
+    padding: 18px;
+    background: var(--paper-muted);
+    border: 1px solid var(--line);
+}
+
+.model-card-heading {
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.model-index {
+    display: grid;
+    width: 31px;
+    height: 31px;
+    place-items: center;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.comparison-model-card .model-dropdown {
+    margin-bottom: 16px;
+}
+
+.comparison-results > .workbook-section + .workbook-section {
+    margin-top: 52px;
+}
+
+.comparison-table {
+    min-width: 540px;
+}
+
+.comparison-balance-grid,
+.curve-comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr));
+    gap: 18px;
+    align-items: start;
+}
+
+.comparison-result-card,
+.curve-comparison-card {
+    min-width: 0;
+}
+
+.comparison-result-card > .balance-sheet-grid {
+    padding: 14px;
+}
+
+.comparison-result-card .balance-sheet-card {
+    box-shadow: none;
+}
+
+.comparison-chart-stack {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+}
+
+.curve-comparison-card .chart-card {
+    box-shadow: none;
+}
+
+.empty-state {
+    padding: 48px 24px;
+    background: var(--paper);
+    border: 1px dashed var(--line-strong);
+    text-align: center;
+}
+
+.empty-state-symbol {
+    color: var(--primary);
+    font-family: var(--serif);
+    font-size: 30px;
+}
+
+.empty-state h3 {
+    margin: 6px 0 4px;
+    font-size: 20px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 12px;
+}
+
+@media (max-width: 1180px) {
+    .explorer-layout {
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 20px;
+    }
+
+    .results-ledger-grid,
+    .chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dynamic-layout {
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 20px;
+    }
+
+    .dynamic-chart-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 820px) {
+    .workbook-masthead {
+        min-height: 68px;
+    }
+
+    .masthead-meta {
+        display: none;
+    }
+
+    .brand-name {
+        font-size: 16px;
+    }
+
+    .brand-subtitle {
+        font-size: 9px;
+    }
+
+    .dashboard-view {
+        width: min(100% - 28px, 1720px);
+        padding-top: 30px;
+    }
+
+    .explorer-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .dynamic-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .control-panel {
+        position: static;
+        max-height: none;
+    }
+
+    .control-panel .parameter-grid {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    }
+
+    .solution-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .dynamic-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .solution-summary > div {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .dynamic-summary > div {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .series-selector-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .comparison-setup-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .workbook-graph {
+        height: 380px;
+    }
+
+    .dynamic-graph {
+        height: 330px;
+    }
+}
+
+@media (max-width: 520px) {
+    .workbook-masthead {
+        padding-inline: 14px;
+    }
+
+    .brand-mark {
+        width: 36px;
+        height: 36px;
+    }
+
+    .workbook-navigation {
+        padding: 0 8px;
+    }
+
+    .workbook-tab,
+    .workbook-tab--selected {
+        min-width: 0;
+        padding-inline: 12px !important;
+        font-size: 11px;
+    }
+
+    .view-heading h1 {
+        font-size: 32px;
+    }
+
+    .view-heading p {
+        font-size: 15px;
+    }
+
+    .control-panel,
+    .comparison-setup,
+    .paper-panel {
+        padding: 16px;
+    }
+
+    .comparison-model-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .workbook-graph {
+        height: 340px;
+    }
+
+    .dynamic-graph {
+        height: 310px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+    }
+}

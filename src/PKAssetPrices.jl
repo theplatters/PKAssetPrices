@@ -23,10 +23,13 @@ function dashboard_models()
     )
 end
 
+dashboard_dynamic_models() = Dashboard.default_dynamic_models()
+
 function @main(args)
     models = dashboard_models()
-    app = Dashboard.get_app(models)
-    Dashboard.register_callbacks!(app, models )
+    dynamic_models = dashboard_dynamic_models()
+    app = Dashboard.get_app(models, dynamic_models)
+    Dashboard.register_callbacks!(app, models, dynamic_models)
 
     Dashboard.run(app)
     return 0
