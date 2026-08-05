@@ -8,7 +8,7 @@ function (@main)(ARGS)
   output_dir = isempty(ARGS) ? default_output_dir : abspath(first(ARGS))
   mkpath(output_dir)
 
-  baseline = StaticPlotting.panel(solve_model(SimplePK); size=(1200, 720))
+  baseline = StaticPlotting.panel(solve_model(SimplePK))
   baseline_path = joinpath(output_dir, "simplepk_equilibrium_panel.pdf")
   save(baseline_path, baseline)
   println("Saved static equilibrium panel to $baseline_path")
@@ -23,8 +23,7 @@ function (@main)(ARGS)
     solution = solve_model(model)
     figure = StaticPlotting.panel(
       solution,
-      StaticPlotting.AssetMarketPanel();
-      size=(1000, 900),
+      StaticPlotting.AssetMarketPanel(),
     )
     output_path = joinpath(output_dir, "$(name)_equilibrium_panel.pdf")
     save(output_path, figure)
