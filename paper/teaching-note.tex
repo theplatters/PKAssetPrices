@@ -320,13 +320,13 @@ In a next step we introduce a market for speculative assets in this framework, w
 
 \paragraph{Asset markets}
 \begin{align}
-  SD &= s_0 - s_1 r, \label{eq:sd} \\
-  AD &= \gamma_0 + \frac{1}{1-\gamma}\frac{SD}{AP}, \label{eq:ad} \\
-  AP &= p_1\frac{AD}{AS}, \label{eq:ap} \\
-  AS &= AQ(\alpha+g_\alpha). \label{eq:as}
+  SD &= (s_0 - s_1 r) / AP  \label{eq:sd} \\
+  AD &= \frac{1}{1 - \gamma} SD \label{eq:ad} \\
+  AP &= \frac{AD}{AS} \label{eq:ap} \\
+  AS &= \bar{AS} %AQ (\alpha + g_\alpha) \label{eq:as} (ICH HÄTTE HIER MAL AUF ALPHA VERZICHTET)
 \end{align}
 
-Speculative borrowing falls with the lending rate. At price \(AP\), the initial loan finances \(SD/AP\) asset units. If sellers reinvest a share \(\gamma\), with \(0\leq\gamma<1\), of their receipts within the same period, repeated transactions produce the gross-purchase multiplier \(1/(1-\gamma)\) in Eq.~\ref{eq:ad}. Thus a higher \(\gamma\) raises gross asset demand. The autonomous term \(\gamma_0\) is included in the code but set to zero in the reported calibration.
+% note on gamma_zero: I dropped gamma_0 here, as it would have led to a third channel of influence and as it is zero anyway it does not matter much. I also reorganized the other equations in search for a simple and plausible narrative.
 
 In this formulation the total purchasing power devoted to speculative purposes is given by $AD$, which, conceptually, has two main components: credit-financed speculative demand $SD$, which depends negatively on the interest rate (which makes credit-financed speculation more costly) and the level of asset prices $AP$. Both assumptions go back directly to the \GT (as discussed in section \ref{subsec:endogenous-money}), where the latter takes up the notion that a ``liquidity preference'' for holding money becomes more pertinent wenn asset prices are high. However, in contrast to the \GT (and its strong focus on the bonds market), we consider the impact of interest rates and asset prices and two separate channels (which are deterministically tied together in the framework of the \GT).
 
@@ -456,6 +456,8 @@ interest rate and output shown in the upper-left panel.
 \end{figure}
 
 \section{Some extensions of the basic model}
+
+HIER BIN NOCH UNSICHER WAS WIR GENAU MACHEN; EVENTUELL AUCH MAL EIN BEISPIEL mit GAMMA_1 und ERWARTUNGEN?
 
 The repository additionally contains experimental variants that endogenize the
 asset turnover rate \(\alpha\). They are not used for the equilibrium figures or
