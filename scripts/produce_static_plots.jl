@@ -1,4 +1,4 @@
-using PKAssetPrices.Static: PQ, PQC, PQCr, PQCrDIFF, SimplePK, solve_model
+using PKAssetPrices.Static: Baseline, PQC, PQCr, PQCrDIFF, SimplePK, solve_model
 using CairoMakie
 using PKAssetPrices
 
@@ -14,7 +14,7 @@ function (@main)(ARGS)
     println("Saved static equilibrium panel to $baseline_path")
 
     asset_market_models = (
-        ("pq", PQ),
+        ("baseline", Baseline),
         ("pqc", PQC),
         ("pqcr", PQCr),
         ("pqcrdiff", PQCrDIFF),

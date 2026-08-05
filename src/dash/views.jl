@@ -34,7 +34,7 @@ model_explore(model_options) = html_div() do
             dcc_dropdown(
                 id = "model-dropdown",
                 options = [(label = k, value = k) for k in keys(model_options)],
-                value = "PQ",
+                value = "Baseline",
                 style = Dict(
                     "marginBottom" => "20px",
                 ),

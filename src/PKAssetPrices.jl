@@ -15,7 +15,7 @@ include("plotting/static_plotting.jl")
 
 function dashboard_models()
     return Dict{String, Static.Parametrization}(
-        "PQ" => Static.PQ,
+        "Baseline" => Static.Baseline,
         "PQA" => Static.PQA,
         "PQC" => Static.PQC,
         "PQCr" => Static.PQCr,

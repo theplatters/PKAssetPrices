@@ -10,7 +10,7 @@ const SP = PKAssetPrices.StaticPlotting
 const DP = PKAssetPrices.DynamicPlotting
 
 @testset "Static plotting" begin
-    solution = PKAssetPrices.solve_model(S.PQ)
+    solution = PKAssetPrices.solve_model(S.Baseline)
     figure = Figure()
     axis = Axis(figure[1, 1])
     @test SP.plot_is_lm(solution, axis) === axis

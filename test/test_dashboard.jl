@@ -17,15 +17,15 @@ end
 
 @testset "Dashboard solve cache" begin
     empty!(Dashboard.SOLVE_CACHE)
-    first_solution = Dashboard.solve_cached(S.PQ)
-    second_solution = Dashboard.solve_cached(S.PQ)
+    first_solution = Dashboard.solve_cached(S.Baseline)
+    second_solution = Dashboard.solve_cached(S.Baseline)
     @test first_solution === second_solution
     @test length(Dashboard.SOLVE_CACHE) == 1
 end
 
 @testset "Dashboard components" begin
     models = PKAssetPrices.dashboard_models()
-    solution = PKAssetPrices.solve_model(S.PQ)
+    solution = PKAssetPrices.solve_model(S.Baseline)
     labels = ["Baseline", "Baseline copy"]
     solutions = [solution, solution]
 

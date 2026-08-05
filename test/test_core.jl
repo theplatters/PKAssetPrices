@@ -13,7 +13,7 @@ const BaseModels = PKAssetPrices.BaseModels
     @test occursin("x == a + 1", sprint(show, equation))
     @test occursin("x == a + 1", sprint(show, MIME("text/plain"), equation))
 
-    @test PKAssetPrices.Static.PQ.model isa BaseModels.AbstractModel
+    @test PKAssetPrices.Static.Baseline.model isa BaseModels.AbstractModel
     @test PKAssetPrices.Dynamic.WorkingModel.model isa BaseModels.AbstractModel
     @test isdefined(PKAssetPrices, :Dashboard)
     @test isdefined(PKAssetPrices, :DynamicPlotting)
@@ -22,10 +22,10 @@ end
 
 @testset "Dashboard registry" begin
     models = PKAssetPrices.dashboard_models()
-    expected = Set(["PQ", "PQA", "PQC", "PQCr", "PQCrDIFF"])
+    expected = Set(["Baseline", "PQA", "PQC", "PQCr", "PQCrDIFF"])
     @test Set(keys(models)) == expected
     @test all(model -> model isa PKAssetPrices.Static.Parametrization, values(models))
-    @test models["PQ"] === PKAssetPrices.Static.PQ
+    @test models["Baseline"] === PKAssetPrices.Static.Baseline
     @test models["PQA"] === PKAssetPrices.Static.PQA
 end
 

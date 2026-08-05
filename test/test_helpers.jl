@@ -13,7 +13,7 @@ const S = PKAssetPrices.Static
     @test S.title_from_snake("central_bank_credit") == "Central Bank Credit"
     @test S.title_from_snake(:asset_price) == "Asset Price"
 
-    solution = PKAssetPrices.solve_model(S.PQ)
+    solution = PKAssetPrices.solve_model(S.Baseline)
     @test occursin("Parametrization", sprint(show, solution.model))
     @test occursin("Solution", sprint(show, solution))
     @test occursin("BalanceSheetFilled", sprint(show, first(solution.sheets)))
@@ -48,10 +48,10 @@ end
 end
 
 @testset "Real-model helper plots" begin
-    baseline = PKAssetPrices.solve_model(S.PQ)
-    changed_params = copy(S.PQ.params)
+    baseline = PKAssetPrices.solve_model(S.Baseline)
+    changed_params = copy(S.Baseline.params)
     changed_params[:b] = 0.45
-    changed = PKAssetPrices.solve_model(S.Parametrization(S.PQ.model, changed_params, S.PQ.u0))
+    changed = PKAssetPrices.solve_model(S.Parametrization(S.Baseline.model, changed_params, S.Baseline.u0))
     solutions = OrderedDict("Baseline" => baseline, "Changed" => changed)
 
     sweep = S.eval_curve(baseline, :r, [0.01, 0.02, 0.03], :IS)

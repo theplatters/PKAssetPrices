@@ -7,7 +7,7 @@ const S = PKAssetPrices.Static
 const D = PKAssetPrices.Dynamic
 
 const STATIC_MODELS = (
-    :PQ, :PQCold, :PQC, :PQCr, :PQCrDIFF,
+    :Baseline, :PQCold, :PQC, :PQCr, :PQCrDIFF,
     :PQA, :PQCA, :PQCrA, :PQCrDIFFA, :PC, :SimplePK,
 )
 
@@ -37,7 +37,7 @@ const DYNAMIC_MODELS = (
 end
 
 @testset "Static IS and IR curves meet at equilibrium" begin
-    for name in (:SimplePK, :PQ, :PQC, :PQCr, :PQCrDIFF)
+    for name in (:SimplePK, :Baseline, :PQC, :PQCr, :PQCrDIFF)
         solution = PKAssetPrices.solve_model(getproperty(S, name))
         curves = S.eval_curve(solution)
 
@@ -49,7 +49,7 @@ end
 end
 
 @testset "Static asset-market curves meet at equilibrium" begin
-    for name in (:PQ, :PQC, :PQCr, :PQCrDIFF)
+    for name in (:Baseline, :PQC, :PQCr, :PQCrDIFF)
         solution = PKAssetPrices.solve_model(getproperty(S, name))
         curves = S.eval_curve(solution)
 
