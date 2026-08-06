@@ -8,7 +8,7 @@ const IR_COLOR = :crimson
 const ASSET_COLOR = Makie.wong_colors()[1]
 const LIABILITY_COLOR = Makie.wong_colors()[2]
 const IS_IR_X_LIMITS = (0.0, 15.0)
-const IS_IR_Y_LIMITS = (0.0, 0.20)
+const IS_IR_Y_LIMITS = (0.0, 0.2)
 const AD_AS_X_LIMITS = (0.0, 15.0)
 const AD_AS_Y_LIMITS = (0.0, 3.0)
 
@@ -40,7 +40,7 @@ end
 """Return a copy of a parametrization with a lower autonomous policy rate."""
 function lower_autonomous_policy_rate(
   parametrization::Static.Parametrization;
-  factor::Real=0.5,
+  factor::Real=0.1,
 )
   0 <= factor < 1 || throw(ArgumentError("factor must satisfy 0 ≤ factor < 1"))
   rate_parameters = (:i0, :i₀, :i_0)
@@ -63,7 +63,7 @@ autonomous policy rate by `lower_i0_factor`.
 function plot_is_lm(
   sol::Static.Solution,
   ax::Makie.Axis;
-  lower_i0_factor::Real=0.5,
+  lower_i0_factor::Real=0.1,
 )
   output_range = range(IS_IR_X_LIMITS...; length=200)
   rate_range = range(IS_IR_Y_LIMITS...; length=200)
@@ -185,7 +185,7 @@ the model variable `AD` itself.
 function plot_asset_market(
   sol::Static.Solution,
   ax::Makie.Axis;
-  lower_i0_factor::Real=0.5,
+  lower_i0_factor::Real=0.1,
 )
   required_variables = (:AP, :AD, :AS)
   all(haskey(sol.variables, variable) for variable in required_variables) ||
@@ -333,7 +333,7 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
     strokecolor=(:black, 0.18),
     strokewidth=1,
     bar_labels=[
-      "$(replace(data.instruments[index], ' ' => '\n'))\n$(round(data.raw_values[index]; sigdigits=4))" for
+      "$(replace(data.instruments[index], ' ' => '\n'))\n$(round(data.raw_values[index]; sigdigits = 4))" for
       index in asset_indices
     ],
     label_position=:center,
@@ -351,7 +351,7 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
     strokecolor=(:black, 0.18),
     strokewidth=1,
     bar_labels=[
-      "$(replace(data.instruments[index], ' ' => '\n'))\n$(round(data.raw_values[index]; sigdigits=4))" for
+      "$(replace(data.instruments[index], ' ' => '\n'))\n$(round(data.raw_values[index]; sigdigits = 4))" for
       index in liability_indices
     ],
     label_position=:center,
