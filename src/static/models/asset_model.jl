@@ -139,10 +139,9 @@ Baseline = @model begin
     W == W0 - h * U
     N == a * Y
     U == 1 - N / Nᶠ
-    SD == s0 - s1 * r
-    AD == γ0 + (1 / (1 - γ)) * SD / AP
+    SD == (s0 - s1 * r) / AP
+    AD == γ0 + (1 / (1 - γ)) * SD
     AP == p1 * (AD / AS)
-    AS == AQ * (α + gₐ)
   end
 
   @curves begin
@@ -150,7 +149,7 @@ Baseline = @model begin
     IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
     AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
     AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
-    AMS(AP) = AQ * (gₐ + α)
+    AMS(AP) = AS
     AMD(AP) = ((s0 - r * s1) / (AP * (1 - γ)) + γ0) / AP
   end
 
