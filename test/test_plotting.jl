@@ -68,6 +68,14 @@ const DP = PKAssetPrices.DynamicPlotting
     )
     @test asset_market_axis.xlabel[] == "Base-price-equivalent quantity"
 
+    titled_panel = SP.panel(
+        PKAssetPrices.solve_model(S.BaselineLinar),
+        SP.AssetMarketPanel();
+        size = (1200, 1000),
+        title = "Linear speculative-debt variant",
+    )
+    @test titled_panel isa Figure
+
     baseline = PKAssetPrices.solve_model(S.SimplePK)
     lower_simple_rate = SP.lower_autonomous_policy_rate(baseline.model)
     @test lower_simple_rate.params[:i₀] == 0.5 * baseline.model.params[:i₀]

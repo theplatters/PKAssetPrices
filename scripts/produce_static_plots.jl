@@ -1,4 +1,5 @@
-using PKAssetPrices.Static: Baseline, FirmsRation, PQC, PQCr, PQCrDIFF, SimplePK, solve_model
+using PKAssetPrices.Static: Baseline, BaselineLinar, FirmsRation, FirmsRationLinar,
+  PQC, PQCLinar, PQCr, PQCrLinar, PQCrDIFF, PQCrDIFFLinar, SimplePK, solve_model
 using CairoMakie
 using PKAssetPrices
 
@@ -29,6 +30,25 @@ function (@main)(ARGS)
     output_path = joinpath(output_dir, "$(name)_equilibrium_panel.pdf")
     save(output_path, figure)
     println("Saved static equilibrium panel to $output_path")
+  end
+
+  linar_asset_market_models = (
+    ("baseline", BaselineLinar),
+    ("pqc", PQCLinar),
+    ("pqcr", PQCrLinar),
+    ("pqcrdiff", PQCrDIFFLinar),
+    ("firmsration", FirmsRationLinar),
+  )
+  for (name, model) in linar_asset_market_models
+    solution = solve_model(model)
+    figure = StaticPlotting.panel(
+      solution,
+      StaticPlotting.AssetMarketPanel();
+      title="Static equilibrium overview — linear speculative-debt variant",
+    )
+    output_path = joinpath(output_dir, "$(name)_linar_equilibrium_panel.pdf")
+    save(output_path, figure)
+    println("Saved linear static equilibrium panel to $output_path")
   end
 
   return 0

@@ -8,6 +8,8 @@ const D = PKAssetPrices.Dynamic
 
 const STATIC_MODELS = (
     :Baseline, :PQCold, :PQC, :PQCr, :PQCrDIFF, :FirmsRation,
+    :BaselineLinar, :PQCLinar, :PQCrLinar, :PQCrDIFFLinar,
+    :FirmsRationLinar,
     :PQA, :PQCA, :PQCrA, :PQCrDIFFA, :PC, :SimplePK,
 )
 
@@ -32,6 +34,38 @@ const DYNAMIC_MODELS = (
             @test all(sheet -> S.assets(sheet) ≈ S.liabilities(sheet), solution.sheets)
             curves = S.eval_curve(solution)
             @test isnothing(curves) || all(isfinite, values(curves))
+        end
+    end
+end
+
+@testset "Linear nominal asset-market models" begin
+    names = (
+        :BaselineLinar, :PQCLinar, :PQCrLinar, :PQCrDIFFLinar,
+        :FirmsRationLinar,
+    )
+
+    for name in names
+        parametrization = getproperty(S, name)
+        solution = PKAssetPrices.solve_model(parametrization)
+        variables = solution.variables
+        curves = S.eval_curve(solution)
+        speculative_rate_multiplier = 1 +
+            parametrization.params[:differential_rate_channel] *
+            (parametrization.params[:iAP] - 1)
+
+        @testset "$name" begin
+            @test variables[:SD] ≈
+                parametrization.params[:s0] -
+                parametrization.params[:s1] * speculative_rate_multiplier * variables[:r] -
+                parametrization.params[:s2] * variables[:AP]
+            @test variables[:AD] ≈
+                parametrization.params[:γ0] + variables[:SD] / (1 - parametrization.params[:γ])
+            @test variables[:dL] ≈ variables[:c] * variables[:D] + variables[:SD]
+            @test curves.IS ≈ variables[:Y] atol = 1.0e-8
+            @test curves.IR ≈ variables[:r] atol = 1.0e-8
+            @test curves.AD ≈ variables[:Y] atol = 1.0e-8
+            @test curves.AS ≈ variables[:P] atol = 1.0e-8
+            @test curves.AMD ≈ curves.AMS atol = 1.0e-8
         end
     end
 end

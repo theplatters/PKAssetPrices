@@ -376,17 +376,26 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
 end
 
 """
-    panel(sol; size = nothing)
-    panel(sol, AssetMarketPanel(); size = nothing)
+    panel(sol; size = nothing, title = "Static equilibrium overview")
+    panel(sol, AssetMarketPanel(); size = nothing, title = "Static equilibrium overview")
 
 Create a presentation-ready equilibrium and balance-sheet overview. The default
 method contains IS–IR, AD–AS, and balance-sheet plots. Dispatch on
 `AssetMarketPanel` to additionally show the asset market. Figure height grows
 with the number of balance-sheet entries so labels are not clipped.
 """
-panel(sol::Static.Solution; size=nothing) = panel(sol, StandardPanel(); size)
+panel(
+  sol::Static.Solution;
+  size=nothing,
+  title="Static equilibrium overview",
+) = panel(sol, StandardPanel(); size, title)
 
-function panel(sol::Static.Solution, ::StandardPanel; size=nothing)
+function panel(
+  sol::Static.Solution,
+  ::StandardPanel;
+  size=nothing,
+  title="Static equilibrium overview",
+)
   entry_count = sum(length(sheet.assets) + length(sheet.liabilities) for sheet in sol.sheets)
   figure_size = isnothing(size) ? (1600, max(1120, 54 * entry_count + 620)) : size
 
@@ -398,7 +407,7 @@ function panel(sol::Static.Solution, ::StandardPanel; size=nothing)
   )
   Label(
     figure[1, 1:2],
-    "Static equilibrium overview";
+    title;
     fontsize=25,
     font=:bold,
     tellwidth=false,
@@ -452,7 +461,12 @@ function panel(sol::Static.Solution, ::StandardPanel; size=nothing)
   return figure
 end
 
-function panel(sol::Static.Solution, ::AssetMarketPanel; size=nothing)
+function panel(
+  sol::Static.Solution,
+  ::AssetMarketPanel;
+  size=nothing,
+  title="Static equilibrium overview",
+)
   entry_count = sum(length(sheet.assets) + length(sheet.liabilities) for sheet in sol.sheets)
   figure_size = isnothing(size) ? (2100, max(1120, 54 * entry_count + 620)) : size
 
@@ -464,7 +478,7 @@ function panel(sol::Static.Solution, ::AssetMarketPanel; size=nothing)
   )
   Label(
     figure[1, 1:3],
-    "Static equilibrium overview";
+    title;
     fontsize=25,
     font=:bold,
     tellwidth=false,
