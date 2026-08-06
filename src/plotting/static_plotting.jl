@@ -40,7 +40,7 @@ end
 """Return a copy of a parametrization with a lower autonomous policy rate."""
 function lower_autonomous_policy_rate(
   parametrization::Static.Parametrization;
-  factor::Real=0.1,
+  factor::Real=0.0,
 )
   0 <= factor < 1 || throw(ArgumentError("factor must satisfy 0 ≤ factor < 1"))
   rate_parameters = (:i0, :i₀, :i_0)
@@ -63,7 +63,7 @@ autonomous policy rate by `lower_i0_factor`.
 function plot_is_lm(
   sol::Static.Solution,
   ax::Makie.Axis;
-  lower_i0_factor::Real=0.1,
+  lower_i0_factor::Real=0.0,
 )
   output_range = range(IS_IR_X_LIMITS...; length=200)
   rate_range = range(IS_IR_Y_LIMITS...; length=200)
@@ -185,7 +185,7 @@ the model variable `AD` itself.
 function plot_asset_market(
   sol::Static.Solution,
   ax::Makie.Axis;
-  lower_i0_factor::Real=0.1,
+  lower_i0_factor::Real=0.0,
 )
   required_variables = (:AP, :AD, :AS)
   all(haskey(sol.variables, variable) for variable in required_variables) ||
