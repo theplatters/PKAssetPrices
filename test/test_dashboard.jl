@@ -6,7 +6,6 @@ using Dash
 
 const Dashboard = PKAssetPrices.Dashboard
 const S = PKAssetPrices.Static
-const D = PKAssetPrices.Dynamic
 
 @testset "Dashboard application" begin
     models = PKAssetPrices.dashboard_models()

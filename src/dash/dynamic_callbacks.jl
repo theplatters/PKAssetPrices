@@ -58,6 +58,10 @@ function register_dynamic_callbacks!(app, model_options)
         else
             [selected_variables]
         end
+        isempty(variables) && return empty_state(
+            "No trajectories selected",
+            "Choose one or more variables to inspect their paths through time.",
+        )
 
         try
             solution = solve_dynamic_cached(configured)
