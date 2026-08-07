@@ -53,8 +53,8 @@ SimplePK = @model begin
   @curves begin
     IS(r) = (1 / (1 - b)) * (c * (d₀ - d₁ * r))
     IR(Y) = (1 + m) * (i₀ + i₁ * (1 + n) * a * (W₀ - h * (1 - (a * Y) / Nᶠ)))
-    AD(P) = (1 / (1 - b)) * (c * (d₀ - d₁ * ((1 + m) * (i₀ + i₁ * P))))
-    AS(Y) = (1 + n) * a * (W₀ - h * (1 - (a * Y) / Nᶠ))
+    ADc(P) = (1 / (1 - b)) * (c * (d₀ - d₁ * ((1 + m) * (i₀ + i₁ * P))))
+    ASc(Y) = (1 + n) * a * (W₀ - h * (1 - (a * Y) / Nᶠ))
   end
 
   @balances begin
@@ -148,8 +148,8 @@ Baseline = @model begin
   @curves begin
     IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
     IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-    AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-    AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+    ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+    ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     AMS(AP) = AQ * (gₐ + α)
     AMD(AP) = ((s0 - r * s1) / (AP * (1 - γ)) + γ0) / AP
   end
@@ -249,14 +249,14 @@ PQCold = @model begin
   @curves begin
     IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
     IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-    AD(P) =
+    ADc(P) =
       let
         rate = (1 + m) * (i0 + i1 * P)
         speculative_debt = s0 - s1 * rate
         credit_rationing = c₀ - c₁ * speculative_debt
         credit_rationing * (d0 - d1 * rate) / (1 - b)
       end
-    AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+    ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     AMS(AP) = AQ * (gₐ + α)
     AMD(AP) = (p1 * ((s0 - r * s1) / (AP * (1 - γ)) + γ0)) / AP
   end
@@ -366,7 +366,7 @@ PQC = @model begin
     )
 
     IR(Y) = (1 + m) * (i0 + a * i1 * (1 + n) * (W0 + h * (-1 + (a * Y) / Nᶠ)))
-    AD(P) =
+    ADc(P) =
       let
         rate = (1 + m) * (i0 + i1 * P)
         speculative_debt = s0 - s1 * rate
@@ -380,7 +380,7 @@ PQC = @model begin
         credit_rationing = c0 - c1 * asset_demand
         credit_rationing * (d0 - d1 * rate) / (1 - b)
       end
-    AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+    ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     AMS(AP) = AQ * (gₐ + α)
     AMD(AP) = (p1 * ((s0 - r * s1) / (AP * (1 - γ)) + γ0)) / AP
   end
@@ -504,7 +504,7 @@ PQCr = @model begin
                       (2 * quadratic)
         base_rate + feedback * asset_price
       end
-    AD(P) =
+    ADc(P) =
       let
         base_rate = (1 + m) * (i0 + i1 * P)
         feedback = (1 + m) * i2
@@ -519,7 +519,7 @@ PQCr = @model begin
         credit_rationing = c0 - c1 * asset_demand
         credit_rationing * (d0 - d1 * rate) / (1 - b)
       end
-    AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+    ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     AMS(AP) = AQ * (gₐ + α)
     AMD(AP) = (p1 * ((s0 - ((1 + m) * (i0 + i1 * ((1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))) + i2 * AP)) * s1) / (AP * (1 - γ)) + γ0)) / AP
 
@@ -623,14 +623,14 @@ PQCrDIFF = @model begin
     IS(r) = (1 / (1 - b)) *
             ((c₀ - c₁ * (s0 - s1 * r * iAP)) * (d0 - d1 * r))
     IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-    AD(P) =
+    ADc(P) =
       let
         rate = (1 + m) * (i0 + i1 * P)
         speculative_debt = s0 - s1 * rate * iAP
         credit_rationing = c₀ - c₁ * speculative_debt
         credit_rationing * (d0 - d1 * rate) / (1 - b)
       end
-    AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+    ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     AMS(AP) = AQ * (gₐ + α)
     AMD(AP) = (p1 * ((s0 - r * s1 * iAP) / (AP * (1 - γ)) + γ0)) / AP
   end
@@ -737,7 +737,7 @@ FirmsRation = @model begin
         c * (d0 - d1 * r - d2 * asset_price) / (1 - b)
       end
     IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-    AD(P) =
+    ADc(P) =
       let
         rate = (1 + m) * (i0 + i1 * P)
         speculative_debt = s0 - s1 * rate
@@ -750,7 +750,7 @@ FirmsRation = @model begin
         ) / (2 * asset_supply / p1)
         c * (d0 - d1 * rate - d2 * asset_price) / (1 - b)
       end
-    AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+    ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     AMS(AP) = AQ * (gₐ + α)
     AMD(AP) = (p1 * ((s0 - r * s1) / (AP * (1 - γ)) + γ0)) / AP
   end

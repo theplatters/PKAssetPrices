@@ -67,8 +67,8 @@ AssetPKSimple = @model begin
     @curves begin
         IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     end
 
 
@@ -162,8 +162,8 @@ AssetPKSimple2 = @model begin
     @curves begin
         IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     end
 
 
@@ -256,8 +256,8 @@ AssetPKSimple3 = @model begin
     @curves begin
         IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     end
 
 
@@ -350,8 +350,8 @@ AssetPKSimple4 = @model begin
     @curves begin
         IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     end
 
 
@@ -444,8 +444,8 @@ AssetPKSimple5 = @model begin
     @curves begin
         IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     end
 
 
@@ -546,8 +546,8 @@ AssetPK = @model begin
     @curves begin
         IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     end
 
 
@@ -642,8 +642,8 @@ AssetPKSDcompare = @model begin
     @curves begin
         IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
     end
 
 

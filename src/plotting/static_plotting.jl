@@ -121,8 +121,8 @@ end
 """Plot aggregate demand and aggregate supply in output–price space."""
 function plot_ad_as(sol::Static.Solution, ax::Makie.Axis)
   equilibrium_curves = Static.eval_curve(sol)
-  all(hasproperty(equilibrium_curves, curve) for curve in (:AD, :AS)) ||
-    throw(ArgumentError("the model does not define aggregate AD and AS curves"))
+  all(hasproperty(equilibrium_curves, curve) for curve in (:ADc, :ASc)) ||
+    throw(ArgumentError("the model does not define aggregate ADc and ASc curves"))
 
   price_range = range(AD_AS_Y_LIMITS...; length=200)
   output_range = range(AD_AS_X_LIMITS...; length=200)
@@ -130,13 +130,13 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis)
   vars = copy(sol.variables)
   demand_values = map(price_range) do price
     vars[:P] = price
-    return Static.eval_curve(sol.model, vars).AD
+    return Static.eval_curve(sol.model, vars).ADc
   end
 
   vars = copy(sol.variables)
   supply_values = map(output_range) do output
     vars[:Y] = output
-    return Static.eval_curve(sol.model, vars).AS
+    return Static.eval_curve(sol.model, vars).ASc
   end
 
   output_eq = sol.variables[:Y]

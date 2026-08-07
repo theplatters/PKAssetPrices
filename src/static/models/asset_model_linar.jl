@@ -117,7 +117,7 @@ LinarAssetModel = @model begin
           (asset_supply + p1 * reinvestment_multiplier * total_price_sensitivity)
         base_rate + policy_feedback * asset_price
       end
-    AD(P) =
+    ADc(P) =
       let
         base_rate = (1 + m) * (i0 + i1 * P)
         policy_feedback = (1 + m) * policy_ap_channel * i2
@@ -144,7 +144,7 @@ LinarAssetModel = @model begin
           d0 - d1 * rate - firms_ap_channel * d2 * asset_price
         credit_rationing * productive_demand / (1 - b)
       end
-    AS(Y) = (1 + n) * a * (W0 - h * (1 - a * Y / Nᶠ))
+    ASc(Y) = (1 + n) * a * (W0 - h * (1 - a * Y / Nᶠ))
     AMS(AP) = AQ * (α + gₐ)
     AMD(AP) =
       let

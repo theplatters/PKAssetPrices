@@ -68,8 +68,8 @@ PQA = @model begin
     @curves begin
         IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
         AMS(AP) = AQ * (gₐ + α₀ / 2 * (1 + AP))
         AMD(AP) = (p1 * ((s0 - r * s1) / (AP * (1 - γ)) + γ0)) / AP
     end
@@ -171,8 +171,8 @@ PQCA = @model begin
     @curves begin
         IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
         AMS(AP) = AQ * (gₐ + α)
         AMD(AP) = (p1 * ((s0 - r * s1) / (AP * (1 - γ)) + γ0)) / AP
     end
@@ -317,8 +317,8 @@ PQCrA = @model begin
                 ) / (-1 + γ)^2
             )
         )
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
         AMS(AP) = AQ * (gₐ + α)
         AMD(AP) = (p1 * ((s0 - ((1 + m) * (i0 + i1 * ((1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))) + i2 * AP)) * s1) / (AP * (1 - γ)) + γ0)) / AP
 
@@ -421,8 +421,8 @@ PQCrDIFFA = @model begin
     @curves begin
         IS(r) = (1 / (1 - b)) * (c * (d0 - d1 * r))
         IR(Y) = (1 + m) * (i0 + i1 * (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ)))
-        AD(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
-        AS(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
+        ADc(P) = (1 / (1 - b)) * (c * (d0 - d1 * ((1 + m) * (i0 + i1 * P))))
+        ASc(Y) = (1 + n) * a * (W0 - h * (1 - (a * Y) / Nᶠ))
         AMS(AP) = AQ * (gₐ + α)
         AMD(AP) = (p1 * ((s0 - r * s1) / (AP * (1 - γ)) + γ0)) / AP
     end

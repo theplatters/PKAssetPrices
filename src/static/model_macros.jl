@@ -76,13 +76,13 @@ end
 ```
 
 ## @curves
-Defines special curves (e.g., IS, LM, AD, AS) as functions of variables for analysis.
+Defines special curves (e.g., IS, LM, ADc, ASc) as functions of variables for analysis.
 
 **Example:**
 ```julia
 @curves begin
     IS(r) = (1/(1-b)) * (c * (d₀ - d₁ * r))
-    AD(P) = (1/(1-b)) * (c * (d₀ - d₁ * ((1 + m) * (i₀ + i₁ * P))))
+    ADc(P) = (1/(1-b)) * (c * (d₀ - d₁ * ((1 + m) * (i₀ + i₁ * P))))
 end
 ```
 

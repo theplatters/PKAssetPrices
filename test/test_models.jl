@@ -63,8 +63,8 @@ end
             @test variables[:dL] ≈ variables[:c] * variables[:D] + variables[:SD]
             @test curves.IS ≈ variables[:Y] atol = 1.0e-8
             @test curves.IR ≈ variables[:r] atol = 1.0e-8
-            @test curves.AD ≈ variables[:Y] atol = 1.0e-8
-            @test curves.AS ≈ variables[:P] atol = 1.0e-8
+            @test curves.ADc ≈ variables[:Y] atol = 1.0e-8
+            @test curves.ASc ≈ variables[:P] atol = 1.0e-8
             @test curves.AMD ≈ curves.AMS atol = 1.0e-8
         end
     end
@@ -93,14 +93,14 @@ end
     end
 end
 
-@testset "Static AD and AS curves meet at equilibrium" begin
+@testset "Static ADc and ASc curves meet at equilibrium" begin
     for name in (:SimplePK, :Baseline, :PQCold, :PQC, :PQCr, :PQCrDIFF, :FirmsRation)
         solution = PKAssetPrices.solve_model(getproperty(S, name))
         curves = S.eval_curve(solution)
 
         @testset "$name" begin
-            @test curves.AD ≈ solution.variables[:Y] atol = 1.0e-8
-            @test curves.AS ≈ solution.variables[:P] atol = 1.0e-8
+            @test curves.ADc ≈ solution.variables[:Y] atol = 1.0e-8
+            @test curves.ASc ≈ solution.variables[:P] atol = 1.0e-8
         end
     end
 end
