@@ -365,7 +365,7 @@ equations.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../plots/baseline_equilibrium_panel.pdf}
-  \caption{Equilibrium in the linear Baseline model: an asset market expands financial
+  \caption{Equilibrium in the Baseline model: an asset market expands financial
   balance sheets without feeding back into output or the interest rate.}
   \label{fig:baseline-equilibrium}
 \end{figure}
@@ -388,7 +388,7 @@ In this variant, we replace the exogenous credit rationing parameter
 
 When gross asset demand \(AD\) rises, the banking sector reduces the share of
 credit available for productive purposes. This is the reduced-form behavioral
-rule implemented in the linear PQC variant; bank balance-sheet exposure itself continues to be
+rule implemented in the PQC variant; bank balance-sheet exposure itself continues to be
 measured by nominal speculative debt \(SD\). The linear rule is not clipped in
 the code, so its economic interpretation requires parameter values that keep
 \(0\leq c\leq1\).
@@ -402,14 +402,14 @@ balance-sheet crowding-out rather than the interest rate channel of the
 depress real activity. The financial circulation is no longer a cordon
 sanitaire---it draws resources away from the industrial circulation.
 
-Figure~\ref{fig:pqc-equilibrium} shows the resulting linear PQC equilibrium. Compared
+Figure~\ref{fig:pqc-equilibrium} shows the resulting PQC equilibrium. Compared
 with the Baseline case, speculative demand now lowers available productive credit and
 therefore shifts the goods-market outcome.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../plots/pqc_equilibrium_panel.pdf}
-  \caption{Equilibrium in the linear PQC model with endogenous credit rationing. Asset
+  \caption{Equilibrium in the PQC model with endogenous credit rationing. Asset
   demand affects the real economy through the availability of productive
   credit.}
   \label{fig:pqc-equilibrium}
@@ -443,14 +443,14 @@ instability. The contemporaneous policy feedback is stabilizing in its immediate
 direction: a higher asset price raises the lending rate, which reduces
 speculative borrowing and asset demand.
 
-Figure~\ref{fig:pqcr-equilibrium} summarizes the linear PQCr solution. The asset-market
+Figure~\ref{fig:pqcr-equilibrium} summarizes the PQCr solution. The asset-market
 price now enters the policy rule, linking the financial equilibrium to the
 interest rate and output shown in the upper-left panel.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../plots/pqcr_equilibrium_panel.pdf}
-  \caption{Equilibrium in the linear PQCr model with an asset-price term in the policy
+  \caption{Equilibrium in the PQCr model with an asset-price term in the policy
   rule. Asset prices affect output through the lending rate.}
   \label{fig:pqcr-equilibrium}
 \end{figure}
@@ -460,7 +460,7 @@ interest rate and output shown in the upper-left panel.
 The preceding variants locate the real effects of speculation in the banking
 sector or in the policy-rate rule. A further channel arises when firms condition
 planned productive investment directly on the valuation of speculative assets.
-The linear \texttt{FirmsRation} variant retains the standard policy rule and an
+The \texttt{FirmsRation} variant retains the standard policy rule and an
 exogenous credit-rationing parameter \(c\), but replaces the investment-demand
 schedule with
 \begin{equation}
@@ -484,7 +484,7 @@ Eq.~\eqref{eq:firms-ration}, changes \(D\), and feeds through to output and
 employment. Unlike PQC, the mechanism does not operate through endogenous bank
 credit rationing. Unlike PQCr, it does not require an asset-price term in the
 policy rule. Because \(AP\) and speculative demand are jointly determined, the
-IS and aggregate-demand schedules shown in the figure use the unique linear solution
+IS and aggregate-demand schedules shown in the figure use the unique solution
 of the asset-market equilibrium at each interest rate or goods price.
 
 Figure~\ref{fig:firmsration-equilibrium} reports the calibrated equilibrium. The
@@ -495,7 +495,7 @@ financial position that generates it.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../plots/firmsration_equilibrium_panel.pdf}
-  \caption{Equilibrium in the linear \texttt{FirmsRation} model. Firms reduce planned
+  \caption{Equilibrium in the \texttt{FirmsRation} model. Firms reduce planned
   productive investment when asset prices rise, creating a direct transmission
   channel from the asset market to output and employment.}
   \label{fig:firmsration-equilibrium}
@@ -504,7 +504,7 @@ financial position that generates it.
 \section{Some extensions of the basic model}
 
 The turnover share \(\alpha\) and asset-creation rate \(g_a\) are fixed parameters
-in the linear teaching variants. Dynamic or experimental specifications that
+in the teaching variants. Dynamic or experimental specifications that
 endogenize turnover are outside the model presented here and are not used for
 the equilibrium figures or comparative claims in this note.
 
@@ -526,14 +526,14 @@ speculative borrowers. Defining the effective speculative rate as
 \end{equation}
 The productive lending rate remains \(r\). Relative to PQCr, this variant also removes the \(i_2AP\) term from the policy rule and makes credit rationing depend on \(SD\) rather than \(AD\). It should therefore be read as an alternative policy specification, not as a one-parameter extension of PQCr. The penalty connects to macroprudential proposals that differentiate financing conditions for productive and speculative borrowing.
 
-Figure~\ref{fig:pqcrdiff-equilibrium} illustrates the linear equilibrium with the
+Figure~\ref{fig:pqcrdiff-equilibrium} illustrates the equilibrium with the
 speculative-rate penalty. The three panels make the policy transmission visible
 simultaneously in asset demand, macroeconomic activity, and bank balance sheets.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../plots/pqcrdiff_equilibrium_panel.pdf}
-  \caption{Equilibrium in the linear PQCrDIFF model. An effective speculative rate
+  \caption{Equilibrium in the PQCrDIFF model. An effective speculative rate
   \(r_{AP}=i_{AP}r\) reduces speculative borrowing, while productive lending
   retains the standard rate \(r\). Credit rationing depends on \(SD\).}
   \label{fig:pqcrdiff-equilibrium}
@@ -542,13 +542,13 @@ simultaneously in asset demand, macroeconomic activity, and bank balance sheets.
 
 \section{Real world analysis: Understanding financial market dynamics as decisions under uncertainty}
 
-The mechanisms captured by our linear model variants are not merely theoretical artefacts. The period 2020--2023 provides a useful illustration of the real-financial nexus, although some of the empirical channels extend beyond the deliberately sparse teaching model.
+The mechanisms captured by our model variants are not merely theoretical artefacts. The period 2020--2023 provides a useful illustration of the real-financial nexus, although some of the empirical channels extend beyond the deliberately sparse teaching model.
 
 \paragraph{Quantitative easing and the ``everything rally.''}
-Between March 2020 and early 2022, the Federal Reserve purchased roughly \$1.33~trillion in mortgage-backed securities---nearly 90\% of the growth in eligible mortgages \citep{klein2025}. Combined with near-zero interest rates and comparable programmes at other major central banks, this produced what market participants called an ``everything rally'': equities, bonds, real estate, commodities, and crypto-assets all rose in synchrony \citep{ft2020everything, handwiki}. The Brookings Institution estimates that US home values rose by approximately \$100,000 on average, adding \$12~trillion in household equity and generating \$480--840~billion in additional consumption through the housing wealth effect \citep{klein2025}. The first part of this sequence is represented by Eqs.~\ref{eq:sd}--\ref{eq:ap}: a lower lending rate raises speculative debt, gross asset demand, and the asset price. The observed wealth effect is not present in the linear teaching variants, whose real feedbacks instead operate through credit rationing, the policy rate, or firms' investment demand; adding consumption out of wealth would require a further equation.
+Between March 2020 and early 2022, the Federal Reserve purchased roughly \$1.33~trillion in mortgage-backed securities---nearly 90\% of the growth in eligible mortgages \citep{klein2025}. Combined with near-zero interest rates and comparable programmes at other major central banks, this produced what market participants called an ``everything rally'': equities, bonds, real estate, commodities, and crypto-assets all rose in synchrony \citep{ft2020everything, handwiki}. The Brookings Institution estimates that US home values rose by approximately \$100,000 on average, adding \$12~trillion in household equity and generating \$480--840~billion in additional consumption through the housing wealth effect \citep{klein2025}. The first part of this sequence is represented by Eqs.~\ref{eq:sd}--\ref{eq:ap}: a lower lending rate raises speculative debt, gross asset demand, and the asset price. The observed wealth effect is not present in the teaching variants, whose real feedbacks instead operate through credit rationing, the policy rate, or firms' investment demand; adding consumption out of wealth would require a further equation.
 
 \paragraph{Monetary tightening and the ``crypto winter.''}
-When the Fed began raising rates in March 2022, the effect was felt immediately in the most leveraged corner of the financial circulation. An IMF study of the ``crypto cycle'' finds that a one-percentage-point rise in the shadow federal funds rate produces a persistent 0.15 standard-deviation decline in the common factor driving crypto-asset prices, with the entire market losing over \$1.7~trillion in value from its November 2021 peak \citep{che2023}. The authors attribute this to the risk-taking channel: tighter monetary policy raises the effective risk aversion of the marginal investor, who responds by deleveraging. This maps onto the asset block common to all linear variants: rising \(i \to\) rising \(r \to\) falling \(SD\) \(\to\) falling \(AD \to\) falling \(AP\). PQCr adds the reverse contemporaneous link, from \(AP\) to the policy rate, whereas PQCrDIFF strengthens the direct cost of speculative borrowing through \(r_{AP}=i_{AP}r\).
+When the Fed began raising rates in March 2022, the effect was felt immediately in the most leveraged corner of the financial circulation. An IMF study of the ``crypto cycle'' finds that a one-percentage-point rise in the shadow federal funds rate produces a persistent 0.15 standard-deviation decline in the common factor driving crypto-asset prices, with the entire market losing over \$1.7~trillion in value from its November 2021 peak \citep{che2023}. The authors attribute this to the risk-taking channel: tighter monetary policy raises the effective risk aversion of the marginal investor, who responds by deleveraging. This maps onto the asset block common to all variants: rising \(i \to\) rising \(r \to\) falling \(SD\) \(\to\) falling \(AD \to\) falling \(AP\). PQCr adds the reverse contemporaneous link, from \(AP\) to the policy rate, whereas PQCrDIFF strengthens the direct cost of speculative borrowing through \(r_{AP}=i_{AP}r\).
 
 The fact that the post-2020 correlation between crypto and equity markets rose sharply, and that the sensitivity of crypto prices to monetary policy became significant only after institutional investors entered the market \citep{che2023}, is also instructive. It suggests that the ``turnover multiplier'' \(1/(1-\gamma)\) advanced in our model is not a fixed structural parameter but a function of institutional participation---as more institutional investors trade crypto, the effective turnover rate \(\gamma\) rises, the multiplier increases, and the sensitivity of asset demand to changes in speculative debt grows.
 

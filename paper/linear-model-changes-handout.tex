@@ -1,0 +1,126 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[a4paper,margin=13mm]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage[table]{xcolor}
+\usepackage{tabularx}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{accent}{HTML}{28536B}
+\definecolor{light}{HTML}{EAF1F4}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt}
+\setlist[itemize]{leftmargin=4.5mm,itemsep=0pt,topsep=1pt}
+\titleformat{\section}{\color{accent}\bfseries\large}{}{0pt}{}
+\titlespacing*{\section}{0pt}{5pt}{2pt}
+\pagestyle{empty}
+
+\newcommand{\commit}[1]{\texttt{#1}}
+\newcommand{\pathcode}[1]{\texttt{\small #1}}
+
+\begin{document}
+
+\small
+
+{\color{accent}\LARGE\bfseries Linear Asset-Market Teaching Model}\par
+{\large Handout on commits \commit{a3a3020} and \commit{1e555f8}}\hfill
+{\small 7 August 2026}
+
+\vspace{1mm}
+\colorbox{light}{%
+  \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
+    \textbf{Outcome.} The teaching note and its canonical figures now use one
+    transparent linear asset-market architecture. The former nonlinear
+    implementation and figures remain available in archive folders. A follow-up
+    change centers the asset-price effect on the reference value $AP=1$.
+  }%
+}
+
+\section*{1. From the nonlinear to the linear model \hfill\normalfont\commit{a3a3020}}
+
+\begin{itemize}
+  \item The linear model became the canonical implementation in
+    \pathcode{src/static/models/asset\_model.jl}; the nonlinear version moved to
+    \pathcode{src/static/models/archive/asset\_model\_clarifications\_nonlinearapproach.jl}.
+  \item The teaching note's equations, descriptions, comparative statics, model
+    variants, and captions were aligned with the linear implementation.
+  \item The five linear figures were promoted to their canonical filenames.
+    Their nonlinear predecessors moved to \pathcode{plots/archive/}.
+  \item Plot generation and tests now refer only to the canonical model names:
+    \texttt{Baseline}, \texttt{PQC}, \texttt{PQCr}, \texttt{PQCrDIFF}, and
+    \texttt{FirmsRation}.
+\end{itemize}
+
+The common asset-market block is
+\begin{align*}
+  SD &= s_0-s_1r-s_2(AP-1),
+  & AD &= \gamma_0+\frac{SD}{1-\gamma},\\
+  AP &= p_1\frac{AD}{AS},
+  & AS &= AQ(\alpha+g_a).
+\end{align*}
+Here $SD$ is nominal speculative debt, $AD$ is gross nominal asset demand,
+$AS$ is the quantity offered for trade, and $AP$ is the asset-price index.
+Seller reinvestment produces the within-period multiplier $1/(1-\gamma)$.
+
+\section*{2. Centering the price response at $AP=1$ \hfill\normalfont\commit{1e555f8}}
+
+The initial linear version used $-s_2AP$. The final specification uses
+$-s_2(AP-1)$, so $s_0-s_1r$ denotes speculative debt at the reference asset
+price. The slope is unchanged: higher prices still reduce desired speculative
+borrowing, providing stabilizing rather than self-reinforcing feedback.
+
+Substitution gives the closed-form equilibrium
+\[
+  AP=\frac{p_1\left[\gamma_0+(s_0+s_2-s_1r)/(1-\gamma)\right]}
+           {AS+p_1s_2/(1-\gamma)}.
+\]
+Centering therefore adds $s_2$ to the numerator while leaving the stabilizing
+$s_2$ term in the denominator. The Julia API retains the existing parameter
+names \texttt{s1} and \texttt{s2}; economically these are the rate and
+asset-price sensitivities $s_r$ and $s_q$.
+
+\section*{3. What distinguishes the five variants}
+
+\renewcommand{\arraystretch}{1.05}
+\rowcolors{2}{light}{white}
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+  \toprule
+  \textbf{Variant} & \textbf{Transmission mechanism} \\
+  \midrule
+  Baseline & The asset market expands loans, deposits, and bank balance sheets,
+  but does not affect real activity. \\
+  PQC & Gross asset demand reduces the share of productive credit that banks
+  accommodate. \\
+  PQCr & Adds an asset-price response to the policy rule on top of the PQC
+  credit-rationing channel. \\
+  PQCrDIFF & Applies a penalty multiplier to the speculative borrowing rate and
+  makes credit rationing depend on $SD$. \\
+  FirmsRation & Firms reduce productive credit demand directly when asset prices
+  rise; bank credit rationing remains exogenous. \\
+  \bottomrule
+\end{tabularx}
+
+\section*{4. Reproducibility and review}
+
+\begin{itemize}
+  \item Independent review confirmed the model equations and every derived
+    \texttt{IS}, \texttt{IR}, \texttt{ADc}, and \texttt{AMD} curve formula.
+  \item The complete Julia test suite passed: \textbf{335/335 tests}; package
+    loading and whitespace checks also passed.
+  \item All five canonical asset-model plots were regenerated and visually
+    reviewed. The unrelated SimplePK plot remained byte-identical.
+  \item The teaching note rebuilt successfully as a 21-page PDF. Remaining
+    citation, layout, and duplicate-destination warnings predate these changes.
+\end{itemize}
+
+\vfill
+{\footnotesize\color{accent}
+Repository state after the two commits: the linear specification is canonical,
+the nonlinear material is preserved for comparison, and no changes were pushed
+to the remote as part of this workflow.}
+
+\end{document}
