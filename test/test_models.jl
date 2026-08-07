@@ -7,9 +7,7 @@ const S = PKAssetPrices.Static
 const D = PKAssetPrices.Dynamic
 
 const STATIC_MODELS = (
-    :Baseline, :PQCold, :PQC, :PQCr, :PQCrDIFF, :FirmsRation,
-    :BaselineLinar, :PQCLinar, :PQCrLinar, :PQCrDIFFLinar,
-    :FirmsRationLinar,
+    :Baseline, :PQC, :PQCr, :PQCrDIFF, :FirmsRation,
     :PQA, :PQCA, :PQCrA, :PQCrDIFFA, :PC, :SimplePK,
 )
 
@@ -39,10 +37,7 @@ const DYNAMIC_MODELS = (
 end
 
 @testset "Linear nominal asset-market models" begin
-    names = (
-        :BaselineLinar, :PQCLinar, :PQCrLinar, :PQCrDIFFLinar,
-        :FirmsRationLinar,
-    )
+    names = (:Baseline, :PQC, :PQCr, :PQCrDIFF, :FirmsRation)
 
     for name in names
         parametrization = getproperty(S, name)
@@ -94,7 +89,7 @@ end
 end
 
 @testset "Static ADc and ASc curves meet at equilibrium" begin
-    for name in (:SimplePK, :Baseline, :PQCold, :PQC, :PQCr, :PQCrDIFF, :FirmsRation)
+    for name in (:SimplePK, :Baseline, :PQC, :PQCr, :PQCrDIFF, :FirmsRation)
         solution = PKAssetPrices.solve_model(getproperty(S, name))
         curves = S.eval_curve(solution)
 

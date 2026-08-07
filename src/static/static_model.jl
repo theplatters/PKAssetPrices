@@ -62,7 +62,6 @@ include("balance_sheets.jl")
 include("helper_functions.jl")
 
 include("models/asset_model.jl")
-include("models/asset_model_linar.jl")
 include("models/end_alpha.jl")
 include("models/pc_model.jl")
 end

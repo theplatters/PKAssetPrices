@@ -69,7 +69,7 @@ const DP = PKAssetPrices.DynamicPlotting
     @test asset_market_axis.xlabel[] == "Base-price-equivalent quantity"
 
     titled_panel = SP.panel(
-        PKAssetPrices.solve_model(S.BaselineLinar),
+        PKAssetPrices.solve_model(S.Baseline),
         SP.AssetMarketPanel();
         size = (1200, 1000),
         title = "Linear speculative-debt variant",
