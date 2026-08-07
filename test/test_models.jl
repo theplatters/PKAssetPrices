@@ -52,7 +52,7 @@ end
             @test variables[:SD] ≈
                 parametrization.params[:s0] -
                 parametrization.params[:s1] * speculative_rate_multiplier * variables[:r] -
-                parametrization.params[:s2] * variables[:AP]
+                parametrization.params[:s2] * (variables[:AP] - 1)
             @test variables[:AD] ≈
                 parametrization.params[:γ0] + variables[:SD] / (1 - parametrization.params[:γ])
             @test variables[:dL] ≈ variables[:c] * variables[:D] + variables[:SD]

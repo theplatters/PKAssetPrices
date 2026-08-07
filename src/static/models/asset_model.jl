@@ -118,7 +118,7 @@ AssetModel = @model begin
     a = 0.8, "unit labour requirement"
     Nᶠ = 6.0, "total labour supply"
     p1 = 1.0, "asset-price scale"
-    s0 = 0.5, "autonomous nominal speculative debt"
+    s0 = 0.5, "nominal speculative debt at zero interest and reference asset price"
     s1 = 1.0, "interest sensitivity of speculative debt"
     s2 = 0.2, "asset-price sensitivity of speculative debt"
     γ0 = 0.0, "autonomous nominal asset demand"
@@ -147,7 +147,7 @@ AssetModel = @model begin
     W == W0 - h * U
     N == a * Y
     U == 1 - N / Nᶠ
-    SD == s0 - s1 * r * (1 + differential_rate_channel * (iAP - 1)) - s2 * AP
+    SD == s0 - s1 * r * (1 + differential_rate_channel * (iAP - 1)) - s2 * (AP - 1)
     AD == γ0 + SD / (1 - γ)
     AP == p1 * AD / AS
     AS == AQ * (α + gₐ)
@@ -161,11 +161,11 @@ AssetModel = @model begin
         reinvestment_multiplier = 1 / (1 - γ)
         speculative_rate_multiplier =
           1 + differential_rate_channel * (iAP - 1)
-        debt_before_price = s0 - s1 * speculative_rate_multiplier * r
+        debt_at_reference_price = s0 - s1 * speculative_rate_multiplier * r
         asset_price =
-          p1 * (γ0 + reinvestment_multiplier * debt_before_price) /
+          p1 * (γ0 + reinvestment_multiplier * (debt_at_reference_price + s2)) /
           (asset_supply + p1 * reinvestment_multiplier * s2)
-        speculative_debt = debt_before_price - s2 * asset_price
+        speculative_debt = debt_at_reference_price - s2 * (asset_price - 1)
         asset_demand = asset_supply * asset_price / p1
         credit_rationing = c0 - c1 * (
           credit_ad_channel * asset_demand +
@@ -183,12 +183,12 @@ AssetModel = @model begin
           1 + differential_rate_channel * (iAP - 1)
         asset_supply = AQ * (α + gₐ)
         reinvestment_multiplier = 1 / (1 - γ)
-        debt_before_price =
-          s0 - s1 * speculative_rate_multiplier * base_rate
+        debt_intercept =
+          s0 + s2 - s1 * speculative_rate_multiplier * base_rate
         total_price_sensitivity =
           s2 + s1 * speculative_rate_multiplier * policy_feedback
         asset_price =
-          p1 * (γ0 + reinvestment_multiplier * debt_before_price) /
+          p1 * (γ0 + reinvestment_multiplier * debt_intercept) /
           (asset_supply + p1 * reinvestment_multiplier * total_price_sensitivity)
         base_rate + policy_feedback * asset_price
       end
@@ -200,16 +200,16 @@ AssetModel = @model begin
           1 + differential_rate_channel * (iAP - 1)
         asset_supply = AQ * (α + gₐ)
         reinvestment_multiplier = 1 / (1 - γ)
-        debt_before_price =
-          s0 - s1 * speculative_rate_multiplier * base_rate
+        debt_intercept =
+          s0 + s2 - s1 * speculative_rate_multiplier * base_rate
         total_price_sensitivity =
           s2 + s1 * speculative_rate_multiplier * policy_feedback
         asset_price =
-          p1 * (γ0 + reinvestment_multiplier * debt_before_price) /
+          p1 * (γ0 + reinvestment_multiplier * debt_intercept) /
           (asset_supply + p1 * reinvestment_multiplier * total_price_sensitivity)
         rate = base_rate + policy_feedback * asset_price
         speculative_debt =
-          s0 - s1 * speculative_rate_multiplier * rate - s2 * asset_price
+          s0 - s1 * speculative_rate_multiplier * rate - s2 * (asset_price - 1)
         asset_demand = asset_supply * asset_price / p1
         credit_rationing = c0 - c1 * (
           credit_ad_channel * asset_demand +
@@ -230,7 +230,7 @@ AssetModel = @model begin
         speculative_rate_multiplier =
           1 + differential_rate_channel * (iAP - 1)
         speculative_debt =
-          s0 - s1 * speculative_rate_multiplier * rate - s2 * AP
+          s0 - s1 * speculative_rate_multiplier * rate - s2 * (AP - 1)
         nominal_asset_demand = γ0 + speculative_debt / (1 - γ)
         p1 * nominal_asset_demand / AP
       end
