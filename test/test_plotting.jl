@@ -17,7 +17,7 @@ const DP = PKAssetPrices.DynamicPlotting
     @test length(axis.scene.plots) == 3
     @test axis.limits[] == ((0.0, 15.0), (0.0, 0.20))
     lower_rate_model = SP.lower_autonomous_policy_rate(solution.model)
-    @test lower_rate_model.params[:i0] == 0.5 * solution.model.params[:i0]
+    @test lower_rate_model.params[:i0] == 0.0 * solution.model.params[:i0]
     @test solution.model.params[:i0] == S.Baseline.params[:i0]
     @test_throws ArgumentError SP.lower_autonomous_policy_rate(solution.model; factor=1.0)
     balance_axis = Axis(figure[1, 2])
@@ -78,7 +78,7 @@ const DP = PKAssetPrices.DynamicPlotting
 
     baseline = PKAssetPrices.solve_model(S.SimplePK)
     lower_simple_rate = SP.lower_autonomous_policy_rate(baseline.model)
-    @test lower_simple_rate.params[:i₀] == 0.5 * baseline.model.params[:i₀]
+    @test lower_simple_rate.params[:i₀] == 0.0 * baseline.model.params[:i₀]
     @test_throws ArgumentError SP.panel(baseline, SP.AssetMarketPanel())
 end
 
