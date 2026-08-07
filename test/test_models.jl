@@ -65,6 +65,17 @@ end
     end
 end
 
+@testset "Baseline asset-market calibration" begin
+    params = S.Baseline.params
+    solution = PKAssetPrices.solve_model(S.Baseline)
+
+    @test (params[:s0], params[:s1], params[:s2]) ==
+        (0.836089551258839, 4.0, 0.2)
+    @test solution.variables[:SD] ≈ 0.38865823446839143
+    @test solution.variables[:AD] ≈ 0.7773164689367829
+    @test solution.variables[:AP] ≈ 0.996559575559978
+end
+
 @testset "Static IS and IR curves meet at equilibrium" begin
     for name in (:SimplePK, :Baseline, :PQC, :PQCr, :PQCrDIFF, :FirmsRation)
         solution = PKAssetPrices.solve_model(getproperty(S, name))
