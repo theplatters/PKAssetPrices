@@ -62,7 +62,7 @@ On this basis, we then present a simple static model in section \ref{sec:model} 
 %\begin{enumerate}[label=(\alph*)]
 %\item model provides a missing link between debates on financialization ond PK models that are mostly focused on the real economy.
 %\item the notion of specullation and liquidty preference has always been there, but whether and to what extent it has an impact is debate. while for mainstreamers money as a whole is only a vial, Keynes emphaizses that the demand for money –  e.g. in the form of hoarded savings – can have real impacts. however, in treatise of money he denies that the supply of money for speculative purposes has such impact. our approach shows what happens if there is such a link and clarifies the most obvious assumptions that come with imposing one in a general framework of endogenous money.
-%\item our argument on turnover implicitly creates a multiplier that governs the mismatch in scale between speculative transactions and GDP (also already discussed in the Treatise!)
+%\item NOTE this for later ––> our argument on turnover implicitly creates a multiplier that governs the mismatch in scale between speculative transactions and GDP (also already discussed in the Treatise!)
 %\end{enumerate}
 
 \section{Keynes on money and speculation} \label{sec:historyofthought}
@@ -116,7 +116,8 @@ In section \ref{sec:model} further below we provide a simple model that focuses 
 However, before doing so we revisit key instances in Keynes' original works to better substantiate our summary as well as the successive modeling efforts.
 
 \todo{Wir könnten uns hier fragen: Wollen wir auch einen Variante für oben links und oben rechts als Modell haben – als nicht nur "bottom row" wie im text? Ich denke sowas haben wir in der genauen Form gerade nicht...
--- man könnte aber dort ansetzen wo wir schon sind und verschiedene challenges darstellen, die so einen kanal aufmachen. UPDATE: HABS MAL SO UMGESCHRIEBEN, DASS WIR DAS NICHT MACHEN SONDERN BEI ENDOGENEN SZEANRIEN BLEIBEN. WIR KÖNNEN JA NOCHMAL ÜBERLEGEN WENN WIR DAS SETUP FÜR DIE GRAPHS HABEN}
+-- man könnte aber dort ansetzen wo wir schon sind und verschiedene challenges darstellen, die so einen kanal aufmachen. 
+NOTE/UPDATE: HABS MAL SO UMGESCHRIEBEN, DASS WIR DAS NICHT MACHEN SONDERN BEI ENDOGENEN SZEANRIEN BLEIBEN. WIR KÖNNEN JA NOCHMAL ÜBERLEGEN WENN WIR DAS SETUP FÜR DIE GRAPHS HABEN}
 
 \subsection{Keynes on endogenous vs.\ exogenous Money} \label{subsec:endogenous-money}
 
@@ -166,8 +167,6 @@ In the \GT[Ch.~15], this institutional apparatus is set aside. Keynes defines mo
 \begin{equation}
 M = M_1 + M_2 = L_1(Y) + L_2(r) \tag{GT, Ch.~15}
 \end{equation}
-
-\
 
 The left-hand side $M$ is the total quantity of money, now treated as a variable ``determined by the action of the central bank'' \citep[Ch.~15]{keynesGeneralTheoryEmployment2009} --- that is, as an exogenously given stock. The analytical effort shifts entirely to the right-hand side: the \emph{demand} for money, which is decomposed into the transactions motive $L_1(Y)$ and the speculative motive $L_2(r)$. The latter variable is thereby directly tied to asset prices, as the real interest rate $r$ is high when bond prices are low, and vice versa.
 
@@ -234,7 +233,7 @@ The model presentation draws on the exposition by Kohler and Prante \parencite{D
 We start by revisiting the key structure of the model, before adding the asset market module in a second step.
 
 
-%package \texttt{PKAssetPrices}.\footnote{The package is available at \url{https://github.com/theplatters/PKAssetPrices} and reproduces the model from \url{https://macrosimulation.org/a_post_keynesian_macro_model_with_endogenous_money}.}
+%TODO add link in the above --> package \texttt{PKAssetPrices}.\footnote{The package is available at \url{https://github.com/theplatters/PKAssetPrices} and reproduces the model from \url{https://macrosimulation.org/a_post_keynesian_macro_model_with_endogenous_money}.}
 
 \subsection{The basic model}
 
@@ -310,11 +309,13 @@ Finally, the figure in the lower panel shows the corresponding balance sheets of
   \label{fig:simplepk-equilibrium}
 \end{figure}
 
-% hier könnte man eine acconting matrix einbauen?
+%todo hier könnte man eine acconting matrix einbauen?
 
 \subsection{Adding an Asset Market}
 
 In a next step we introduce a market for speculative assets in this framework. Four new variables describe it: nominal speculative debt $SD$, nominal gross asset demand $AD$, the quantity of assets offered for trade $AS$, and the asset price index $AP$. The assets can be interpreted as urban real estate, bonds, shares, pieces of art, crypto-assets, or a composite of these. Because Eq.~\ref{eq:as} pins $AS$ to parameters, the operative feedback among $SD$, $AD$, and $AP$ is linear. This keeps the extension analytically transparent while allowing the asset market and the macroeconomic block to be solved simultaneously.
+
+% TOOD – Wir müssen hier nochmal über labeling nachdenken – vor allem mit blick auf AS und AD
 
 \paragraph{Asset markets}
 \begin{align}
@@ -324,10 +325,12 @@ In a next step we introduce a market for speculative assets in this framework. F
   AS &= AQ(\alpha+g_a). \label{eq:as}
 \end{align}
 
-The asset-price index is normalized so that \(AP=1\) denotes its reference level. Consequently, \(s_0\) is speculative debt at the reference asset price and a zero lending rate; more generally, debt at \(AP=1\) is \(s_0-s_1r\). Speculative debt falls with the lending rate because higher financing costs discourage leveraged positions. It also falls when the current asset price rises above its reference level: as assets become expensive, a given nominal position buys less and speculators become more inclined to hold liquidity. Conversely, an asset price below one raises speculative borrowing relative to the reference case. This response captures, in reduced form, the \GT{} idea that liquidity preference becomes more pertinent when asset prices are high. Unlike the \GT{} bond-market construction, however, the lending rate and the asset-price deviation enter Eq.~\ref{eq:sd} as distinct arguments. Centering the price term does not alter the slope of the debt schedule; it gives the intercept \(s_0\) an economically meaningful reference point rather than defining it at the counterfactual price \(AP=0\).
+The asset-price index is normalized so that $AP=1$ denotes its reference level. Consequently, $s_0$ is speculative debt at the reference asset price and a zero lending rate; more generally, debt at $AP=1$ is $s_0-s_1 r$. Speculative debt falls with the lending rate because higher financing costs discourage leveraged positions. Furthermore, as indicated by $s_2(AP-1)$, it also falls when the current asset price rises above its reference level: as assets become expensive, a given nominal position buys less and speculators become more inclined to hold liquidity. Conversely, an asset price below one raises speculative borrowing relative to the reference case. This response captures, in reduced form, the \GT{} idea that liquidity preference becomes more pertinent when asset prices are high. Unlike the \GT{} bond-market construction, however, where the lending rate and the asset-price deviation are directly related (as bonds serve as the main asset type), these variables enter Eq.~\ref{eq:sd} as distinct, independent arguments. 
+% TODO – brauchen wir den Satz hier wirklich: Centering the price term does not alter the slope of the debt schedule; it gives the intercept \(s_0\) an economically meaningful reference point rather than defining it at the counterfactual price \(AP=0\).
 
 Buying assets shifts liquidity to their sellers. If a share $\gamma$ of each seller's receipts is used to purchase another asset within the same period, repeated transactions generate the multiplier $1/(1-\gamma)$ in Eq.~\ref{eq:ad}. The term $\gamma_0$ permits autonomous nominal asset demand; it is set to zero in the reported calibration. Thus $AD$ measures gross nominal transactions rather than either outstanding bank debt or a physical stock of assets.
 
+%TODO das ist ja dann neu – eventuell einmal besprechen?
 Equations~\ref{eq:sd}--\ref{eq:ap} form a simultaneous but linear feedback loop. Substitution gives the unique asset price
 \begin{equation}
   AP
@@ -337,9 +340,12 @@ Equations~\ref{eq:sd}--\ref{eq:ap} form a simultaneous but linear feedback loop.
 \end{equation}
 provided $AS>0$ and $0\leq\gamma<1$. The negative price-deviation term in speculative debt raises the denominator and therefore dampens, rather than amplifies, the contemporaneous price response. 
 
-The static model does not represent the full spectrum of forces influencing speculative demand. In particular, it contains the deviation of the current asset-price index from its normalized reference level but neither past nor expected price changes. One may interpret $\gamma$ as a reduced-form indicator of market sentiment: expected price increases encourage sellers to reinvest more of their receipts, whereas pessimism reduces this within-period recycling. Such an interpretation resonates with the \treatise{} emphasis on bullish and bearish expectations discussed in Section~\ref{subsec:speculation}, but expectations remain exogenous in the present model.
+This simple static model gives only a stylized representation and does not represent the full spectrum of forces influencing speculative demand. In particular, it contains the deviation of the current asset-price index from its normalized reference level but neither past nor expected price changes. One may interpret $\gamma$ as a reduced-form indicator of market sentiment: expected price increases encourage sellers to reinvest more of their receipts, whereas pessimism reduces this within-period recycling. Such an interpretation resonates with the \treatise{} emphasis on bullish and bearish expectations discussed in Section~\ref{subsec:speculation}, but expectations remain exogenous in the present model.
 
-The asset price is proportional to the ratio of nominal demand to the quantity offered for trade, with $p_1$ setting the price scale. Equation~\ref{eq:as} constructs the available supply from the outstanding asset amount $AQ$, the turnover share $\alpha$, and the rate $g_a$ at which assets are newly offered or created. These quantities are parameters in the static variants presented here, so $AS$ is exogenous within an equilibrium even though its components remain visible for comparative exercises.
+% TODO brauchen wir p_1 überhaupt?
+The asset price is proportional to the ratio of nominal demand to the quantity offered for trade, with $p_1$ setting the price scale. 
+
+Equation~\ref{eq:as} constructs the available supply from the outstanding asset amount $AQ$, the turnover share $\alpha$, and the rate $g_a$ at which assets are newly offered or created. These quantities are parameters in the static variants presented here, so $AS$ is exogenous within an equilibrium even though its components remain visible for comparative exercises.
 
 Crucially, speculative debt now appears as a liability of the private sector and
 an asset of the banking system alongside productive loans $cD$. Consequently,
@@ -347,12 +353,12 @@ $dM=dL$ also records deposits created to finance speculative positions, as in
 Keynes's claim that bank-money expansion accommodates the financial circulation.
 
 \begin{equation}
-  dL = c D + SD \label{eq:dl-extended} 
+  dL = cD + SD \label{eq:dl-extended} 
 \end{equation}
 
-In this variant, Eqs.~\ref{eq:simple_y}--\ref{eq:simple_dr}, \ref{eq:sd}--\ref{eq:as}, and \ref{eq:dl-extended} are solved simultaneously, with \(c=c_0\) fixed as an exogenous parameter.
-The asset market determines \(SD\), \(AD\), \(AP\), \(AS\) and inflates the balance sheet (loans and deposits both larger by \(SD\)), but none of the real variables are affected.
-Output, employment, the price level, and the interest rate are identical to the baseline model without an asset market.
+This variant no exactly corresponds precisely to the \treatise{} position when taking $c=c_0$ as a fixed exogenous parameter. Then asset market dynamics as represented by \(SD\), \(AD\), \(AP\), \(AS\) inflate the balance sheet (loans and deposits both grow by \(SD\)), but none of the real variables are affected; they are fully contained within the financial circulation and do not feed back into the industrial circulation. Hence, output, employment, the price level, and the interest rate are identical to the baseline model without an asset market.
+
+%TODO Link interest rate and impact on asset markets
 
 Figure~\ref{fig:baseline-equilibrium} displays this separation in the Baseline variant. The
 asset-market equilibrium adds speculative lending to sector balance sheets,
@@ -367,7 +373,7 @@ equations.
   \label{fig:baseline-equilibrium}
 \end{figure}
 
-This corresponds precisely to the \treatise{} position.
+This 
 As Keynes wrote, speculative expansion of bank money can be contained within the financial circulation: ``there will be no effect on the purchasing power of money'' \citep[Vol.~1, Ch.~17, pp.~270--271]{johnmaynardkeynesTreatiseMoneyTwo2011}.
 Higher autonomous speculative borrowing \(s_0\) expands loans and deposits without affecting the industrial circulation. A higher \(\gamma\) raises gross asset transactions and the asset price. Because the higher price feeds back negatively through Eq.~\ref{eq:sd}, it can reduce the speculative-debt stock required to support those transactions; the turnover multiplier does not mechanically create additional bank debt.
 Speculation is a side-show---``bubbles on a steady stream of enterprise.''
