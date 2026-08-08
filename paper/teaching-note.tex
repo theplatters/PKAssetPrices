@@ -273,7 +273,7 @@ As already indicated the monetary sector is mainly governed by interest rates $r
 \begin{align}
   i &= i_0 + i_1 P \label{eq:simple_i} \\
   r &= (1 + m) i \label{eq:simple_r} \\
-  dL &= c D \label{eq:simple_dl} \\
+  dL &= cD \label{eq:simple_dl} \\
   dM &= dL \label{eq:simple_dm} \\
   dR &= k dM \label{eq:simple_dr}
 \end{align}
@@ -281,8 +281,7 @@ As already indicated the monetary sector is mainly governed by interest rates $r
 This version of the model features a minimal version of a Taylor-rule that neglects the output/employment term and focuses on price stability only.
 Similar to the rationale of the Blecker-Setterfield exposition this setup aims to implement a minimal, but accurate representation of the inner workings of contemporary monetary systems (REF, BankOfEngland) with a minimum of algebraic load.\footnote{While this reduces the standard Taylor-rule to a simple price-stability rule in the simple baseline model, appropriate extensions covering this aspect can be added in later stages of the exposition.}
 
-\todo{eventuell sollten wir uns mal anschauen was eine echte taylorrule bewirken würde -> aber vielleicht geht das im statischen modell gar nicht wg.
-rekursivität}
+\todo{eventuell sollten wir uns mal anschauen was eine echte taylorrule bewirken würde -> aber vielleicht geht das im statischen modell gar nicht wg. rekursivität}
 
 While the accounting scheme is still taking reserves into account, these reserves are not a constraint on the monetary system, but, rather, arise as an outcome residual  from the operation of private banks. Specifically, new loans $dL$ create new deposits $dM$ (Eqs.~\ref{eq:simple_dl}--\ref{eq:simple_dm}) and a fraction $k$ of these deposits -- the reserve rate -- is generated as reserves $dR$ (Eq.~\ref{eq:simple_dr}). Money is, hence, purely endogenous as the supply of credit determines the money stock.\footnote{While our focus is on models of endogenous money that seem to bear greater relevance for the description of contemporary economies, \textit{reserves} obviously could serve as key anchor for bringing exogenous notions of money back into the model.}
 
@@ -296,13 +295,11 @@ The final component of this minimal macroeconomic model with endogenous money is
   U &= 1 - \frac{N}{N^f} \label{eq:simple_u}
 \end{align}
 
-Here we reproduce a simple standard setup: firms set prices as a markup on unit labour costs (Eq.~\ref{eq:simple_p}), while nominal wages fall with unemployment (Eq.~\ref{eq:simple_w}), reflecting workers' reduced bargaining power. In the implemented equations, \(a\) is a fixed unit labour requirement, not labour productivity: \(N=aY\), so productivity is \(1/a\). Employment is therefore proportional to output (Eq.~\ref{eq:simple_n}) and unemployment is the gap between labour supply \(N^f\) and actual employment (Eq.~\ref{eq:simple_u}).
+Here we reproduce a simple standard setup: firms set prices as a markup on unit labour costs (Eq.~\ref{eq:simple_p}), while nominal wages fall with unemployment (Eq.~\ref{eq:simple_w}), reflecting workers' reduced bargaining power. In this setup, $a$ is a fixed unit labour requirement, so that productivity is given by $\frac{1}{a}$. Employment is therefore proportional to output (Eq.~\ref{eq:simple_n}) and unemployment is given by the gap between labour supply $N^f$ and actual employment (Eq.~\ref{eq:simple_u}).
 
-Figure~\ref{fig:simplepk-equilibrium} summarizes the baseline equilibrium. The
-left panel shows the intersection of the goods-market schedule and the
-interest-rate rule. The right panel records the corresponding transaction-flow
-balance sheets: newly created loans generate matching deposits, while reserve
-requirements create equal reserve assets and central-bank liabilities.
+Figure~\ref{fig:simplepk-equilibrium} summarizes the baseline formulation diagrammatically by showing how a change in interest rates affect the static quilibrium. The upper left panel shows the intersection of the goods-market dynamics, represented by an IS-curve, with the interest rate rule imposed by the central bank behavior, as captured by the IR-curve. As usual the latter represents labor market, price dynamics and interest rates; specifically, current output impacts on employment and prices, which lead the central bank to adjust the interest rate. As indicated the scenario in Figure~\ref{fig:simplepk-equilibrium} shows the effect of a more lenient interest rate rule (i.e., a lower $i_0$) that shifts the IR-curve downwards. Correspondingly, the upper right panel shows an AD-curve that modifies the IS-relation from before to  capture the feebback from prices on output. Correspondingly, the AS-curve is derived from the labor market and price dynamics and indicates how higher output leads to higher prices. Comparing intersections of the AD-curve and the AS-curve shows how a more lenient interest rate rule leads to higher output and prices in the static equilibrium.
+
+Finally, the figure in the lower panel shows the corresponding balance sheets of the three sectors in the model: the private sector, the banking sector, and the central bank. Given our static model setup we cannot model stocks directly; rather, these values are to be interpreted as the changes in actual stocks occuring the period described by the model. 
 
 \begin{figure}[htbp]
   \centering
@@ -313,6 +310,7 @@ requirements create equal reserve assets and central-bank liabilities.
   \label{fig:simplepk-equilibrium}
 \end{figure}
 
+% hier könnte man eine acconting matrix einbauen?
 
 \subsection{Adding an Asset Market}
 
