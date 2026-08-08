@@ -119,7 +119,7 @@ function plot_is_lm(
 end
 
 """Plot aggregate demand and aggregate supply in output–price space."""
-function plot_ad_as(sol::Static.Solution, ax::Makie.Axis)
+function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=0.0)
   equilibrium_curves = Static.eval_curve(sol)
   all(hasproperty(equilibrium_curves, curve) for curve in (:ADc, :ASc)) ||
     throw(ArgumentError("the model does not define aggregate ADc and ASc curves"))
@@ -137,6 +137,13 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis)
   supply_values = map(output_range) do output
     vars[:Y] = output
     return Static.eval_curve(sol.model, vars).ASc
+  end
+
+  lower_rate_model = lower_autonomous_policy_rate(sol.model; factor=lower_i0_factor)
+  vars = copy(sol.variables)
+  lower_ir_values = map(price_range) do price
+    vars[:P] = price
+    return Static.eval_curve(lower_rate_model, vars).ADc
   end
 
   output_eq = sol.variables[:Y]
@@ -157,6 +164,17 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis)
     linewidth=3,
     label="Aggregate supply",
   )
+
+  lines!(
+    ax,
+    lower_ir_values,
+    price_range;
+    color=(IS_COLOR, 0.38),
+    linewidth=2,
+    linestyle=:dash,
+    label="AD curve (lower i₀)",
+  )
+
   vlines!(ax, [output_eq]; color=(:black, 0.25), linestyle=:dot, linewidth=1.5)
   hlines!(ax, [price_eq]; color=(:black, 0.25), linestyle=:dot, linewidth=1.5)
   scatter!(
