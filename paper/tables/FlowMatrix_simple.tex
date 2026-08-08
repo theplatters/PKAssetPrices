@@ -1,0 +1,176 @@
+\begin{table}[htbp]
+  \centering
+  \caption{Transactions-flow matrix with distributed and retained bank profits}
+  \label{tab:simplepk-flow-bank-profits}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Transaction
+      & Households
+      & Firms
+      & Banks
+      & Central bank
+      & Total
+    \\
+    \midrule
+
+    % ---------------------------------------------------------------
+    % 1. Key model dynamics
+    % ---------------------------------------------------------------
+
+    \multicolumn{6}{l}{\textit{Key model dynamics}}
+    \\
+    \midrule
+
+    Consumption $C_t$
+      & $-C_t$
+      & $+C_t$
+      & $0$
+      & $0$
+      & $0$
+    \\
+
+    Investment output $I_t$
+      & $0$
+      & $+I_t$
+      & $0$
+      & $0$
+      & $+I_t$
+    \\
+
+    Investment expenditure $I_t$
+      & $0$
+      & $-I_t$
+      & $0$
+      & $0$
+      & $-I_t$
+    \\
+
+    Wages $W_tN_t$
+      & $+W_tN_t$
+      & $-W_tN_t$
+      & $0$
+      & $0$
+      & $0$
+    \\
+
+
+
+    % ---------------------------------------------------------------
+    % 2. Implicit relations for intertemporal consistency
+    % ---------------------------------------------------------------
+
+    \midrule
+    \multicolumn{6}{l}{\textit{Implicit relations for intertemporal consistency}}
+    \\
+    \midrule
+
+    \textcolor{gray}{Interest on loans
+      $r_tL_{t-1}$}
+      & \textcolor{gray}{$0$}
+      & \textcolor{gray}{$-r_tL_{t-1}$}
+      & \textcolor{gray}{$+r_tL_{t-1}$}
+      & \textcolor{gray}{$0$}
+      & \textcolor{gray}{$0$}
+    \\
+
+    \textcolor{gray}{Interest on deposits
+      $r^D_tM_{t-1}$}
+      & \textcolor{gray}{$+r^D_tM_{t-1}$}
+      & \textcolor{gray}{$0$}
+      & \textcolor{gray}{$-r^D_tM_{t-1}$}
+      & \textcolor{gray}{$0$}
+      & \textcolor{gray}{$0$}
+    \\
+
+    % ---------------------------------------------------------------
+    % 3. Financial-sector closure
+    % ---------------------------------------------------------------
+
+    \midrule
+    \multicolumn{6}{l}{\textit{Financial-sector closure}}
+    \\
+    \midrule
+        Bank profits $\Pi^B_t$
+      & $0$
+      & $0$
+      & $-\Pi^B_t$
+      & $0$
+      & $-\Pi^B_t$
+    \\
+
+    Distributed bank profits $d\Pi^B_t$
+      & $+d\Pi^B_t$
+      & $0$
+      & $0$
+      & $0$
+      & $+d\Pi^B_t$
+    \\
+
+    Retained bank profits $(1-d)\Pi^B_t$
+      & $0$
+      & $0$
+      & $+(1-d)\Pi^B_t$
+      & $0$
+      & $+(1-d)\Pi^B_t$
+    \\
+
+    \midrule
+    \multicolumn{6}{l}{\textit{Closing balances: correcting stocks for changes in the current period}}
+    \\
+    \midrule
+
+    New loans $\Delta L_t$
+      & $0$
+      & $+\Delta L_t$
+      & $-\Delta L_t$
+      & $0$
+      & $0$
+    \\
+
+    New deposits $\Delta M_t$
+      & $-\Delta M_t$
+      & $0$
+      & $+\Delta M_t$
+      & $0$
+      & $0$
+    \\
+
+    Central-bank credit $\Delta F^{CB}_t$
+      & $0$
+      & $0$
+      & $-\Delta F^{CB}_t$
+      & $+\Delta F^{CB}_t$
+      & $0$
+    \\
+
+    New reserves $\Delta R_t$
+      & $0$
+      & $0$
+      & $+\Delta R_t$
+      & $-\Delta R_t$
+      & $0$
+    \\
+
+    \midrule
+
+    Column sum
+      & $0$
+      & $0$
+      & $0$
+      & $0$
+      & $0$
+    \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+% \begin{align}
+%   \Delta L_t &= I_t, \\
+%   \Delta M_t &= \Delta L_t, \\
+%   \Delta R_t &= k\Delta M_t, \\
+%   \Delta F^{CB}_t &= \Delta R_t.
+% \end{align}
+
+

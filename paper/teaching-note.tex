@@ -18,6 +18,9 @@
 \usepackage{xspace}
 \usepackage{makecell}
 \usepackage{multirow}
+\usepackage{array}
+\usepackage[table]{xcolor}
+
 
 \geometry{margin=2.5cm}
 \onehalfspacing
@@ -360,10 +363,9 @@ This variant no exactly corresponds precisely to the \treatise{} position when t
 
 %TODO Link interest rate and impact on asset markets
 
-Figure~\ref{fig:baseline-equilibrium} displays this separation in the Baseline variant. The
-asset-market equilibrium adds speculative lending to sector balance sheets,
-while the goods-market equilibrium remains governed by the baseline real-side
-equations.
+Figure~\ref{fig:baseline-equilibrium} displays this separation graphically. In this simple model setup, the real interest rate $r$ is the key variable that has an impact on both, real and financial, markets as lower interest not only dirve up real investment, but also make speculative endeavors less risky, which increases the net demand for assets as depicted in the far right panel in Figure~\ref{fig:baseline-equilibrium}. The balance sheet panel in the lower panel of the same figure indicates that, under these assumptions, the introduction of an asset-market inflates sector balance sheets due to the presence of speculative borrowing. However, in this version this balance sheet inflation does not carry any real economic consequences as Keynes wrote, speculative expansion of bank money can be contained within the financial circulation: ``there will be no effect on the purchasing power of money'' \citep[Vol.~1, Ch.~17, pp.~270--271]{johnmaynardkeynesTreatiseMoneyTwo2011}.
+
+%TODO: eigentlich könnte man in diese formulierung des riskindikator mit aufnehmen
 
 \begin{figure}[htbp]
   \centering
@@ -373,11 +375,13 @@ equations.
   \label{fig:baseline-equilibrium}
 \end{figure}
 
-This 
-As Keynes wrote, speculative expansion of bank money can be contained within the financial circulation: ``there will be no effect on the purchasing power of money'' \citep[Vol.~1, Ch.~17, pp.~270--271]{johnmaynardkeynesTreatiseMoneyTwo2011}.
-Higher autonomous speculative borrowing \(s_0\) expands loans and deposits without affecting the industrial circulation. A higher \(\gamma\) raises gross asset transactions and the asset price. Because the higher price feeds back negatively through Eq.~\ref{eq:sd}, it can reduce the speculative-debt stock required to support those transactions; the turnover multiplier does not mechanically create additional bank debt.
-Speculation is a side-show---``bubbles on a steady stream of enterprise.''
+% TODO the stuff below smells a little bit like AIslop – do we need it?
+%Higher autonomous speculative borrowing \(s_0\) expands loans and deposits without affecting the industrial circulation. A higher \(\gamma\) raises gross asset transactions and the asset price. Because the higher price feeds back negatively through Eq.~\ref{eq:sd}, it can reduce the speculative-debt stock required to support those transactions; the turnover multiplier does not mechanically create additional bank debt.
+%Speculation is a side-show---``bubbles on a steady stream of enterprise.''
 
+\input{tables/StockMatrix_simple.tex}
+
+\input{tables/FlowMatrix_simple.tex}
 
 \section{Real economic impacts of financial speculation} \label{sec:impact}
 
