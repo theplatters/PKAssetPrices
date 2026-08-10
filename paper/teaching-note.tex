@@ -21,6 +21,8 @@
 \usepackage{array}
 \usepackage[table]{xcolor}
 
+\definecolor{NewTermPurple}{RGB}{128,0,128}
+\newcommand{\newterm}[1]{\textcolor{NewTermPurple}{#1}}
 
 \geometry{margin=2.5cm}
 \onehalfspacing
@@ -46,7 +48,7 @@
 
 \maketitle
 
-\section{Introduction}
+\section{Introduction}\label{sec:intro}
 
 While Keynes is often credited with fundamentally changing the way economists think about money and finance, especially when it comes to the evaluating the link between financial market dynamics and real economic activity.
 However, Keynes himself was not fully consistent in his treatment of money, finance and speculation across his works and in the past decades different authors and traditions took up and emphasized different aspects of his core contributions.
@@ -84,6 +86,8 @@ In the \GT{} (1936), however, this cordon is removed: speculative motives are ca
 
 The shift from the \treatise{} to the \GT{} is therefore not a single change but a \emph{double shift}: one along the speculation--real-economy dimension, another along the endogenous--exogenous money dimension.
 These two shifts can be represented by the simple typology, shown in Table~\ref{tab:typology}.
+
+%NOTE: Should we better write something like "post-Keynesian intuition" oder "heterodox economics" (dann wüde man oben links vllt auch einfach "neclassical economics" schreiben?) instead of "our model"?
 
 \begin{table}[h]
 \centering
@@ -238,8 +242,7 @@ We start by revisiting the key structure of the model, before adding the asset m
 
 %TODO add link in the above --> package \texttt{PKAssetPrices}.\footnote{The package is available at \url{https://github.com/theplatters/PKAssetPrices} and reproduces the model from \url{https://macrosimulation.org/a_post_keynesian_macro_model_with_endogenous_money}.}
 
-\subsection{The basic model}
-
+\subsection{The basic model}\label{subsec:basic_model}
 The real side of the model is described by a goods market and a wage-price system to represent labor market dynamics. The monetary side, in contrast, is governed by an endogenous money creation process and a Taylor-style policy rule. While being modeled as an endogenous variable, the interest rate depends on a series of parameters that are (exogenously) set by the central bank, so that different impacts on interest rate dynamics can be modeled in such a setup.
 
 The key equations for the goods market are, hence, given by 
@@ -312,13 +315,16 @@ Finally, the figure in the lower panel shows the corresponding balance sheets of
   \label{fig:simplepk-equilibrium}
 \end{figure}
 
-%todo hier könnte man eine acconting matrix einbauen?
+%todo wenn wir die accounting matrizen im text behalten wollen, müssen wir sie auch einbetten; sonst könnten sie eventuell auch in einen appendix passen.
+\input{tables/StockMatrix_simple.tex}
 
-\subsection{Adding an Asset Market}
+\input{tables/FlowMatrix_simple.tex}
+
+\subsection{Adding an Asset Market}\label{subsec:asset_market}
 
 In a next step we introduce a market for speculative assets in this framework. Four new variables describe it: nominal speculative debt $SD$, nominal gross asset demand $AD$, the quantity of assets offered for trade $AS$, and the asset price index $AP$. The assets can be interpreted as urban real estate, bonds, shares, pieces of art, crypto-assets, or a composite of these. Because Eq.~\ref{eq:as} pins $AS$ to parameters, the operative feedback among $SD$, $AD$, and $AP$ is linear. This keeps the extension analytically transparent while allowing the asset market and the macroeconomic block to be solved simultaneously.
 
-% TOOD – Wir müssen hier nochmal über labeling nachdenken – vor allem mit blick auf AS und AD
+% TODO – Wir müssen hier nochmal über labeling nachdenken – vor allem mit blick auf AS und AD
 
 \paragraph{Asset markets}
 \begin{align}
@@ -327,6 +333,7 @@ In a next step we introduce a market for speculative assets in this framework. F
   AP &= p_1\frac{AD}{AS}, \qquad p_1>0, \label{eq:ap} \\
   AS &= AQ(\alpha+g_a). \label{eq:as}
 \end{align}
+% NOTE: Ich denke das g_a macht eigentlich für die statische Variante kaum Sinn...
 
 The asset-price index is normalized so that $AP=1$ denotes its reference level. Consequently, $s_0$ is speculative debt at the reference asset price and a zero lending rate; more generally, debt at $AP=1$ is $s_0-s_1 r$. Speculative debt falls with the lending rate because higher financing costs discourage leveraged positions. Furthermore, as indicated by $s_2(AP-1)$, it also falls when the current asset price rises above its reference level: as assets become expensive, a given nominal position buys less and speculators become more inclined to hold liquidity. Conversely, an asset price below one raises speculative borrowing relative to the reference case. This response captures, in reduced form, the \GT{} idea that liquidity preference becomes more pertinent when asset prices are high. Unlike the \GT{} bond-market construction, however, where the lending rate and the asset-price deviation are directly related (as bonds serve as the main asset type), these variables enter Eq.~\ref{eq:sd} as distinct, independent arguments. 
 % TODO – brauchen wir den Satz hier wirklich: Centering the price term does not alter the slope of the debt schedule; it gives the intercept \(s_0\) an economically meaningful reference point rather than defining it at the counterfactual price \(AP=0\).
@@ -361,11 +368,9 @@ Keynes's claim that bank-money expansion accommodates the financial circulation.
 
 This variant no exactly corresponds precisely to the \treatise{} position when taking $c=c_0$ as a fixed exogenous parameter. Then asset market dynamics as represented by \(SD\), \(AD\), \(AP\), \(AS\) inflate the balance sheet (loans and deposits both grow by \(SD\)), but none of the real variables are affected; they are fully contained within the financial circulation and do not feed back into the industrial circulation. Hence, output, employment, the price level, and the interest rate are identical to the baseline model without an asset market.
 
-%TODO Link interest rate and impact on asset markets
-
 Figure~\ref{fig:baseline-equilibrium} displays this separation graphically. In this simple model setup, the real interest rate $r$ is the key variable that has an impact on both, real and financial, markets as lower interest not only dirve up real investment, but also make speculative endeavors less risky, which increases the net demand for assets as depicted in the far right panel in Figure~\ref{fig:baseline-equilibrium}. The balance sheet panel in the lower panel of the same figure indicates that, under these assumptions, the introduction of an asset-market inflates sector balance sheets due to the presence of speculative borrowing. However, in this version this balance sheet inflation does not carry any real economic consequences as Keynes wrote, speculative expansion of bank money can be contained within the financial circulation: ``there will be no effect on the purchasing power of money'' \citep[Vol.~1, Ch.~17, pp.~270--271]{johnmaynardkeynesTreatiseMoneyTwo2011}.
 
-%TODO: eigentlich könnte man in diese formulierung des riskindikator mit aufnehmen
+%TODO: eigentlich könnte man in diese formulierung den riskindikator mit aufnehmen
 
 \begin{figure}[htbp]
   \centering
@@ -379,11 +384,24 @@ Figure~\ref{fig:baseline-equilibrium} displays this separation graphically. In t
 %Higher autonomous speculative borrowing \(s_0\) expands loans and deposits without affecting the industrial circulation. A higher \(\gamma\) raises gross asset transactions and the asset price. Because the higher price feeds back negatively through Eq.~\ref{eq:sd}, it can reduce the speculative-debt stock required to support those transactions; the turnover multiplier does not mechanically create additional bank debt.
 %Speculation is a side-show---``bubbles on a steady stream of enterprise.''
 
-\input{tables/StockMatrix_simple.tex}
+Building on the baseline accounting structure as shown in tables \ref{tab:stockmatrix_simple} and \ref{tab:flowmatrix_simple}, we now show  how the introduction of an asset market impacts the stock-flow characteristics of th economy. %NOTE: hier müsste man dann auf das verhältnis von L_S und SD eingehen...
 
-\input{tables/FlowMatrix_simple.tex}
+\input{tables/StockMatrix_assets.tex}
+%TODO -- das ist traditionell geschrieben, aber man könnte auch die rentiers auskoppeln und als eigene Klasse darstellen.
+%NOTE –– wir müssen auch nochmal klären wie wir das Handelsvolumen nennen – beim Tabele wäre mir "AT" als "asset turnover in the sinn gekommen
+%NOTE -- ggf. wäre auch hier ein guter PLatz um zu erklären was wir unter assets genau verstehen (nicht nur financial, auch wenn die loans natürlich immer financial sind...)
 
-\section{Real economic impacts of financial speculation} \label{sec:impact}
+\input{tables/FlowMatrix_assets.tex}
+
+In particular, speculative debt $SD$ now enters bank lending alongside productive credit, so that total loan creation becomes $dL=cD+SD$, with a corresponding one-for-one creation of deposits. Similarly, the flow matrix captures flows induced by $SD$ as well as overall speculative trading within the SECTOR. By these extensions new asset-market block is therefore fully integrated into the stock-flow framework, but in the present static version it remains confined to financial circulation and leaves the real side of the model unchanged.
+%NOTE: clarify sector after decision – eigene Klasse?
+
+\section{Real economic impacts of financial speculation} \label{sec:real_impact}
+
+In this section we suggest different formulations tor scenarios that would break the 'cordon sanitaire' betwen industrial and financial circulation and, hence, allow speculation to affect real economic activity. Given the typology shown in table \ref{tab:typology} we thereby move from the position of the \treatise{} as captured in section \ref{subsec:asset_market} to WHATEVER.
+%NOTE: WHATEVER depends a little on the framing decision above, in line 70 or so, with the first typology table
+
+Thereby, a review of the respective literature suggest that such interaction between real and financial sphere can be driven by different actors and, hence, different causal channels. In the following we will discuss three such channels driven by three different actors. In the first of these the propensity of banks to ration credit for real investment is negatively affected by the behavior of asset markets mimicing a crowding-out effect in terms of credit provided \ref{}. In the second scenario, the central bank reacts to asset prices in addition to the price level, which affects the lending rate and, hence, has an indirect impact investment \ref{}. Finally, the third scenario captures the idea of a financialization of firms (SOURCE) \ref{}. In this setup, firms themselves condition their planned productive investment on asset prices taking into account speculative activities as a viable alternative to real investment, which similarly affects real activity.
 
 \subsection{The Credit Rationing Channel (General Theory I)} \label{sec:pqc}
 
