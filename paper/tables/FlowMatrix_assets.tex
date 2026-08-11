@@ -1,7 +1,7 @@
 \begin{table}[htbp]
   \centering
-  \caption{Transactions-flow matrix with distributed and retained bank profits}
-  \label{tab:flowmatrix_simple}
+  \caption{Transactions-flow matrix with asset-market extension}
+  \label{tab:assetpk-flow}
   \renewcommand{\arraystretch}{1.2}
   \begin{tabular}{lrrrrr}
     \toprule
@@ -9,16 +9,16 @@
       & Households
       & Firms
       & Banks
-      & Central bank
+      & \makecell{Central\\bank}
       & Total
     \\
     \midrule
 
     % ---------------------------------------------------------------
-    % 1. Key model dynamics
+    % 1. Real economy
     % ---------------------------------------------------------------
 
-    \multicolumn{6}{l}{\textit{Key model dynamics}}
+    \multicolumn{6}{l}{\textit{Key model dynamics (real economy)}}
     \\
     \midrule
 
@@ -54,10 +54,41 @@
       & $0$
     \\
 
+    % ---------------------------------------------------------------
+    % 2. Asset market
+    % ---------------------------------------------------------------
 
+    \midrule
+    \multicolumn{6}{l}{\newterm{\textit{Key model dynamics (asset market)}}}
+    \\
+    \midrule
+
+    \newterm{Speculative borrowing $SD_t$}
+      & \newterm{$+SD_t$}
+      & $0$
+      & \newterm{$-SD_t$}
+      & $0$
+      & $0$
+    \\
+
+    \newterm{Speculative asset purchases $AT_t$}
+      & \newterm{$+AT_t$}
+      & $0$
+      & $0$
+      & $0$
+      & \newterm{$+AT_t$}
+    \\
+
+    \newterm{Speculative asset sales $AT_t$}
+      & \newterm{$-AT_t$}
+      & $0$
+      & $0$
+      & $0$
+      & \newterm{$-AT_t$}
+    \\
 
     % ---------------------------------------------------------------
-    % 2. Implicit relations for intertemporal consistency
+    % 3. Intertemporal consistency
     % ---------------------------------------------------------------
 
     \midrule
@@ -65,17 +96,23 @@
     \\
     \midrule
 
-    \textcolor{gray}{Interest on loans
-      $r_tL_{t-1}$}
+    \textcolor{gray}{\makecell[l]{Interest: loans $r_tL^P_{t-1}$}}
       & \textcolor{gray}{$0$}
-      & \textcolor{gray}{$-r_tL_{t-1}$}
-      & \textcolor{gray}{$+r_tL_{t-1}$}
+      & \textcolor{gray}{$-r_tL^P_{t-1}$}
+      & \textcolor{gray}{$+r_tL^P_{t-1}$}
       & \textcolor{gray}{$0$}
       & \textcolor{gray}{$0$}
     \\
 
-    \textcolor{gray}{Interest on deposits
-      $r^D_tM_{t-1}$}
+    \textcolor{gray}{\makecell[l]{Interest: speculative loans $r_tL^S_{t-1}$}}
+      & \textcolor{gray}{$0$}
+      & \textcolor{gray}{$-r_tL^S_{t-1}$}
+      & \textcolor{gray}{$+r_tL^S_{t-1}$}
+      & \textcolor{gray}{$0$}
+      & \textcolor{gray}{$0$}
+    \\
+
+    \textcolor{gray}{\makecell[l]{Interest: deposits $r^D_tM_{t-1}$}}
       & \textcolor{gray}{$+r^D_tM_{t-1}$}
       & \textcolor{gray}{$0$}
       & \textcolor{gray}{$-r^D_tM_{t-1}$}
@@ -84,14 +121,15 @@
     \\
 
     % ---------------------------------------------------------------
-    % 3. Financial-sector closure
+    % 4. Financial sector closure
     % ---------------------------------------------------------------
 
     \midrule
     \multicolumn{6}{l}{\textit{Financial-sector closure}}
     \\
     \midrule
-        Bank profits $\Pi^B_t$
+
+    Bank profits $\Pi^B_t$
       & $0$
       & $0$
       & $-\Pi^B_t$
@@ -115,23 +153,35 @@
       & $+(1-d)\Pi^B_t$
     \\
 
+    % ---------------------------------------------------------------
+    % 5. Closing balances
+    % ---------------------------------------------------------------
+
     \midrule
     \multicolumn{6}{l}{\textit{Closing balances: correcting stocks for changes in the current period}}
     \\
     \midrule
 
-    New loans $\Delta L_t$
+    New productive loans $\Delta L^P_t$
       & $0$
-      & $+\Delta L_t$
-      & $-\Delta L_t$
+      & $+cD_t$
+      & $-cD_t$
+      & $0$
+      & $0$
+    \\
+
+    New speculative loans $\Delta L^S_t$
+      & \newterm{$+SD_t$}
+      & $0$
+      & \newterm{$-SD_t$}
       & $0$
       & $0$
     \\
 
     New deposits $\Delta M_t$
-      & $-\Delta M_t$
+      & $-(cD_t+\newterm{SD_t})$
       & $0$
-      & $+\Delta M_t$
+      & $+(cD_t+\newterm{SD_t})$
       & $0$
       & $0$
     \\
@@ -164,13 +214,3 @@
     \bottomrule
   \end{tabular}
 \end{table}
-
-
-% \begin{align}
-%   \Delta L_t &= I_t, \\
-%   \Delta M_t &= \Delta L_t, \\
-%   \Delta R_t &= k\Delta M_t, \\
-%   \Delta F^{CB}_t &= \Delta R_t.
-% \end{align}
-
-

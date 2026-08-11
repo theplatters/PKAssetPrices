@@ -1,7 +1,7 @@
 \begin{table}[htbp]
   \centering
-  \caption{End-of-period balance-sheet matrix with central-bank credit}
-  \label{tab:stockmatrix_simple}
+  \caption{End-of-period balance-sheet matrix with asset-market extension}
+  \label{tab:stockmatrix_assets}
   \renewcommand{\arraystretch}{1.2}
   \begin{tabular}{lrrrrr}
     \toprule
@@ -22,6 +22,14 @@
       & $+K_t$
     \\
 
+    \newterm{Speculative assets $A_t$}
+      & \newterm{$+A_t$}
+      & $0$
+      & $0$
+      & $0$
+      & \newterm{$+A_t$}
+    \\
+
     Deposits $M_t$
       & $+M_t$
       & $0$
@@ -30,12 +38,20 @@
       & $0$
     \\
 
-    Loans $L_t$
+    Productive loans $L^P_t$
       & $0$
-      & $-L_t$
-      & $+L_t$
+      & $-L^P_t$
+      & $+L^P_t$
       & $0$
       & $0$
+    \\
+
+    \newterm{Speculative loans $L^S_t$}
+      & \newterm{$-L^S_t$}
+      & $0$
+      & \newterm{$+L^S_t$}
+      & $0$
+      & \newterm{$0$}
     \\
 
     Central-bank credit $F^{CB}_t$
@@ -73,18 +89,3 @@
     \bottomrule
   \end{tabular}
 \end{table}
-
-% \begin{align}
-%   \Delta L^P_t &= cD_t, \\
-%   \Delta L^S_t &= SD_t, \\
-%   \Delta M_t &= \Delta L^P_t + \Delta L^S_t, \\
-%   \Delta R_t &= k\Delta M_t, \\
-%   \Delta F^{CB}_t &= \Delta R_t.
-% \end{align}
-
-% \begin{align}
-%   SD_t &= s_0-s_1r_t-s_2(AP_t-1), \\
-%   AD_t &= \gamma_0+\frac{SD_t}{1-\gamma}, \\
-%   AP_t &= p_1\frac{AD_t}{AS_t}, \\
-%   AS_t &= AQ(\alpha+g_a).
-% \end{align}
