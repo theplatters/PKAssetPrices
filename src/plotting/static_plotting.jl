@@ -169,7 +169,7 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=
     ax,
     lower_ir_values,
     price_range;
-    color=(IS_COLOR, 0.38),
+    color=IS_COLOR),
     linewidth=2,
     linestyle=:dash,
     label="AD curve (lower i₀)",
@@ -251,7 +251,7 @@ function plot_asset_market(
     ax,
     lower_demand_values,
     asset_price_range;
-    color=(IS_COLOR, 0.38),
+    color=IS_COLOR,
     linewidth=2,
     linestyle=:dash,
     label="Demand (lower i₀)",
