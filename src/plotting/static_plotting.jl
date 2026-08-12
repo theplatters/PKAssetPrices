@@ -5,12 +5,25 @@ using CairoMakie
 
 const IS_COLOR = :royalblue
 const IR_COLOR = :crimson
-const ASSET_COLOR = Makie.wong_colors()[1]
-const LIABILITY_COLOR = Makie.wong_colors()[2]
-const IS_IR_X_LIMITS = (0.0, 15.0)
-const IS_IR_Y_LIMITS = (0.0, 0.2)
-const AD_AS_X_LIMITS = (0.0, 15.0)
-const AD_AS_Y_LIMITS = (0.0, 3.0)
+const ASSET_SHADES = (
+  Makie.RGBf(0.04, 0.24, 0.36),
+  Makie.RGBf(0.08, 0.36, 0.63),
+  Makie.RGBf(0.18, 0.55, 0.75),
+  Makie.RGBf(0.30, 0.62, 0.85),
+)
+const LIABILITY_SHADES = (
+  Makie.RGBf(0.54, 0.18, 0.00),
+  Makie.RGBf(0.72, 0.28, 0.00),
+  Makie.RGBf(0.85, 0.41, 0.00),
+  Makie.RGBf(0.91, 0.54, 0.08),
+)
+const ASSET_COLOR = ASSET_SHADES[2]
+const LIABILITY_COLOR = LIABILITY_SHADES[2]
+const IS_IR_X_LIMITS = (3.0, 12.0)
+const IS_IR_Y_LIMITS = (0.05, 0.15)
+const AD_AS_X_LIMITS = (3.0, 12.0)
+const AD_AS_Y_LIMITS = (0.5, 2.5)
+const LABEL_SIZE = 24
 
 abstract type PanelVariant end
 
@@ -26,7 +39,7 @@ function equilibrium_range(value::Real; length::Integer=200)
     return range(-1.0, 1.0; length=length)
   end
 
-  endpoints = sort((0.2 * value, 3.0 * value))
+  endpoints = sort((0.5 * value, 2.0 * value))
   return range(first(endpoints), last(endpoints); length=length)
 end
 
@@ -35,6 +48,24 @@ function display_name(name::Symbol)
   words = replace(String(name), '_' => ' ')
   words = replace(words, r"(?<=[a-z])(?=[A-Z])" => " ")
   return titlecase(words)
+end
+
+"""Return the actor name used in balance-sheet plots."""
+balance_sheet_actor_name(name::Symbol) = name == :Private ? "Firms" : display_name(name)
+
+"""Assign each instrument a shade from its asset or liability color family."""
+function balance_sheet_segment_colors(
+  instruments::AbstractVector{<:AbstractString},
+  sides::AbstractVector{Symbol},
+)
+  instrument_order = unique(instruments)
+  shade_index = Dict(
+    instrument => index for (index, instrument) in enumerate(instrument_order)
+  )
+  return map(instruments, sides) do instrument, side
+    shades = side == :asset ? ASSET_SHADES : LIABILITY_SHADES
+    shades[mod1(shade_index[instrument], length(shades))]
+  end
 end
 
 """Return a copy of a parametrization with a lower autonomous policy rate."""
@@ -169,7 +200,7 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=
     ax,
     lower_ir_values,
     price_range;
-    color=IS_COLOR),
+    color=IS_COLOR,
     linewidth=2,
     linestyle=:dash,
     label="AD curve (lower i₀)",
@@ -185,7 +216,6 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=
     markersize=14,
     strokecolor=:white,
     strokewidth=2,
-    label="Equilibrium",
   )
   xlims!(ax, AD_AS_X_LIMITS...)
   ylims!(ax, AD_AS_Y_LIMITS...)
@@ -274,7 +304,6 @@ function plot_asset_market(
     markersize=14,
     strokecolor=:white,
     strokewidth=2,
-    label="Equilibrium",
   )
   axislegend(ax; position=:rt, framevisible=false, labelsize=14)
   return ax
@@ -292,17 +321,21 @@ function balance_sheet_plot_data(sol::Static.Solution)
   tick_positions = Float64[]
   tick_labels = String[]
   totals = Float64[]
+  actor_positions = Float64[]
+  actor_labels = String[]
   position = 1.0
 
   for sheet in sol.sheets
-    sector = display_name(sheet.sector_name)
+    sector = balance_sheet_actor_name(sheet.sector_name)
+    push!(actor_positions, position + 0.5)
+    push!(actor_labels, sector)
     for (side, entries) in (
       (:asset, sheet.assets),
       (:liability, sheet.liabilities),
     )
       side_label = side == :asset ? "Assets" : "Liabilities"
       push!(tick_positions, position)
-      push!(tick_labels, "$sector\n$side_label")
+      push!(tick_labels, side_label)
       push!(totals, sum(abs(value) for (_, value) in entries; init=0.0))
 
       for (stack, (name, value)) in enumerate(entries)
@@ -330,6 +363,8 @@ function balance_sheet_plot_data(sol::Static.Solution)
     tick_positions,
     tick_labels,
     totals,
+    actor_positions,
+    actor_labels,
   )
 end
 
@@ -340,6 +375,7 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
 
   asset_indices = findall(==(:asset), data.sides)
   liability_indices = findall(==(:liability), data.sides)
+  segment_colors = balance_sheet_segment_colors(data.instruments, data.sides)
 
   barplot!(
     ax,
@@ -347,16 +383,16 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
     data.values[asset_indices];
     stack=data.stacks[asset_indices],
     width=0.82,
-    color=ASSET_COLOR,
-    strokecolor=(:black, 0.18),
-    strokewidth=1,
+    color=segment_colors[asset_indices],
+    strokecolor=(:black, 0.65),
+    strokewidth=1.5,
     bar_labels=[
       "$(replace(data.instruments[index], ' ' => '\n'))\n$(round(data.raw_values[index]; sigdigits = 4))" for
       index in asset_indices
     ],
     label_position=:center,
     label_color=:white,
-    label_size=9,
+    label_size=14,
     label="Assets",
   )
   barplot!(
@@ -365,30 +401,55 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
     data.values[liability_indices];
     stack=data.stacks[liability_indices],
     width=0.82,
-    color=LIABILITY_COLOR,
-    strokecolor=(:black, 0.18),
-    strokewidth=1,
+    color=segment_colors[liability_indices],
+    strokecolor=(:black, 0.65),
+    strokewidth=1.5,
     bar_labels=[
       "$(replace(data.instruments[index], ' ' => '\n'))\n$(round(data.raw_values[index]; sigdigits = 4))" for
       index in liability_indices
     ],
     label_position=:center,
-    label_color=:black,
-    label_size=9,
+    label_color=:white,
+    label_size=14,
     label="Liabilities",
   )
   hlines!(ax, [0.0]; color=(:black, 0.55), linewidth=1.5)
 
+  max_total = max(maximum(data.totals), 1.0)
+  text!(
+    ax,
+    data.actor_positions,
+    fill(1.025 * max_total, length(data.actor_positions));
+    text=data.actor_labels,
+    align=(:center, :bottom),
+    font=:bold,
+    fontsize=20,
+    color=:black,
+  )
+
   ax.xticks = (data.tick_positions, data.tick_labels)
   xlims!(ax, first(data.tick_positions) - 0.7, last(data.tick_positions) + 0.7)
-  limit = max(maximum(data.totals), 1.0) * 1.18
+  limit = max_total * 1.18
   ylims!(ax, 0.0, limit)
   axislegend(
-    ax;
+    ax,
+    [
+      Makie.PolyElement(
+        color=ASSET_COLOR,
+        strokecolor=(:black, 0.65),
+        strokewidth=1.5,
+      ),
+      Makie.PolyElement(
+        color=LIABILITY_COLOR,
+        strokecolor=(:black, 0.65),
+        strokewidth=1.5,
+      ),
+    ],
+    ["Assets", "Liabilities"];
     position=:rt,
     orientation=:horizontal,
     framevisible=false,
-    labelsize=14,
+    labelsize=20,
   )
   return ax
 end
@@ -419,7 +480,7 @@ function panel(
 
   figure = Figure(
     size=figure_size,
-    fontsize=16,
+    fontsize=LABEL_SIZE,
     figure_padding=(28, 38, 28, 28),
     backgroundcolor=:white,
   )
@@ -440,8 +501,8 @@ function panel(
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
     titlesize=19,
-    xlabelsize=16,
-    ylabelsize=16,
+    xlabelsize=LABEL_SIZE,
+    ylabelsize=LABEL_SIZE,
   )
   ad_as_axis = Axis(
     figure[2, 2];
@@ -451,19 +512,19 @@ function panel(
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
     titlesize=19,
-    xlabelsize=16,
-    ylabelsize=16,
+    xlabelsize=LABEL_SIZE,
+    ylabelsize=LABEL_SIZE,
   )
   balance_axis = Axis(
     figure[3, 1:2];
     title="Sector balance sheets",
-    xlabel="Sector · balance-sheet side",
+    xlabel="Balance-sheet side",
     ylabel="Amount",
     xgridvisible=false,
     ygridcolor=(:black, 0.08),
     titlesize=19,
-    xlabelsize=16,
-    ylabelsize=16,
+    xlabelsize=LABEL_SIZE,
+    ylabelsize=LABEL_SIZE,
     xticklabelsize=12,
     xticklabelrotation=pi / 4,
     xticklabelalign=(:right, :center),
@@ -511,8 +572,8 @@ function panel(
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
     titlesize=19,
-    xlabelsize=16,
-    ylabelsize=16,
+    xlabelsize=LABEL_SIZE,
+    ylabelsize=LABEL_SIZE,
   )
   ad_as_axis = Axis(
     figure[2, 2];
@@ -522,8 +583,8 @@ function panel(
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
     titlesize=19,
-    xlabelsize=16,
-    ylabelsize=16,
+    xlabelsize=LABEL_SIZE,
+    ylabelsize=LABEL_SIZE,
   )
   asset_market_axis = Axis(
     figure[2, 3];
@@ -533,19 +594,19 @@ function panel(
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
     titlesize=19,
-    xlabelsize=16,
-    ylabelsize=16,
+    xlabelsize=LABEL_SIZE,
+    ylabelsize=LABEL_SIZE,
   )
   balance_axis = Axis(
     figure[3, 1:3];
     title="Sector balance sheets",
-    xlabel="Sector · balance-sheet side",
+    xlabel="Balance-sheet side",
     ylabel="Amount",
     xgridvisible=false,
     ygridcolor=(:black, 0.08),
     titlesize=19,
-    xlabelsize=16,
-    ylabelsize=16,
+    xlabelsize=LABEL_SIZE,
+    ylabelsize=LABEL_SIZE,
     xticklabelsize=12,
     xticklabelrotation=pi / 4,
     xticklabelalign=(:right, :center),

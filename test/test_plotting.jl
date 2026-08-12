@@ -38,6 +38,12 @@ const DP = PKAssetPrices.DynamicPlotting
     @test all(data.values[data.sides .== :asset] .>= 0)
     @test all(data.values[data.sides .== :liability] .>= 0)
     @test all(data.totals .>= 0)
+    @test data.actor_labels == ["Firms", "Banks", "Central Bank"]
+    @test data.actor_positions ≈ [1.5, 4.15, 6.8]
+    @test data.tick_labels == repeat(["Assets", "Liabilities"], length(solution.sheets))
+    segment_colors = SP.balance_sheet_segment_colors(data.instruments, data.sides)
+    @test length(unique(segment_colors[data.sides .== :asset])) > 1
+    @test length(unique(segment_colors[data.sides .== :liability])) > 1
     @test "Central Bank · Central Bank Credit" in data.labels
     @test extrema(SP.equilibrium_range(0.0)) == (-1.0, 1.0)
     @test extrema(SP.equilibrium_range(-2.0)) == (-6.0, -0.4)
