@@ -331,12 +331,19 @@ In a next step we introduce a market for speculative assets in this framework. F
   SD &= s_0-s_1r-s_2(AP-1), \qquad s_1,s_2>0, \label{eq:sd} \\
   AD &= \gamma_0+\frac{SD}{1-\gamma}, \qquad 0\leq\gamma<1, \label{eq:ad} \\
   AP &= p_1\frac{AD}{AS}, \qquad p_1>0, \label{eq:ap} \\
-  AS &= AQ(\alpha+g_a). \label{eq:as}
+  AS &= \bar{AS} \qquad bar{AS} > 0 . \label{eq:as}
 \end{align}
-% NOTE: Ich denke das g_a macht eigentlich für die statische Variante kaum Sinn...
+% NOTE: Ich denke das g_a macht eigentlich für die statische Variante kaum Sinn... F: Find ich auch
 
-The asset-price index is normalized so that $AP=1$ denotes its reference level. Consequently, $s_0$ is speculative debt at the reference asset price and a zero lending rate; more generally, debt at $AP=1$ is $s_0-s_1 r$. Speculative debt falls with the lending rate because higher financing costs discourage leveraged positions. Furthermore, as indicated by $s_2(AP-1)$, it also falls when the current asset price rises above its reference level: as assets become expensive, a given nominal position buys less and speculators become more inclined to hold liquidity. Conversely, an asset price below one raises speculative borrowing relative to the reference case. This response captures, in reduced form, the \GT{} idea that liquidity preference becomes more pertinent when asset prices are high. Unlike the \GT{} bond-market construction, however, where the lending rate and the asset-price deviation are directly related (as bonds serve as the main asset type), these variables enter Eq.~\ref{eq:sd} as distinct, independent arguments. 
+The asset-price index is normalized so that $AP=1$ denotes its reference level.
+Consequently, $s_0$ is speculative debt at the reference asset price and a zero lending rate;
+more generally, debt at $AP=1$ is $s_0-s_1 r$. Speculative debt falls with the lending rate because higher financing costs discourage leveraged positions.
+Furthermore, as indicated by $s_2(AP-1)$, it also falls when the current asset price rises above its reference level:
+as assets become expensive, a given nominal position buys less and speculators become more inclined to hold liquidity.
+Conversely, an asset price below one raises speculative borrowing relative to the reference case.
+This response captures, in reduced form, the \GT{} idea that liquidity preference becomes more pertinent when asset prices are high. Unlike the \GT{} bond-market construction, however, where the lending rate and the asset-price deviation are directly related (as bonds serve as the main asset type), these variables enter Eq.~\ref{eq:sd} as distinct, independent arguments. 
 % TODO – brauchen wir den Satz hier wirklich: Centering the price term does not alter the slope of the debt schedule; it gives the intercept \(s_0\) an economically meaningful reference point rather than defining it at the counterfactual price \(AP=0\).
+% F: Nein, find nocht
 
 Buying assets shifts liquidity to their sellers. If a share $\gamma$ of each seller's receipts is used to purchase another asset within the same period, repeated transactions generate the multiplier $1/(1-\gamma)$ in Eq.~\ref{eq:ad}. The term $\gamma_0$ permits autonomous nominal asset demand; it is set to zero in the reported calibration. Thus $AD$ measures gross nominal transactions rather than either outstanding bank debt or a physical stock of assets.
 
@@ -379,10 +386,6 @@ Figure~\ref{fig:baseline-equilibrium} displays this separation graphically. In t
   balance sheets without feeding back into output or the interest rate.}
   \label{fig:baseline-equilibrium}
 \end{figure}
-
-% TODO the stuff below smells a little bit like AIslop – do we need it?
-%Higher autonomous speculative borrowing \(s_0\) expands loans and deposits without affecting the industrial circulation. A higher \(\gamma\) raises gross asset transactions and the asset price. Because the higher price feeds back negatively through Eq.~\ref{eq:sd}, it can reduce the speculative-debt stock required to support those transactions; the turnover multiplier does not mechanically create additional bank debt.
-%Speculation is a side-show---``bubbles on a steady stream of enterprise.''
 
 Building on the baseline accounting structure as shown in tables \ref{tab:stockmatrix_simple} and \ref{tab:flowmatrix_simple}, we now show  how the introduction of an asset market impacts the stock-flow characteristics of th economy. %NOTE: hier müsste man dann auf das verhältnis von L_S und SD eingehen...
 
