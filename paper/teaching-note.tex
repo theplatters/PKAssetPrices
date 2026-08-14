@@ -330,10 +330,9 @@ In a next step we introduce a market for speculative assets in this framework. F
 \begin{align}
   SD &= s_0-s_1r-s_2(AP-1), \qquad s_1,s_2>0, \label{eq:sd} \\
   AD &= \gamma_0+\frac{SD}{1-\gamma}, \qquad 0\leq\gamma<1, \label{eq:ad} \\
-  AP &= p_1\frac{AD}{AS}, \qquad p_1>0, \label{eq:ap} \\
+  AP &= \frac{AD}{AS}, \label{eq:ap} \\
   AS &= \bar{AS} \qquad bar{AS} > 0 . \label{eq:as}
 \end{align}
-% NOTE: Ich denke das g_a macht eigentlich für die statische Variante kaum Sinn... F: Find ich auch
 
 The asset-price index is normalized so that $AP=1$ denotes its reference level.
 Consequently, $s_0$ is speculative debt at the reference asset price and a zero lending rate;
@@ -351,16 +350,14 @@ Buying assets shifts liquidity to their sellers. If a share $\gamma$ of each sel
 Equations~\ref{eq:sd}--\ref{eq:ap} form a simultaneous but linear feedback loop. Substitution gives the unique asset price
 \begin{equation}
   AP
-  =\frac{p_1\left[\gamma_0+(s_0+s_2-s_1r)/(1-\gamma)\right]}
-  {AS+p_1s_2/(1-\gamma)},
+  =\frac{\left[\gamma_0 (1 - \gamma) + (s_0+s_2-s_1r)\right]}
+  {AS(1-\gamma) +s_2},
   \label{eq:linear-ap-solution}
 \end{equation}
 provided $AS>0$ and $0\leq\gamma<1$. The negative price-deviation term in speculative debt raises the denominator and therefore dampens, rather than amplifies, the contemporaneous price response. 
 
 This simple static model gives only a stylized representation and does not represent the full spectrum of forces influencing speculative demand. In particular, it contains the deviation of the current asset-price index from its normalized reference level but neither past nor expected price changes. One may interpret $\gamma$ as a reduced-form indicator of market sentiment: expected price increases encourage sellers to reinvest more of their receipts, whereas pessimism reduces this within-period recycling. Such an interpretation resonates with the \treatise{} emphasis on bullish and bearish expectations discussed in Section~\ref{subsec:speculation}, but expectations remain exogenous in the present model.
 
-% TODO brauchen wir p_1 überhaupt?
-The asset price is proportional to the ratio of nominal demand to the quantity offered for trade, with $p_1$ setting the price scale. 
 
 Equation~\ref{eq:as} constructs the available supply from the outstanding asset amount $AQ$, the turnover share $\alpha$, and the rate $g_a$ at which assets are newly offered or created. These quantities are parameters in the static variants presented here, so $AS$ is exogenous within an equilibrium even though its components remain visible for comparative exercises.
 
