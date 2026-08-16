@@ -322,16 +322,16 @@ Finally, the figure in the lower panel shows the corresponding balance sheets of
 
 \subsection{Adding an Asset Market}\label{subsec:asset_market}
 
-In a next step we introduce a market for speculative assets in this framework. Four new variables describe it: nominal speculative debt $SD$, nominal gross asset demand $AD$, the quantity of assets offered for trade $AS$, and the asset price index $AP$. The assets can be interpreted as urban real estate, bonds, shares, pieces of art, crypto-assets, or a composite of these. Because Eq.~\ref{eq:as} pins $AS$ to parameters, the operative feedback among $SD$, $AD$, and $AP$ is linear. This keeps the extension analytically transparent while allowing the asset market and the macroeconomic block to be solved simultaneously.
+In a next step we introduce a market for speculative assets in this framework. Four new variables describe it: nominal speculative debt $SD$, nominal gross asset demand $AE$, the quantity of assets offered for trade $QE$, and the asset price index $AP$. The assets can be interpreted as urban real estate, bonds, shares, pieces of art, crypto-assets, or a composite of these. Because Eq.~\ref{eq:as} pins $QA$ to parameters, the operative feedback among $SD$, $AE$, and $AP$ is linear. This keeps the extension analytically transparent while allowing the asset market and the macroeconomic block to be solved simultaneously.
 
 % TODO – Wir müssen hier nochmal über labeling nachdenken – vor allem mit blick auf AS und AD
 
 \paragraph{Asset markets}
 \begin{align}
   SD &= s_0-s_1r-s_2(AP-1), \qquad s_1,s_2>0, \label{eq:sd} \\
-  AD &= \gamma_0+\frac{SD}{1-\gamma}, \qquad 0\leq\gamma<1, \label{eq:ad} \\
-  AP &= \frac{AD}{AS}, \label{eq:ap} \\
-  AS &= \bar{AS} \qquad bar{AS} > 0 . \label{eq:as}
+  AE &= \gamma_0+\frac{SD}{1-\gamma}, \qquad 0\leq\gamma<1, \label{eq:ad} \\
+  AP &= \frac{AE}{QA}, \label{eq:ap} \\
+  QA &= \bar{QA} \qquad \bar{QA} > 0 . \label{eq:as}
 \end{align}
 
 The asset-price index is normalized so that $AP=1$ denotes its reference level.
@@ -344,22 +344,22 @@ This response captures, in reduced form, the \GT{} idea that liquidity preferenc
 % TODO – brauchen wir den Satz hier wirklich: Centering the price term does not alter the slope of the debt schedule; it gives the intercept \(s_0\) an economically meaningful reference point rather than defining it at the counterfactual price \(AP=0\).
 % F: Nein, find nocht
 
-Buying assets shifts liquidity to their sellers. If a share $\gamma$ of each seller's receipts is used to purchase another asset within the same period, repeated transactions generate the multiplier $1/(1-\gamma)$ in Eq.~\ref{eq:ad}. The term $\gamma_0$ permits autonomous nominal asset demand; it is set to zero in the reported calibration. Thus $AD$ measures gross nominal transactions rather than either outstanding bank debt or a physical stock of assets.
+Buying assets shifts liquidity to their sellers. If a share $\gamma$ of each seller's receipts is used to purchase another asset within the same period, repeated transactions generate the multiplier $1/(1-\gamma)$ in Eq.~\ref{eq:ad}. The term $\gamma_0$ permits autonomous nominal asset demand; it is set to zero in the reported calibration. Thus $AE$ measures gross nominal transactions rather than either outstanding bank debt or a physical stock of assets.
 
 %TODO das ist ja dann neu – eventuell einmal besprechen?
 Equations~\ref{eq:sd}--\ref{eq:ap} form a simultaneous but linear feedback loop. Substitution gives the unique asset price
 \begin{equation}
   AP
   =\frac{\left[\gamma_0 (1 - \gamma) + (s_0+s_2-s_1r)\right]}
-  {AS(1-\gamma) +s_2},
+  {QA(1-\gamma) +s_2},
   \label{eq:linear-ap-solution}
 \end{equation}
-provided $AS>0$ and $0\leq\gamma<1$. The negative price-deviation term in speculative debt raises the denominator and therefore dampens, rather than amplifies, the contemporaneous price response. 
+provided $QA>0$ and $0\leq\gamma<1$. The negative price-deviation term in speculative debt raises the denominator and therefore dampens, rather than amplifies, the contemporaneous price response. 
 
 This simple static model gives only a stylized representation and does not represent the full spectrum of forces influencing speculative demand. In particular, it contains the deviation of the current asset-price index from its normalized reference level but neither past nor expected price changes. One may interpret $\gamma$ as a reduced-form indicator of market sentiment: expected price increases encourage sellers to reinvest more of their receipts, whereas pessimism reduces this within-period recycling. Such an interpretation resonates with the \treatise{} emphasis on bullish and bearish expectations discussed in Section~\ref{subsec:speculation}, but expectations remain exogenous in the present model.
 
 
-Equation~\ref{eq:as} constructs the available supply from the outstanding asset amount $AQ$, the turnover share $\alpha$, and the rate $g_a$ at which assets are newly offered or created. These quantities are parameters in the static variants presented here, so $AS$ is exogenous within an equilibrium even though its components remain visible for comparative exercises.
+Equation~\ref{eq:as} constructs the available supply from the outstanding asset amount $AQ$, the turnover share $\alpha$, and the rate $g_a$ at which assets are newly offered or created. These quantities are parameters in the static variants presented here, so $QA$ is exogenous within an equilibrium even though its components remain visible for comparative exercises.
 
 Crucially, speculative debt now appears as a liability of the private sector and
 an asset of the banking system alongside productive loans $cD$. Consequently,
@@ -370,7 +370,7 @@ Keynes's claim that bank-money expansion accommodates the financial circulation.
   dL = cD + SD \label{eq:dl-extended} 
 \end{equation}
 
-This variant no exactly corresponds precisely to the \treatise{} position when taking $c=c_0$ as a fixed exogenous parameter. Then asset market dynamics as represented by \(SD\), \(AD\), \(AP\), \(AS\) inflate the balance sheet (loans and deposits both grow by \(SD\)), but none of the real variables are affected; they are fully contained within the financial circulation and do not feed back into the industrial circulation. Hence, output, employment, the price level, and the interest rate are identical to the baseline model without an asset market.
+This variant no exactly corresponds precisely to the \treatise{} position when taking $c=c_0$ as a fixed exogenous parameter. Then asset market dynamics as represented by \(SD\), \(AE\), \(AP\), \(QA\) inflate the balance sheet (loans and deposits both grow by \(SD\)), but none of the real variables are affected; they are fully contained within the financial circulation and do not feed back into the industrial circulation. Hence, output, employment, the price level, and the interest rate are identical to the baseline model without an asset market.
 
 Figure~\ref{fig:baseline-equilibrium} displays this separation graphically. In this simple model setup, the real interest rate $r$ is the key variable that has an impact on both, real and financial, markets as lower interest not only dirve up real investment, but also make speculative endeavors less risky, which increases the net demand for assets as depicted in the far right panel in Figure~\ref{fig:baseline-equilibrium}. The balance sheet panel in the lower panel of the same figure indicates that, under these assumptions, the introduction of an asset-market inflates sector balance sheets due to the presence of speculative borrowing. However, in this version this balance sheet inflation does not carry any real economic consequences as Keynes wrote, speculative expansion of bank money can be contained within the financial circulation: ``there will be no effect on the purchasing power of money'' \citep[Vol.~1, Ch.~17, pp.~270--271]{johnmaynardkeynesTreatiseMoneyTwo2011}.
 
@@ -408,10 +408,10 @@ Thereby, a review of the respective literature suggest that such interaction bet
 In this variant, we replace the exogenous credit rationing parameter
 \(c\) with an endogenous function of asset demand:
 \begin{equation}
-  c = c_0 - c_1 AD \label{eq:c-ad}
+  c = c_0 - c_1 AE \label{eq:c-ad}
 \end{equation}
 
-When gross asset demand \(AD\) rises, the banking sector reduces the share of
+When gross asset demand \(AE\) rises, the banking sector reduces the share of
 credit available for productive purposes. This is the reduced-form behavioral
 rule implemented in the PQC variant; bank balance-sheet exposure itself continues to be
 measured by nominal speculative debt \(SD\). The linear rule is not clipped in
@@ -420,7 +420,7 @@ the code, so its economic interpretation requires parameter values that keep
 
 This yields a \GT{} result: an increase in speculative
 activity (a rise in \(s_0\), say, or a rise in \(\gamma\)) raises
-\(AD\), which lowers \(c\), which contracts \(Y\) through
+\(AE\), which lowers \(c\), which contracts \(Y\) through
 Eqs.~\ref{eq:simple_y} and \ref{eq:simple_nd}. The mechanism is
 balance-sheet crowding-out rather than the interest rate channel of the
 \GT{}, but the qualitative conclusion is the same: speculation can
@@ -549,7 +549,7 @@ speculative borrowers. Defining the effective speculative rate as
 \end{aligned}
 \label{eq:sd-diff}
 \end{equation}
-The productive lending rate remains \(r\). Relative to PQCr, this variant also removes the \(i_2AP\) term from the policy rule and makes credit rationing depend on \(SD\) rather than \(AD\). It should therefore be read as an alternative policy specification, not as a one-parameter extension of PQCr. The penalty connects to macroprudential proposals that differentiate financing conditions for productive and speculative borrowing.
+The productive lending rate remains \(r\). Relative to PQCr, this variant also removes the \(i_2AP\) term from the policy rule and makes credit rationing depend on \(SD\) rather than \(AE\). It should therefore be read as an alternative policy specification, not as a one-parameter extension of PQCr. The penalty connects to macroprudential proposals that differentiate financing conditions for productive and speculative borrowing.
 
 Figure~\ref{fig:pqcrdiff-equilibrium} illustrates the equilibrium with the
 speculative-rate penalty. The three panels make the policy transmission visible
@@ -573,7 +573,7 @@ The mechanisms captured by our model variants are not merely theoretical artefac
 Between March 2020 and early 2022, the Federal Reserve purchased roughly \$1.33~trillion in mortgage-backed securities---nearly 90\% of the growth in eligible mortgages \citep{klein2025}. Combined with near-zero interest rates and comparable programmes at other major central banks, this produced what market participants called an ``everything rally'': equities, bonds, real estate, commodities, and crypto-assets all rose in synchrony \citep{ft2020everything, handwiki}. The Brookings Institution estimates that US home values rose by approximately \$100,000 on average, adding \$12~trillion in household equity and generating \$480--840~billion in additional consumption through the housing wealth effect \citep{klein2025}. The first part of this sequence is represented by Eqs.~\ref{eq:sd}--\ref{eq:ap}: a lower lending rate raises speculative debt, gross asset demand, and the asset price. The observed wealth effect is not present in the teaching variants, whose real feedbacks instead operate through credit rationing, the policy rate, or firms' investment demand; adding consumption out of wealth would require a further equation.
 
 \paragraph{Monetary tightening and the ``crypto winter.''}
-When the Fed began raising rates in March 2022, the effect was felt immediately in the most leveraged corner of the financial circulation. An IMF study of the ``crypto cycle'' finds that a one-percentage-point rise in the shadow federal funds rate produces a persistent 0.15 standard-deviation decline in the common factor driving crypto-asset prices, with the entire market losing over \$1.7~trillion in value from its November 2021 peak \citep{che2023}. The authors attribute this to the risk-taking channel: tighter monetary policy raises the effective risk aversion of the marginal investor, who responds by deleveraging. This maps onto the asset block common to all variants: rising \(i \to\) rising \(r \to\) falling \(SD\) \(\to\) falling \(AD \to\) falling \(AP\). PQCr adds the reverse contemporaneous link, from \(AP\) to the policy rate, whereas PQCrDIFF strengthens the direct cost of speculative borrowing through \(r_{AP}=i_{AP}r\).
+When the Fed began raising rates in March 2022, the effect was felt immediately in the most leveraged corner of the financial circulation. An IMF study of the ``crypto cycle'' finds that a one-percentage-point rise in the shadow federal funds rate produces a persistent 0.15 standard-deviation decline in the common factor driving crypto-asset prices, with the entire market losing over \$1.7~trillion in value from its November 2021 peak \citep{che2023}. The authors attribute this to the risk-taking channel: tighter monetary policy raises the effective risk aversion of the marginal investor, who responds by deleveraging. This maps onto the asset block common to all variants: rising \(i \to\) rising \(r \to\) falling \(SD\) \(\to\) falling \(AE \to\) falling \(AP\). PQCr adds the reverse contemporaneous link, from \(AP\) to the policy rate, whereas PQCrDIFF strengthens the direct cost of speculative borrowing through \(r_{AP}=i_{AP}r\).
 
 The fact that the post-2020 correlation between crypto and equity markets rose sharply, and that the sensitivity of crypto prices to monetary policy became significant only after institutional investors entered the market \citep{che2023}, is also instructive. It suggests that the ``turnover multiplier'' \(1/(1-\gamma)\) advanced in our model is not a fixed structural parameter but a function of institutional participation---as more institutional investors trade crypto, the effective turnover rate \(\gamma\) rises, the multiplier increases, and the sensitivity of asset demand to changes in speculative debt grows.
 
