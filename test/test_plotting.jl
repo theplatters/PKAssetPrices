@@ -20,8 +20,14 @@ const DP = PKAssetPrices.DynamicPlotting
     @test lower_rate_model.params[:i0] == 0.0 * solution.model.params[:i0]
     @test solution.model.params[:i0] == S.Baseline.params[:i0]
     @test_throws ArgumentError SP.lower_autonomous_policy_rate(solution.model; factor=1.0)
-    balance_axis = Axis(figure[1, 2])
+    balance_figure = Figure()
+    balance_axis = Axis(balance_figure[1, 1])
     @test SP.plot_balance_sheets(solution, balance_axis) === balance_axis
+    @test SP.reserve_ratio(solution) ≈ solution.variables[:dR] / solution.variables[:dM]
+    @test SP.total_loans(solution) ≈ solution.variables[:dL]
+    @test SP.risk_indicator(solution) ≈ solution.variables[:AE] / solution.variables[:dL]
+    @test SP.risk_indicator(PKAssetPrices.solve_model(S.SimplePK)) == 0.0
+    @test !any(content -> content isa Legend, balance_figure.content)
     asset_axis = Axis(figure[1, 3])
     @test SP.plot_asset_market(solution, asset_axis) === asset_axis
     @test length(asset_axis.scene.plots) == 6

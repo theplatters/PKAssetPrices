@@ -9,12 +9,12 @@ const ASSET_SHADES = (
   Makie.RGBf(0.04, 0.24, 0.36),
   Makie.RGBf(0.08, 0.36, 0.63),
   Makie.RGBf(0.18, 0.55, 0.75),
-  Makie.RGBf(0.30, 0.62, 0.85),
+  Makie.RGBf(0.3, 0.62, 0.85),
 )
 const LIABILITY_SHADES = (
-  Makie.RGBf(0.54, 0.18, 0.00),
-  Makie.RGBf(0.72, 0.28, 0.00),
-  Makie.RGBf(0.85, 0.41, 0.00),
+  Makie.RGBf(0.54, 0.18, 0.0),
+  Makie.RGBf(0.72, 0.28, 0.0),
+  Makie.RGBf(0.85, 0.41, 0.0),
   Makie.RGBf(0.91, 0.54, 0.08),
 )
 const ASSET_COLOR = ASSET_SHADES[2]
@@ -226,16 +226,16 @@ end
 """
 Plot base-price-equivalent demand and asset supply against the asset price.
 
-The model curve `AMD = p₁ AD / AP` values demand in units of the asset at its
-base price. It is therefore comparable with the fixed quantity `AS`; it is not
-the model variable `AD` itself.
+The model curve `AMD = p₁ AE / AP` values demand in units of the asset at its
+base price. It is therefore comparable with the fixed quantity `AQ`; it is not
+the model variable `AE` itself.
 """
 function plot_asset_market(
   sol::Static.Solution,
   ax::Makie.Axis;
   lower_i0_factor::Real=0.0,
 )
-  required_variables = (:AP, :AD, :AS)
+  required_variables = (:AP, :AE, :AQ)
   all(haskey(sol.variables, variable) for variable in required_variables) ||
     throw(ArgumentError("the solution does not contain an asset market"))
 
@@ -368,6 +368,20 @@ function balance_sheet_plot_data(sol::Static.Solution)
   )
 end
 
+
+function reserve_ratio(sol::Static.Solution)
+  return sol.variables[:dR] / sol.variables[:dM]
+end
+
+function total_loans(sol::Static.Solution)
+  return sol.variables[:dL]
+end
+
+function risk_indicator(sol::Static.Solution)
+  asset_exposure = get(sol.variables, :SD, 0.0)
+  return asset_exposure / sol.variables[:dL]
+end
+
 """Plot sector balance sheets as grouped vertical asset and liability bars."""
 function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
   data = balance_sheet_plot_data(sol)
@@ -431,25 +445,22 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
   xlims!(ax, first(data.tick_positions) - 0.7, last(data.tick_positions) + 0.7)
   limit = max_total * 1.18
   ylims!(ax, 0.0, limit)
-  axislegend(
+  text!(
     ax,
-    [
-      Makie.PolyElement(
-        color=ASSET_COLOR,
-        strokecolor=(:black, 0.65),
-        strokewidth=1.5,
-      ),
-      Makie.PolyElement(
-        color=LIABILITY_COLOR,
-        strokecolor=(:black, 0.65),
-        strokewidth=1.5,
-      ),
-    ],
-    ["Assets", "Liabilities"];
-    position=:rt,
-    orientation=:horizontal,
-    framevisible=false,
-    labelsize=20,
+    0.98,
+    0.5;
+    text=join(
+      [
+        "Reserve ratio: $(round(reserve_ratio(sol); sigdigits = 4))",
+        "Total loans: $(round(total_loans(sol); sigdigits = 4))",
+        "Risk indicator: $(round(risk_indicator(sol); sigdigits = 4))",
+      ],
+      '\n',
+    ),
+    space=:relative,
+    align=(:right, :center),
+    fontsize=24,
+    color=:black,
   )
   return ax
 end
