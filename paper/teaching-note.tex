@@ -53,7 +53,7 @@
 While Keynes is often credited with fundamentally changing the way economists think about money and finance, especially when it comes to the evaluating the link between financial market dynamics and real economic activity.
 However, Keynes himself was not fully consistent in his treatment of money, finance and speculation across his works and in the past decades different authors and traditions took up and emphasized different aspects of his core contributions.
 This leads to a fragmented reception of Keynes' ideas on money and finance, where later works often highlight specific takes advanced by Keynes, but fail to provide a coherent picture of his overall view.
-In this paper we build on \textcite{fontanaSimpleTeachableMacroeconomic2009} to develop a simple model that synthesizes Keynes's key insights from an endogenous money perspective. The model illustrates shows how different assumptions about the nature of the financial sector and role of speculative activity determine whether and to what extent financial aspects shape real economic outcomes.
+In this paper we build on \citet{fontanaSimpleTeachableMacroeconomic2009} to develop a simple model that synthesizes Keynes's key insights from an endogenous money perspective. The model illustrates shows how different assumptions about the nature of the financial sector and role of speculative activity determine whether and to what extent financial aspects shape real economic outcomes.
 
 Aside from its core purpose to rationally reconstruct key stances on money and finance developed by Keynes, we find that the resulting model can also be used to introduce students to the concept of endogenous money as a key starting point for understanding and modeling interactions between real and financial sectors.
 
@@ -230,17 +230,15 @@ Speculators may do no harm as bubbles on a steady stream of enterprise. But the 
 
 Speculation, hence, can harm enterprise and economic development, in the \GT{} framework, \textit{only through the rate of interest}. A more leveraged financial sector is fine as long as it does not shift the liquidity preference schedule too much so that productive investment is left unconstrained. In such a situation speculation is, strictly speaking, harmless. However, as soon as speculation may crowd out investment via higher interest rates this separation breaks and speculation can have \textit{real} consequences.\footnote{The rate of interest is thereby not the only possible dampening channel on investment. A key example for an alternative factor is that speculation provide an outside option for liquid individuals, who can directly substitute investment for speculative activity.}
 
-\todo{wir könnten mal drüber nachdenken was es in unserem framework heißen würde, den portfolio choice explicit zu machen –– also eine erwartete profitrate und einen erwartete preissteigerung zu berechnen und damit die investitionen direkt zu modellieren. Das wäre im Wesentlichen was in der Fußnote steht...}
+%expand? :wir könnten mal drüber nachdenken was es in unserem framework heißen würde, den portfolio choice explicit zu machen –– also eine erwartete profitrate und einen erwartete preissteigerung zu berechnen und damit die investitionen direkt zu modellieren. Das wäre im Wesentlichen was in der Fußnote steht...
 
 \section{A simple teaching model} \label{sec:model}
 
 In what follows we embed key arguments from the bottom row of table \ref{tab:typology} in a simple linear model of endogenous money.
-We thereby take the endogenous money model by Black \& Setterfield adapted from \textcite{fontanaSimpleTeachableMacroeconomic2009} as a starting point and extend this model with an explicit market for (speculative) assets.
-The model presentation draws on the exposition by Kohler and Prante \parencite{DIYMacroeconomicModel} and has been implemented in Julia\footnote{LINK TO GIT?}.
-We start by revisiting the key structure of the model, before adding the asset market module in a second step.
+We thereby take the endogenous money model by \citet{fontanaSimpleTeachableMacroeconomic2009} as a starting point and extend this model with an explicit market for speculative assets.
 
+The model presentation draws on the exposition by \citet{DIYMacroeconomicModel} and has been implemented in Julia. We start by revisiting the key structure of the model, before adding the asset market module in a second step.\footnote{The respective package is available on \href{https://github.com/theplatters/PKAssetPrices}{Github}. It starts from the model representation as given by \citet{DIYMacroeconomicModel} reproduces \href{https://macrosimulation.org/a_post_keynesian_macro_model_with_endogenous_money}{the respective model} and successively extends the framework to provide a simplified representation of asset market dyanmics and their interaction with the real economy.}
 
-%TODO add link in the above --> package \texttt{PKAssetPrices}.\footnote{The package is available at \url{https://github.com/theplatters/PKAssetPrices} and reproduces the model from \url{https://macrosimulation.org/a_post_keynesian_macro_model_with_endogenous_money}.}
 
 \subsection{The basic model}\label{subsec:basic_model}
 The real side of the model is described by a goods market and a wage-price system to represent labor market dynamics. The monetary side, in contrast, is governed by an endogenous money creation process and a Taylor-style policy rule. While being modeled as an endogenous variable, the interest rate depends on a series of parameters that are (exogenously) set by the central bank, so that different impacts on interest rate dynamics can be modeled in such a setup.
@@ -272,8 +270,6 @@ In the above setup, the latter enter via $r$ as a general constraint and $c$, wh
 
 As already indicated the monetary sector is mainly governed by interest rates $r$, which are jointly determined by the central bank's policy rate $i$ as well as bank markup $m$. The remaining equations do collect relevant transactions for accounting purposes.
 
-\todo{Eventuell sollten wir auch hier eine einfache Accounting Matrix aufstellen?? Die könnte man zB auch am Ende dieser Section präsentieren...}
-
 \paragraph{Monetary system}
 \begin{align}
   i &= i_0 + i_1 P \label{eq:simple_i} \\
@@ -283,12 +279,11 @@ As already indicated the monetary sector is mainly governed by interest rates $r
   dR &= k dM \label{eq:simple_dr}
 \end{align}
 
-This version of the model features a minimal version of a Taylor-rule that neglects the output/employment term and focuses on price stability only.
-Similar to the rationale of the Blecker-Setterfield exposition this setup aims to implement a minimal, but accurate representation of the inner workings of contemporary monetary systems (REF, BankOfEngland) with a minimum of algebraic load.\footnote{While this reduces the standard Taylor-rule to a simple price-stability rule in the simple baseline model, appropriate extensions covering this aspect can be added in later stages of the exposition.}
+This model features a minimal version of a Taylor-rule that neglects the output/employment term and focuses on price stability only. Similar to the rationale of the original exposition of \citet{fontanaSimpleTeachableMacroeconomic2009},this setup aims to implement a minimal, but plausible representation of the inner workings of contemporary monetary systems \citep[e.g.][]{McLeay.2014}; appropriate extensions covering this aspect can be easily added in later stages of the exposition.
 
-\todo{eventuell sollten wir uns mal anschauen was eine echte taylorrule bewirken würde -> aber vielleicht geht das im statischen modell gar nicht wg. rekursivität}
+%expand?{eventuell sollten wir uns mal anschauen was eine echte taylorrule bewirken würde -> aber vielleicht geht das im statischen modell gar nicht wg. rekursivität}
 
-While the accounting scheme is still taking reserves into account, these reserves are not a constraint on the monetary system, but, rather, arise as an outcome residual  from the operation of private banks. Specifically, new loans $dL$ create new deposits $dM$ (Eqs.~\ref{eq:simple_dl}--\ref{eq:simple_dm}) and a fraction $k$ of these deposits -- the reserve rate -- is generated as reserves $dR$ (Eq.~\ref{eq:simple_dr}). Money is, hence, purely endogenous as the supply of credit determines the money stock.\footnote{While our focus is on models of endogenous money that seem to bear greater relevance for the description of contemporary economies, \textit{reserves} obviously could serve as key anchor for bringing exogenous notions of money back into the model.}
+The accounting scheme underlying this model is still taking reserves into account. However, these reserves are not a constraint on the monetary system, but, rather, arise as an outcome residual from the operation of private banks. Specifically, new loans $dL$ create new deposits $dM$ (Eqs.~\ref{eq:simple_dl}--\ref{eq:simple_dm}) and a fraction $k$ of these deposits -- the reserve rate -- is generated as reserves $dR$ (Eq.~\ref{eq:simple_dr}) by the central bank. Money is, hence, purely endogenous as the supply of credit determines the money stock. While our focus is on models of endogenous money that seem to bear greater relevance for the description of contemporary economies, \textit{reserves} are the obvious anchor for bringing exogenous notions of money back into the story.
 
 The final component of this minimal macroeconomic model with endogenous money is given by the labor market conditions -- employment $N$ and unemployment $U$ -- and corresponding trends in wages $W$ and prices $P$.
 
@@ -302,9 +297,9 @@ The final component of this minimal macroeconomic model with endogenous money is
 
 Here we reproduce a simple standard setup: firms set prices as a markup on unit labour costs (Eq.~\ref{eq:simple_p}), while nominal wages fall with unemployment (Eq.~\ref{eq:simple_w}), reflecting workers' reduced bargaining power. In this setup, $a$ is a fixed unit labour requirement, so that productivity is given by $\frac{1}{a}$. Employment is therefore proportional to output (Eq.~\ref{eq:simple_n}) and unemployment is given by the gap between labour supply $N^f$ and actual employment (Eq.~\ref{eq:simple_u}).
 
-Figure~\ref{fig:simplepk-equilibrium} summarizes the baseline formulation diagrammatically by showing how a change in interest rates affect the static quilibrium. The upper left panel shows the intersection of the goods-market dynamics, represented by an IS-curve, with the interest rate rule imposed by the central bank behavior, as captured by the IR-curve. As usual the latter represents labor market, price dynamics and interest rates; specifically, current output impacts on employment and prices, which lead the central bank to adjust the interest rate. As indicated the scenario in Figure~\ref{fig:simplepk-equilibrium} shows the effect of a more lenient interest rate rule (i.e., a lower $i_0$) that shifts the IR-curve downwards. Correspondingly, the upper right panel shows an AD-curve that modifies the IS-relation from before to  capture the feebback from prices on output. Correspondingly, the AS-curve is derived from the labor market and price dynamics and indicates how higher output leads to higher prices. Comparing intersections of the AD-curve and the AS-curve shows how a more lenient interest rate rule leads to higher output and prices in the static equilibrium.
+Figure~\ref{fig:simplepk-equilibrium} summarizes the baseline formulation diagrammatically by showing how a change in interest rates affect the static quilibrium. The upper left panel shows the intersection of the goods-market dynamics, represented by an IS-curve, with the interest rate rule imposed by the central bank behavior, as captured by the IR-curve. As usual the latter represents labor market, price dynamics and interest rates; specifically, current output impacts on employment and prices, which lead the central bank to adjust the interest rate. As indicated the scenario in Figure~\ref{fig:simplepk-equilibrium} shows the effect of a more lenient interest rate rule (i.e., a lower $i_0$) that shifts the IR-curve downwards. Correspondingly, the upper right panel shows an AD-curve that modifies the IS-relation from before to capture the feedback from prices on output. Correspondingly, the AS-curve is derived from the labor market and price dynamics and indicates how higher output leads to higher prices. Comparing intersections of the AD-curve and the AS-curve shows how a more lenient interest rate rule leads to higher output and prices in the static equilibrium.
 
-Finally, the figure in the lower panel shows the corresponding balance sheets of the three sectors in the model: the private sector, the banking sector, and the central bank. Given our static model setup we cannot model stocks directly; rather, these values are to be interpreted as the changes in actual stocks occuring the period described by the model. 
+Finally, the figure in the lower panel shows the corresponding financial balance sheets of the three sectors in the model: the private sector, the banking sector, and the central bank indicating their interconnectedness via loans and deposits. 
 
 \begin{figure}[htbp]
   \centering
@@ -315,16 +310,21 @@ Finally, the figure in the lower panel shows the corresponding balance sheets of
   \label{fig:simplepk-equilibrium}
 \end{figure}
 
-%todo wenn wir die accounting matrizen im text behalten wollen, müssen wir sie auch einbetten; sonst könnten sie eventuell auch in einen appendix passen.
-\input{tables/StockMatrix_simple.tex}
+Given our static model setup focused on flows we do not model stocks directly; rather, these values are to be interpreted as the changes in actual stocks occuring the period described by the model. In this simple model financial balance sheets are very close to real balance sheets; effectively we only abstract from the capital stock of firms when doing so. Collapsing the private sector, firms and households, into one sector, clearly indicates how banks intermediate between private sector parties as the convemtional representation typically assumes that all deposits of the private sector are held by households, whereas firms carry all liabilities. 
 
-\input{tables/FlowMatrix_simple.tex}
+This aspect and related notions of stock-flow consistency can be captured even more precisely by Tables \ref{tab:sfc-simple-stocks} and \ref{tab:sfc-simple-flows} below. These tables not only make the conventional assumption about private sector deposits and loands transparent, but also allows for spotlighing other aspects that are implied by the model but do not directly enter the apparatus of a static model: the existence of a capital stock (in Table \ref{tab:sfc-simple-stocks}), the impact of intertemporal consistency requirements or the role of bank sector profits (which can assumed to be zero, in which case the three respective rows drop out.)
+
+While such matrices are typically not often employed for simple static models -- exactly because such models only represent flows and corresponding closures -- they are a useful pedagogical device to create an intuition for the underlying balance sheet dynamics, which carry greater weight when explicitly introducing asset markets into the model.
+
+\input{tables/StockMatrix_simple.tex} \label{tab:sfc-simple-stocks}
+
+\input{tables/FlowMatrix_simple.tex} \label{tab:sfc-simple-flows}
 
 \subsection{Adding an Asset Market}\label{subsec:asset_market}
 
-In a next step we introduce a market for speculative assets in this framework. Four new variables describe it: nominal speculative debt $SD$, nominal gross asset demand $AE$, the quantity of assets offered for trade $QE$, and the asset price index $AP$. The assets can be interpreted as urban real estate, bonds, shares, pieces of art, crypto-assets, or a composite of these. Because Eq.~\ref{eq:as} pins $QA$ to parameters, the operative feedback among $SD$, $AE$, and $AP$ is linear. This keeps the extension analytically transparent while allowing the asset market and the macroeconomic block to be solved simultaneously.
+In a next step we introduce a market for speculative assets in this framework. Four new variables describe it: nominal speculative debt $SD$, nominal gross asset expenditure $AE$, the quantity of assets offered for trade $QA$, and the level of asset prices $AP$. The assets can be interpreted as urban real estate, bonds, shares, pieces of art, crypto-assets, or a composite of these. As a consequence our conceptualization of assets covers everything that can be conceived to targeted for speculative endeavors and is not per se restricted to the financial sphere. Because Eq.~\ref{eq:as} pins $QA$ to parameters, the operative feedback among $SD$, $AE$, and $AP$ is linear. This keeps the extension analytically transparent while allowing the asset market and the macroeconomic block to be solved simultaneously.
 
-% TODO – Wir müssen hier nochmal über labeling nachdenken – vor allem mit blick auf AS und AD
+% TODO – Wir müssen hier nochmal über labeling nachdenken --> ist besser geworden aber ich würde gamma_0 noch rauswerfen – wie mal geschrieben verkompliziert das aus meiner sicht die matrizzen unnötig
 
 \paragraph{Asset markets}
 \begin{align}
@@ -336,17 +336,16 @@ In a next step we introduce a market for speculative assets in this framework. F
 
 The asset-price index is normalized so that $AP=1$ denotes its reference level.
 Consequently, $s_0$ is speculative debt at the reference asset price and a zero lending rate;
-more generally, debt at $AP=1$ is $s_0-s_1 r$. Speculative debt falls with the lending rate because higher financing costs discourage leveraged positions.
-Furthermore, as indicated by $s_2(AP-1)$, it also falls when the current asset price rises above its reference level:
-as assets become expensive, a given nominal position buys less and speculators become more inclined to hold liquidity.
+more generally, debt taken is $s_0-s_1 r - s_2(AP-1)$: Speculative debt falls with the lending rate, because higher financing costs discourage leveraged positions, and with the current asset price (evaluated relative to its reference level). The latter represents the intuition of the ``liquidity preference'': as assets become expensive, a given nominal position buys less and speculators become more inclined to hold liquidity.
 Conversely, an asset price below one raises speculative borrowing relative to the reference case.
-This response captures, in reduced form, the \GT{} idea that liquidity preference becomes more pertinent when asset prices are high. Unlike the \GT{} bond-market construction, however, where the lending rate and the asset-price deviation are directly related (as bonds serve as the main asset type), these variables enter Eq.~\ref{eq:sd} as distinct, independent arguments. 
-% TODO – brauchen wir den Satz hier wirklich: Centering the price term does not alter the slope of the debt schedule; it gives the intercept \(s_0\) an economically meaningful reference point rather than defining it at the counterfactual price \(AP=0\).
-% F: Nein, find nocht
+This response captures, in reduced form, the the notion of a liquidity preference as formulated in the \GT{}. Unlike the \GT{} bond-market construction, however, where the lending rate and the asset-price deviation are directly related (as bonds serve as the main asset type), these variables enter Eq.~\ref{eq:sd} as distinct, independent arguments. 
 
-Buying assets shifts liquidity to their sellers. If a share $\gamma$ of each seller's receipts is used to purchase another asset within the same period, repeated transactions generate the multiplier $1/(1-\gamma)$ in Eq.~\ref{eq:ad}. The term $\gamma_0$ permits autonomous nominal asset demand; it is set to zero in the reported calibration. Thus $AE$ measures gross nominal transactions rather than either outstanding bank debt or a physical stock of assets.
+Buying assets shifts liquidity to their sellers. If a share $\gamma$ of each seller's receipts is used to purchase another asset within the same period, repeated transactions generate the multiplier $1/(1-\gamma)$ in Eq.~\ref{eq:ad}. Thus $AE$ measures gross nominal transactions - in contrast to either newly created bank debt ($SD$) or a physical stock of assets ($QA$).
 
-%TODO das ist ja dann neu – eventuell einmal besprechen?
+%TODO – Siehe oben - The term $\gamma_0$ permits autonomous nominal asset demand; it is set to zero in the reported calibration.
+
+%TODO auch hier wieder gamma_0 --> auch im code? 
+
 Equations~\ref{eq:sd}--\ref{eq:ap} form a simultaneous but linear feedback loop. Substitution gives the unique asset price
 \begin{equation}
   AP
@@ -358,10 +357,7 @@ provided $QA>0$ and $0\leq\gamma<1$. The negative price-deviation term in specul
 
 This simple static model gives only a stylized representation and does not represent the full spectrum of forces influencing speculative demand. In particular, it contains the deviation of the current asset-price index from its normalized reference level but neither past nor expected price changes. One may interpret $\gamma$ as a reduced-form indicator of market sentiment: expected price increases encourage sellers to reinvest more of their receipts, whereas pessimism reduces this within-period recycling. Such an interpretation resonates with the \treatise{} emphasis on bullish and bearish expectations discussed in Section~\ref{subsec:speculation}, but expectations remain exogenous in the present model.
 
-
-Equation~\ref{eq:as} constructs the available supply from the outstanding asset amount $AQ$, the turnover share $\alpha$, and the rate $g_a$ at which assets are newly offered or created. These quantities are parameters in the static variants presented here, so $QA$ is exogenous within an equilibrium even though its components remain visible for comparative exercises.
-
-Crucially, speculative debt now appears as a liability of the private sector and
+AS indicated, speculative debt now appears as a liability of the private sector and
 an asset of the banking system alongside productive loans $cD$. Consequently,
 $dM=dL$ also records deposits created to finance speculative positions, as in
 Keynes's claim that bank-money expansion accommodates the financial circulation.
@@ -370,9 +366,9 @@ Keynes's claim that bank-money expansion accommodates the financial circulation.
   dL = cD + SD \label{eq:dl-extended} 
 \end{equation}
 
-This variant no exactly corresponds precisely to the \treatise{} position when taking $c=c_0$ as a fixed exogenous parameter. Then asset market dynamics as represented by \(SD\), \(AE\), \(AP\), \(QA\) inflate the balance sheet (loans and deposits both grow by \(SD\)), but none of the real variables are affected; they are fully contained within the financial circulation and do not feed back into the industrial circulation. Hence, output, employment, the price level, and the interest rate are identical to the baseline model without an asset market.
+This variant of the model corresponds precisely to the \treatise{} position when taking $c=c_0$ as a fixed exogenous parameter. Then asset market dynamics as represented by \(SD\), \(AE\), \(AP\), \(QA\) inflate the balance sheet (loans and deposits both grow by \(SD\)), but none of the real variables are affected; they are fully contained within the financial circulation and do not feed back into the industrial circulation. Hence, output, employment, the price level, and the interest rate are identical to the baseline model without an asset market.
 
-Figure~\ref{fig:baseline-equilibrium} displays this separation graphically. In this simple model setup, the real interest rate $r$ is the key variable that has an impact on both, real and financial, markets as lower interest not only dirve up real investment, but also make speculative endeavors less risky, which increases the net demand for assets as depicted in the far right panel in Figure~\ref{fig:baseline-equilibrium}. The balance sheet panel in the lower panel of the same figure indicates that, under these assumptions, the introduction of an asset-market inflates sector balance sheets due to the presence of speculative borrowing. However, in this version this balance sheet inflation does not carry any real economic consequences as Keynes wrote, speculative expansion of bank money can be contained within the financial circulation: ``there will be no effect on the purchasing power of money'' \citep[Vol.~1, Ch.~17, pp.~270--271]{johnmaynardkeynesTreatiseMoneyTwo2011}.
+Figure~\ref{fig:baseline-equilibrium} displays this separation graphically. In this simple model setup, the real interest rate $r$ is the key variable that has an impact on both, real and financial, markets as lower interest not only drive up real investment, but also make speculative endeavors less risky. This increases the net demand for assets when interest rates are reduced as depicted in the far right panel in Figure~\ref{fig:baseline-equilibrium}. The balance sheet  in the lower panel of the same figure indicates how the introduction of an asset-market inflates sector balance sheets due to the presence of speculative borrowing. However, this balance sheet inflation does not carry any real economic consequences as Keynes wrote, speculative expansion of bank money can be contained within the financial circulation: ``there will be no effect on the purchasing power of money'' \citep[Vol.~1, Ch.~17, pp.~270--271]{johnmaynardkeynesTreatiseMoneyTwo2011}.
 
 %TODO: eigentlich könnte man in diese formulierung den riskindikator mit aufnehmen
 
@@ -384,14 +380,13 @@ Figure~\ref{fig:baseline-equilibrium} displays this separation graphically. In t
   \label{fig:baseline-equilibrium}
 \end{figure}
 
-Building on the baseline accounting structure as shown in tables \ref{tab:stockmatrix_simple} and \ref{tab:flowmatrix_simple}, we now show  how the introduction of an asset market impacts the stock-flow characteristics of th economy. %NOTE: hier müsste man dann auf das verhältnis von L_S und SD eingehen...
+Building on the baseline accounting structure as shown in tables \ref{tab:stockmatrix_simple} and \ref{tab:flowmatrix_simple}, we now show  how the introduction of an asset market impacts the stock-flow characteristics of th economy. Indicatively for the relevant changes are the introduction of real assets $A_t$ household's asset side and the new role of speculative loans given to households (both shown in Table \ref{tab:sfc-asset-stock}), where the flow matrix 
+%TODO: wir müssen hier mal klären was in den tables wirklich abgeht ;-)
 
-\input{tables/StockMatrix_assets.tex}
-%TODO -- das ist traditionell geschrieben, aber man könnte auch die rentiers auskoppeln und als eigene Klasse darstellen.
-%NOTE –– wir müssen auch nochmal klären wie wir das Handelsvolumen nennen – beim Tabele wäre mir "AT" als "asset turnover in the sinn gekommen
-%NOTE -- ggf. wäre auch hier ein guter PLatz um zu erklären was wir unter assets genau verstehen (nicht nur financial, auch wenn die loans natürlich immer financial sind...)
+\input{tables/StockMatrix_assets.tex} \label{tab:sfc-asset-stock}
+%expand? -- (1) das ist traditionell geschrieben, aber man könnte auch die rentiers auskoppeln und als eigene Klasse darstellen. (machen wir mal eher nicht...?) 
 
-\input{tables/FlowMatrix_assets.tex}
+\input{tables/FlowMatrix_assets.tex} \label{tab:sfc-asset-flow}
 
 In particular, speculative debt $SD$ now enters bank lending alongside productive credit, so that total loan creation becomes $dL=cD+SD$, with a corresponding one-for-one creation of deposits. Similarly, the flow matrix captures flows induced by $SD$ as well as overall speculative trading within the SECTOR. By these extensions new asset-market block is therefore fully integrated into the stock-flow framework, but in the present static version it remains confined to financial circulation and leaves the real side of the model unchanged.
 %NOTE: clarify sector after decision – eigene Klasse?
