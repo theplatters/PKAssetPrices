@@ -5,25 +5,38 @@ using CairoMakie
 
 const IS_COLOR = :royalblue
 const IR_COLOR = :crimson
-const ASSET_SHADES = (
-  Makie.RGBf(0.04, 0.24, 0.36),
-  Makie.RGBf(0.08, 0.36, 0.63),
-  Makie.RGBf(0.18, 0.55, 0.75),
-  Makie.RGBf(0.3, 0.62, 0.85),
+const ASSET_COLOR = Makie.wong_colors()[2] # orange
+const LIABILITY_COLOR = Makie.wong_colors()[4] # reddish pink
+const BALANCE_SHADE_LEVELS = (0.85f0, 0.9f0, 0.95f0, 1.0f0)
+const ASSET_SHADES = map(
+  level -> Makie.lerp(Makie.RGBAf(1, 1, 1, 1), ASSET_COLOR, level),
+  BALANCE_SHADE_LEVELS,
 )
-const LIABILITY_SHADES = (
-  Makie.RGBf(0.54, 0.18, 0.0),
-  Makie.RGBf(0.72, 0.28, 0.0),
-  Makie.RGBf(0.85, 0.41, 0.0),
-  Makie.RGBf(0.91, 0.54, 0.08),
+const LIABILITY_SHADES = map(
+  level -> Makie.lerp(Makie.RGBAf(1, 1, 1, 1), LIABILITY_COLOR, level),
+  BALANCE_SHADE_LEVELS,
 )
-const ASSET_COLOR = ASSET_SHADES[2]
-const LIABILITY_COLOR = LIABILITY_SHADES[2]
 const IS_IR_X_LIMITS = (3.0, 12.0)
 const IS_IR_Y_LIMITS = (0.05, 0.15)
-const AD_AS_X_LIMITS = (3.0, 12.0)
+const AD_AS_X_LIMITS = (4.5, 9.0)
 const AD_AS_Y_LIMITS = (0.5, 2.5)
-const LABEL_SIZE = 24
+const ASSET_X_LIMITS = (0.4, 1.6)
+const ASSET_Y_LIMITS = (0.5, 2.0)
+const BALANCE_SECTOR_GAP = 0.0
+const BALANCE_ANNOTATION_PADDING = 2.0
+
+# These figures are included at `\textwidth` in `paper/teaching-note.tex`.
+# The asset-market panels are 2100 px wide, so font sizes need to be larger
+# than Makie's defaults to remain legible after they are scaled to the page.
+const FIGURE_FONT_SIZE = 30
+const FIGURE_TITLE_SIZE = 40
+const AXIS_TITLE_SIZE = 30
+const AXIS_LABEL_SIZE = 30
+const LEGEND_LABEL_SIZE = 28
+const BALANCE_BAR_LABEL_SIZE = 17
+const BALANCE_ACTOR_LABEL_SIZE = 30
+const BALANCE_ANNOTATION_SIZE = 35
+const BALANCE_TICK_LABEL_SIZE = 28
 
 abstract type PanelVariant end
 
@@ -51,7 +64,7 @@ function display_name(name::Symbol)
 end
 
 """Return the actor name used in balance-sheet plots."""
-balance_sheet_actor_name(name::Symbol) = name == :Private ? "Firms" : display_name(name)
+balance_sheet_actor_name(name::Symbol) = display_name(name)
 
 """Assign each instrument a shade from its asset or liability color family."""
 function balance_sheet_segment_colors(
@@ -145,7 +158,7 @@ function plot_is_lm(
   )
   xlims!(ax, IS_IR_X_LIMITS...)
   ylims!(ax, IS_IR_Y_LIMITS...)
-  axislegend(ax; position=:rt, framevisible=false, labelsize=14)
+  axislegend(ax; position=:rb, framevisible=false, labelsize=LEGEND_LABEL_SIZE)
   return ax
 end
 
@@ -219,7 +232,7 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=
   )
   xlims!(ax, AD_AS_X_LIMITS...)
   ylims!(ax, AD_AS_Y_LIMITS...)
-  axislegend(ax; position=:rt, framevisible=false, labelsize=14)
+  axislegend(ax; position=:rb, framevisible=false, labelsize=LEGEND_LABEL_SIZE)
   return ax
 end
 
@@ -305,7 +318,10 @@ function plot_asset_market(
     strokecolor=:white,
     strokewidth=2,
   )
-  axislegend(ax; position=:rt, framevisible=false, labelsize=14)
+
+  xlims!(ax, ASSET_X_LIMITS...)
+  ylims!(ax, ASSET_Y_LIMITS...)
+  axislegend(ax; position=:rt, framevisible=false, labelsize=LEGEND_LABEL_SIZE)
   return ax
 end
 
@@ -349,7 +365,7 @@ function balance_sheet_plot_data(sol::Static.Solution)
       end
       position += 1.0
     end
-    position += 0.65
+    position += BALANCE_SECTOR_GAP
   end
 
   return (;
@@ -405,8 +421,8 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
       index in asset_indices
     ],
     label_position=:center,
-    label_color=:white,
-    label_size=14,
+    label_color=:black,
+    label_size=BALANCE_BAR_LABEL_SIZE,
     label="Assets",
   )
   barplot!(
@@ -423,8 +439,8 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
       index in liability_indices
     ],
     label_position=:center,
-    label_color=:white,
-    label_size=14,
+    label_color=:black,
+    label_size=BALANCE_BAR_LABEL_SIZE,
     label="Liabilities",
   )
   hlines!(ax, [0.0]; color=(:black, 0.55), linewidth=1.5)
@@ -437,12 +453,16 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
     text=data.actor_labels,
     align=(:center, :bottom),
     font=:bold,
-    fontsize=20,
+    fontsize=BALANCE_ACTOR_LABEL_SIZE,
     color=:black,
   )
 
   ax.xticks = (data.tick_positions, data.tick_labels)
-  xlims!(ax, first(data.tick_positions) - 0.7, last(data.tick_positions) + 0.7)
+  xlims!(
+    ax,
+    first(data.tick_positions) - 0.7,
+    last(data.tick_positions) + BALANCE_ANNOTATION_PADDING,
+  )
   limit = max_total * 1.18
   ylims!(ax, 0.0, limit)
   text!(
@@ -459,7 +479,7 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
     ),
     space=:relative,
     align=(:right, :center),
-    fontsize=24,
+    fontsize=BALANCE_ANNOTATION_SIZE,
     color=:black,
   )
   return ax
@@ -491,52 +511,43 @@ function panel(
 
   figure = Figure(
     size=figure_size,
-    fontsize=LABEL_SIZE,
+    fontsize=FIGURE_FONT_SIZE,
     figure_padding=(28, 38, 28, 28),
     backgroundcolor=:white,
   )
-  Label(
-    figure[1, 1:2],
-    title;
-    fontsize=25,
-    font=:bold,
-    tellwidth=false,
-    padding=(0, 0, 4, 4),
-  )
 
   curve_axis = Axis(
-    figure[2, 1];
+    figure[1, 1];
     title="Goods market and interest-rate rule",
     xlabel="Output (Y)",
     ylabel="Interest rate (r)",
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
-    titlesize=19,
-    xlabelsize=LABEL_SIZE,
-    ylabelsize=LABEL_SIZE,
+    titlesize=AXIS_TITLE_SIZE,
+    xlabelsize=AXIS_LABEL_SIZE,
+    ylabelsize=AXIS_LABEL_SIZE,
   )
   ad_as_axis = Axis(
-    figure[2, 2];
+    figure[1, 2];
     title="Aggregate demand and supply",
     xlabel="Output (Y)",
     ylabel="Price level (P)",
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
-    titlesize=19,
-    xlabelsize=LABEL_SIZE,
-    ylabelsize=LABEL_SIZE,
+    titlesize=AXIS_TITLE_SIZE,
+    xlabelsize=AXIS_LABEL_SIZE,
+    ylabelsize=AXIS_LABEL_SIZE,
   )
   balance_axis = Axis(
-    figure[3, 1:2];
+    figure[2, 1:2];
     title="Sector balance sheets",
-    xlabel="Balance-sheet side",
     ylabel="Amount",
     xgridvisible=false,
     ygridcolor=(:black, 0.08),
-    titlesize=19,
-    xlabelsize=LABEL_SIZE,
-    ylabelsize=LABEL_SIZE,
-    xticklabelsize=12,
+    titlesize=AXIS_TITLE_SIZE,
+    xlabelsize=AXIS_LABEL_SIZE,
+    ylabelsize=AXIS_LABEL_SIZE,
+    xticklabelsize=BALANCE_TICK_LABEL_SIZE,
     xticklabelrotation=pi / 4,
     xticklabelalign=(:right, :center),
   )
@@ -562,63 +573,54 @@ function panel(
 
   figure = Figure(
     size=figure_size,
-    fontsize=16,
+    fontsize=FIGURE_FONT_SIZE,
     figure_padding=(28, 38, 28, 28),
     backgroundcolor=:white,
   )
-  Label(
-    figure[1, 1:3],
-    title;
-    fontsize=25,
-    font=:bold,
-    tellwidth=false,
-    padding=(0, 0, 4, 4),
-  )
 
   curve_axis = Axis(
-    figure[2, 1];
+    figure[1, 1];
     title="Goods market and interest-rate rule",
     xlabel="Output (Y)",
     ylabel="Interest rate (r)",
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
-    titlesize=19,
-    xlabelsize=LABEL_SIZE,
-    ylabelsize=LABEL_SIZE,
+    titlesize=AXIS_TITLE_SIZE,
+    xlabelsize=AXIS_LABEL_SIZE,
+    ylabelsize=AXIS_LABEL_SIZE,
   )
   ad_as_axis = Axis(
-    figure[2, 2];
+    figure[1, 2];
     title="Aggregate demand and supply",
     xlabel="Output (Y)",
     ylabel="Price level (P)",
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
-    titlesize=19,
-    xlabelsize=LABEL_SIZE,
-    ylabelsize=LABEL_SIZE,
+    titlesize=AXIS_TITLE_SIZE,
+    xlabelsize=AXIS_LABEL_SIZE,
+    ylabelsize=AXIS_LABEL_SIZE,
   )
   asset_market_axis = Axis(
-    figure[2, 3];
+    figure[1, 3];
     title="Asset market",
     xlabel="Base-price-equivalent quantity",
     ylabel="Asset price (AP)",
     xgridcolor=(:black, 0.08),
     ygridcolor=(:black, 0.08),
-    titlesize=19,
-    xlabelsize=LABEL_SIZE,
-    ylabelsize=LABEL_SIZE,
+    titlesize=AXIS_TITLE_SIZE,
+    xlabelsize=AXIS_LABEL_SIZE,
+    ylabelsize=AXIS_LABEL_SIZE,
   )
   balance_axis = Axis(
-    figure[3, 1:3];
+    figure[2, 1:3];
     title="Sector balance sheets",
-    xlabel="Balance-sheet side",
     ylabel="Amount",
     xgridvisible=false,
     ygridcolor=(:black, 0.08),
-    titlesize=19,
-    xlabelsize=LABEL_SIZE,
-    ylabelsize=LABEL_SIZE,
-    xticklabelsize=12,
+    titlesize=AXIS_TITLE_SIZE,
+    xlabelsize=AXIS_LABEL_SIZE,
+    ylabelsize=AXIS_LABEL_SIZE,
+    xticklabelsize=BALANCE_TICK_LABEL_SIZE,
     xticklabelrotation=pi / 4,
     xticklabelalign=(:right, :center),
   )

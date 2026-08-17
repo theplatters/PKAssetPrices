@@ -45,14 +45,26 @@ const DP = PKAssetPrices.DynamicPlotting
     @test all(data.values[data.sides .== :liability] .>= 0)
     @test all(data.totals .>= 0)
     @test data.actor_labels == ["Firms", "Banks", "Central Bank"]
-    @test data.actor_positions ≈ [1.5, 4.15, 6.8]
+    @test data.actor_positions ≈ [1.5, 3.5, 5.5]
     @test data.tick_labels == repeat(["Assets", "Liabilities"], length(solution.sheets))
     segment_colors = SP.balance_sheet_segment_colors(data.instruments, data.sides)
+    @test SP.ASSET_COLOR == Makie.wong_colors()[2]
+    @test SP.LIABILITY_COLOR == Makie.wong_colors()[4]
     @test length(unique(segment_colors[data.sides .== :asset])) > 1
     @test length(unique(segment_colors[data.sides .== :liability])) > 1
     @test "Central Bank · Central Bank Credit" in data.labels
     @test extrema(SP.equilibrium_range(0.0)) == (-1.0, 1.0)
     @test extrema(SP.equilibrium_range(-2.0)) == (-6.0, -0.4)
+
+    for model in (S.Baseline, S.PQC, S.PQCr, S.PQCrDIFF, S.FirmsRation)
+        model_solution = PKAssetPrices.solve_model(model)
+        curves = S.eval_curve(model_solution)
+        @test curves.IS ≈ model_solution.variables[:Y]
+        @test curves.IR ≈ model_solution.variables[:r]
+        @test curves.ADc ≈ model_solution.variables[:Y]
+        @test curves.ASc ≈ model_solution.variables[:P]
+        @test curves.AMD ≈ curves.AMS
+    end
 
     panel = SP.panel(solution; size = (1200, 800))
     @test panel isa Figure
