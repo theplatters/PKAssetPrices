@@ -381,15 +381,14 @@ Figure~\ref{fig:baseline-equilibrium} displays this separation graphically. In t
 \end{figure}
 
 Building on the baseline accounting structure as shown in tables \ref{tab:stockmatrix_simple} and \ref{tab:flowmatrix_simple}, we now show  how the introduction of an asset market impacts the stock-flow characteristics of th economy. Indicatively for the relevant changes are the introduction of real assets $A_t$ household's asset side and the new role of speculative loans given to households (both shown in Table \ref{tab:sfc-asset-stock}), where the flow matrix 
-%TODO: wir müssen hier mal klären was in den tables wirklich abgeht ;-)
+%TODO: ich glaube die balance sheets stimmen jetzt. aber wir sollten noch zwei sachen machen: (1) eine aggregierte saldonull für AE und I bauen und in den captions genau ausweisen, was die underlying definitions für die closures sind. eventuell sollte man auch die fixe zuordnung der neuen deposits aufheben und das flexibel über households und firms schreiben. aber dann bricht die klare defnition...
 
 \input{tables/StockMatrix_assets.tex} \label{tab:sfc-asset-stock}
 %expand? -- (1) das ist traditionell geschrieben, aber man könnte auch die rentiers auskoppeln und als eigene Klasse darstellen. (machen wir mal eher nicht...?) 
 
 \input{tables/FlowMatrix_assets.tex} \label{tab:sfc-asset-flow}
 
-In particular, speculative debt $SD$ now enters bank lending alongside productive credit, so that total loan creation becomes $dL=cD+SD$, with a corresponding one-for-one creation of deposits. Similarly, the flow matrix captures flows induced by $SD$ as well as overall speculative trading within the SECTOR. By these extensions new asset-market block is therefore fully integrated into the stock-flow framework, but in the present static version it remains confined to financial circulation and leaves the real side of the model unchanged.
-%NOTE: clarify sector after decision – eigene Klasse?
+In particular, speculative debt $SD$ now enters bank lending alongside productive credit, so that total loan creation becomes $dL=cD+SD$, with a corresponding one-for-one creation of deposits. Similarly, the flow matrix captures flows induced by $SD$ as well as overall speculative trading within the private sector. By these extensions new asset-market block is therefore fully integrated into the stock-flow framework, but in the present static version it leaves the real side of the model unchanged.
 
 \section{Real economic impacts of financial speculation} \label{sec:real_impact}
 
