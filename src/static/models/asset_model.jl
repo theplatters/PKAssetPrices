@@ -127,7 +127,6 @@ AssetModel = @model begin
     gₐ = 0.03, "rate of assets being created"
     AQ = 6.0, "asset amount"
     AQ_bar = 0.78, "asset amount"
-    credit_ad_channel = 0.0, "activate credit rationing through asset demand"
     credit_sd_channel = 0.0, "activate credit rationing through speculative debt"
     policy_ap_channel = 0.0, "activate the asset-price policy response"
     firms_ap_channel = 0.0, "activate firms' asset-price response"
@@ -152,7 +151,7 @@ AssetModel = @model begin
     AE == γ0 + SD / (1 - γ)
     AP == p1 * AE / AQ
     AQ == AQ_bar
-    c == c0 - c1 * (credit_ad_channel * AE + credit_sd_channel * SD)
+    c == c0 - c1 * (credit_sd_channel * SD)
   end
 
   @curves begin
@@ -169,7 +168,6 @@ AssetModel = @model begin
         speculative_debt = debt_at_reference_price - s2 * (asset_price - 1)
         asset_demand = asset_supply * asset_price / p1
         credit_rationing = c0 - c1 * (
-          credit_ad_channel * asset_demand +
           credit_sd_channel * speculative_debt
         )
         productive_demand = d0 - d1 * r - firms_ap_channel * d2 * asset_price
@@ -213,7 +211,6 @@ AssetModel = @model begin
           s0 - s1 * speculative_rate_multiplier * rate - s2 * (asset_price - 1)
         asset_demand = asset_supply * asset_price / p1
         credit_rationing = c0 - c1 * (
-          credit_ad_channel * asset_demand +
           credit_sd_channel * speculative_debt
         )
         productive_demand =
@@ -260,11 +257,11 @@ end
 Baseline = AssetModel
 
 PQC = @scenario AssetModel begin
-  credit_ad_channel = 1.0
+  credit_sd_channel = 1.0
 end
 
 PQCr = @scenario AssetModel begin
-  credit_ad_channel = 1.0
+  credit_sd_channel = 1.0
   policy_ap_channel = 1.0
 end
 

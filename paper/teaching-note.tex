@@ -404,21 +404,19 @@ This channel builds on the intuition that credit provided for financial speculat
 %TODO: wäre es nicht ökonomisch plausibler hier SD oder vllt AP-1 zu verwenden? --> new pic
 
 \begin{equation}
-  c = c_0 - c_1 AE \label{eq:c-ad}
+  c = c_0 - c_1 SD \label{eq:c-ad}
 \end{equation}
 
-When gross asset demand \(AE\) rises, the banking sector reduces the share of
-credit available for productive purposes. This is the reduced-form behavioral
-rule implemented in the PQC variant; bank balance-sheet exposure itself continues to be
-measured by nominal speculative debt \(SD\). The linear rule is not clipped in
+When speculative demand \(SD\) rises, the banking sector reduces the share of
+credit available for productive purposes. The linear rule is not clipped in
 the code, so its economic interpretation requires parameter values that keep
 \(0\leq c\leq1\).
 
 This yields a \GT{} result: an increase in speculative
-activity (a rise in \(s_0\), say, or a rise in \(\gamma\)) raises
-\(AE\), which lowers \(c\), which contracts \(Y\) through
-Eqs.~\ref{eq:simple_y} and \ref{eq:simple_nd}. The mechanism is
-balance-sheet crowding-out rather than the interest rate channel of the
+activity (a rise in \(s_0\)) raises
+\(SD\), which lowers \(c\), which contracts \(Y\) through
+Eqs.~\ref{eq:simple_y} and \ref{eq:simple_nd}.
+The mechanism is balance-sheet crowding-out rather than the interest rate channel of the
 \GT{}, but the qualitative conclusion is the same: speculation can
 depress real activity. The financial circulation is no longer a cordon
 sanitaire---it draws resources away from the industrial circulation.
