@@ -88,6 +88,8 @@ The shift from the \treatise{} to the \GT{} is therefore not a single change but
 These two shifts can be represented by the simple typology, shown in Table~\ref{tab:typology}.
 
 %NOTE: Should we better write something like "post-Keynesian intuition" oder "heterodox economics" (dann wüde man oben links vllt auch einfach "neclassical economics" schreiben?) instead of "our model"?
+% Hm hab Angst, dass "heterodox economics" begrifflich dann bisschen überladen ist. Lieber post-Keynesian intuition
+
 
 \begin{table}[h]
 \centering
@@ -324,12 +326,11 @@ While such matrices are typically not often employed for simple static models --
 
 In a next step we introduce a market for speculative assets in this framework. Four new variables describe it: nominal speculative debt $SD$, nominal gross asset expenditure $AE$, the quantity of assets offered for trade $QA$, and the level of asset prices $AP$. The assets can be interpreted as urban real estate, bonds, shares, pieces of art, crypto-assets, or a composite of these. As a consequence our conceptualization of assets covers everything that can be conceived to targeted for speculative endeavors and is not per se restricted to the financial sphere. Because Eq.~\ref{eq:as} pins $QA$ to parameters, the operative feedback among $SD$, $AE$, and $AP$ is linear. This keeps the extension analytically transparent while allowing the asset market and the macroeconomic block to be solved simultaneously.
 
-% TODO – Wir müssen hier nochmal über labeling nachdenken --> ist besser geworden aber ich würde gamma_0 noch rauswerfen – wie mal geschrieben verkompliziert das aus meiner sicht die matrizzen unnötig
 
 \paragraph{Asset markets}
 \begin{align}
   SD &= s_0-s_1r-s_2(AP-1), \qquad s_1,s_2>0, \label{eq:sd} \\
-  AE &= \gamma_0+\frac{SD}{1-\gamma}, \qquad 0\leq\gamma<1, \label{eq:ad} \\
+  AE &= \frac{SD}{1-\gamma}, \qquad 0\leq\gamma<1, \label{eq:ad} \\
   AP &= \frac{AE}{QA}, \label{eq:ap} \\
   QA &= \bar{QA} \qquad \bar{QA} > 0 . \label{eq:as}
 \end{align}
@@ -342,14 +343,12 @@ This response captures, in reduced form, the the notion of a liquidity preferenc
 
 Buying assets shifts liquidity to their sellers. If a share $\gamma$ of each seller's receipts is used to purchase another asset within the same period, repeated transactions generate the multiplier $1/(1-\gamma)$ in Eq.~\ref{eq:ad}. Thus $AE$ measures gross nominal transactions - in contrast to either newly created bank debt ($SD$) or a physical stock of assets ($QA$).
 
-%TODO – Siehe oben - The term $\gamma_0$ permits autonomous nominal asset demand; it is set to zero in the reported calibration.
 
-%TODO auch hier wieder gamma_0 --> auch im code? 
 
 Equations~\ref{eq:sd}--\ref{eq:ap} form a simultaneous but linear feedback loop. Substitution gives the unique asset price
 \begin{equation}
   AP
-  =\frac{\left[\gamma_0 (1 - \gamma) + (s_0+s_2-s_1r)\right]}
+  =\frac{\left[ (1 - \gamma) + (s_0+s_2-s_1r)\right]}
   {QA(1-\gamma) +s_2},
   \label{eq:linear-ap-solution}
 \end{equation}
