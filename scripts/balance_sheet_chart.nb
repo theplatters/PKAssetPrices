@@ -1,0 +1,74 @@
+(* Balance sheet bar chart — replicates the layout from baseline_equilibrium_panel.pdf *)
+
+(* ── data from equilibrium_values.csv ── *)
+dL = 3.67167;     (* change in loans *)
+dM = 3.67167;     (* change in money *)
+dR = 1.10150;     (* change in reserves *)
+SD = 0.388658;    (* speculative debt *)
+
+(* auxiliary indicators *)
+reserveRatio = dR / dM;
+totalLoans   = dL;
+riskIndicator = SD / dL;
+
+(* ── sector layout (6 bars, 3 sectors × assets+liabilities) ── *)
+(* each bar is a list of {label, value, colour} segments, stacked *)
+
+colPrivate = {RGBColor[0.20, 0.59, 0.86]};      (* blue-ish for assets *)
+colBanksA  = {RGBColor[0.20, 0.59, 0.86], RGBColor[0.35, 0.72, 0.93]};
+colBanksL  = {RGBColor[0.84, 0.25, 0.30], RGBColor[0.92, 0.50, 0.55]};
+colCentral = {RGBColor[0.20, 0.59, 0.86]};
+colLiab    = {RGBColor[0.84, 0.25, 0.30]};       (* red-ish for liabilities *)
+
+bar1 = {Style["deposits", colPrivate[[1]]] -> dM};                                      (* PrivateSector Assets *)
+bar2 = {Style["loans",    colLiab[[1]]]   -> dL};                                       (* PrivateSector Liabilities *)
+bar3 = {Style["loans",    colBanksA[[1]]]  -> dL,
+        Style["reserves", colBanksA[[2]]]  -> dR};                                       (* Banks Assets *)
+bar4 = {Style["deposits",           colBanksL[[1]]] -> dM,
+        Style["central_bank_credit",colBanksL[[2]]] -> dR};                               (* Banks Liabilities *)
+bar5 = {Style["central_bank_credit", colCentral[[1]]] -> dR};                             (* CentralBank Assets *)
+bar6 = {Style["reserves", colLiab[[1]]] -> dR};                                            (* CentralBank Liabilities *)
+
+labels = {"Assets\nPrivateSector", "Liabilities\nPrivateSector",
+          "Assets\nBanks",         "Liabilities\nBanks",
+          "Assets\nCentralBank",   "Liabilities\nCentralBank"};
+
+barData = {bar1, bar2, bar3, bar4, bar5, bar6};
+
+(* ── chart ── *)
+chart = BarChart[
+  barData,
+  ChartLayout -> "Stacked",
+  ChartLabels -> Placed[labels, Axis, Rotate[#, Pi/4] &],
+  ChartStyle -> {EdgeForm[{Black, Opacity[0.65]}],
+                 ColorFunction -> (Automatic &)},
+  BarOrigin -> Bottom,
+  Axes -> {True, True},
+  Frame -> {{True, False}, {False, True}},
+  FrameLabel -> {{None, None}, {None, "Amount"}},
+  PlotRange -> {All, {0, 4.5}},
+  GridLines -> {None, Automatic},
+  GridLinesStyle -> Directive[Gray, Dashed, Opacity[0.25]],
+  LabelingFunction -> (Placed[Rotate[#1, 0], Center] &),
+  ImageSize -> 500,
+  AspectRatio -> 1 / GoldenRatio,
+  PlotLabel -> Style["Sector Balance Sheets", Bold, 14]
+  ];
+
+(* ── annotations ── *)
+annotations = Graphics[{
+   Text[Style["PrivateSector", Bold, 12],
+     {1.5, 4.3}, {0, 0}],
+   Text[Style["Banks", Bold, 12],
+     {3.5, 4.3}, {0, 0}],
+   Text[Style["CentralBank", Bold, 12],
+     {5.5, 4.3}, {0, 0}],
+   Text[Style["Reserve ratio: " <> ToString[NumberForm[reserveRatio, {4, 3}]],
+        Medium], {5.9, 3.5}, {1, 0}],
+   Text[Style["Total loans: " <> ToString[NumberForm[totalLoans, {4, 3}]],
+        Medium], {5.9, 2.5}, {1, 0}],
+   Text[Style["Risk indicator: " <> ToString[NumberForm[riskIndicator, {4, 3}]],
+        Medium], {5.9, 1.5}, {1, 0}]
+   }];
+
+Show[chart, annotations]
