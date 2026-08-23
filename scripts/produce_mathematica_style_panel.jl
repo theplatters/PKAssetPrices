@@ -166,12 +166,12 @@ scatter!(ax2, [Y_eq], [P_eq]; color = :black, markersize = 12,
 
 xlims!(ax2, PLOT_RANGES.AD_AS_X...)
 ylims!(ax2, PLOT_RANGES.AD_AS_Y...)
-# Inline labels (no legend box) — relative coordinates
-text!(ax2, 0.10, 0.85; text = "AD", space = :relative,
+# Inline labels (no legend box) — relative coordinates, at chart borders
+text!(ax2, 0.08, 0.88; text = "AD", space = :relative,
     color = CURVE_COLOR, fontsize = LEGEND_SIZE, align = (:left, :top))
-text!(ax2, 0.10, 0.68; text = "AD (lower i₀)", space = :relative,
+text!(ax2, 0.08, 0.72; text = "AD (lower i₀)", space = :relative,
     color = (CURVE_COLOR, 0.38), fontsize = LEGEND_SIZE - 2, align = (:left, :top))
-text!(ax2, 0.88, 0.85; text = "AS", space = :relative,
+text!(ax2, 0.88, 0.88; text = "AS", space = :relative,
     color = SUPPLY_COLOR, fontsize = LEGEND_SIZE, align = (:right, :top))
 
 # ─────────────────── Panel C: Financial Market Dynamics (Asset Market) ───
@@ -228,13 +228,13 @@ scatter!(ax3, [Q_eq], [AP_eq]; color = :black, markersize = 12,
 
 xlims!(ax3, PLOT_RANGES.AM_X...)
 ylims!(ax3, PLOT_RANGES.AM_Y...)
-# Inline labels (no legend box) — relative coordinates
-text!(ax3, 0.85, 0.85; text = "Asset Demand", space = :relative,
-    color = CURVE_COLOR, fontsize = LEGEND_SIZE - 1, align = (:right, :top))
-text!(ax3, 0.85, 0.10; text = "Asset Supply", space = :relative,
-    color = SUPPLY_COLOR, fontsize = LEGEND_SIZE - 1, align = (:right, :bottom))
-text!(ax3, 0.85, 0.68; text = "Demand (lower i₀)", space = :relative,
-    color = (CURVE_COLOR, 0.38), fontsize = LEGEND_SIZE - 3, align = (:right, :top))
+# Inline labels (no legend box) — relative coordinates, at chart borders
+text!(ax3, 0.08, 0.88; text = "Asset Demand", space = :relative,
+    color = CURVE_COLOR, fontsize = LEGEND_SIZE - 1, align = (:left, :top))
+text!(ax3, 0.08, 0.68; text = "Demand (lower i₀)", space = :relative,
+    color = (CURVE_COLOR, 0.38), fontsize = LEGEND_SIZE - 3, align = (:left, :top))
+text!(ax3, 0.88, 0.88; text = "Asset Supply", space = :relative,
+    color = SUPPLY_COLOR, fontsize = LEGEND_SIZE - 1, align = (:right, :top))
 
 # ─────────────────── Panel D: Sector Balance Sheets ──────────────────────
 ax4 = Axis(
