@@ -158,12 +158,6 @@ lines!(ax2, lower_ad_Y, p_range;
     color = (CURVE_COLOR, 0.38), linewidth = 2, linestyle = :dash,
     label = "AD (lower i₀)")
 
-# Equilibrium reference lines
-vlines!(ax2, [Y_eq]; color = (:black, 0.20), linestyle = :dot, linewidth = 1.5)
-hlines!(ax2, [P_eq]; color = (:black, 0.20), linestyle = :dot, linewidth = 1.5)
-scatter!(ax2, [Y_eq], [P_eq]; color = :black, markersize = 12,
-    strokecolor = :white, strokewidth = 2)
-
 xlims!(ax2, PLOT_RANGES.AD_AS_X...)
 ylims!(ax2, PLOT_RANGES.AD_AS_Y...)
 # Inline labels (no legend box) — relative coordinates, at chart borders
@@ -218,14 +212,6 @@ lines!(ax3, lower_amd_Q, ap_range;
     color = (CURVE_COLOR, 0.38), linewidth = 2, linestyle = :dash,
     label = "Demand (lower i₀)")
 
-# Equilibrium point
-curves_eq = eval_curve(solution)
-Q_eq = (curves_eq.AMD + curves_eq.AMS) / 2
-vlines!(ax3, [Q_eq]; color = (:black, 0.20), linestyle = :dot, linewidth = 1.5)
-hlines!(ax3, [AP_eq]; color = (:black, 0.20), linestyle = :dot, linewidth = 1.5)
-scatter!(ax3, [Q_eq], [AP_eq]; color = :black, markersize = 12,
-    strokecolor = :white, strokewidth = 2)
-
 xlims!(ax3, PLOT_RANGES.AM_X...)
 ylims!(ax3, PLOT_RANGES.AM_Y...)
 # Inline labels (no legend box) — relative coordinates, at chart borders
@@ -257,17 +243,27 @@ dL_val = vars[:dL]
 dM_val = vars[:dM]
 dR_val = vars[:dR]
 
-# 6 bars (3 sectors × Assets/Liabilities), spaced for sector separation
-positions = [1.0, 2.0, 4.0, 5.0, 7.0, 8.0]
-bar_vals = [dM_val, dL_val, dL_val, dM_val, dR_val, dR_val]
-bar_clrs = [BS_ASSET, BS_LIABILITY, BS_ASSET, BS_LIABILITY, BS_ASSET, BS_LIABILITY]
-bar_nms  = ["Deposits", "Loans", "Loans", "Deposits", "CB Credit", "Reserves"]
+# 8 bar segments (3 sectors, with Banks stacked: Loans+Reserves, Deposits+CB credit)
+positions = [1.0, 2.0, 4.0, 4.0, 5.0, 5.0, 7.0, 8.0]
+bar_vals = [dM_val, dL_val, dL_val, dR_val, dM_val, dR_val, dR_val, dR_val]
+bar_clrs = [BS_ASSET, BS_LIABILITY, BS_ASSET, BS_ASSET, BS_LIABILITY, BS_LIABILITY, BS_ASSET, BS_LIABILITY]
+bar_stck = Int[1, 2, 3, 3, 4, 4, 5, 6]
+bar_lbls = [
+    @sprintf("D: %.1f", dM_val),
+    @sprintf("L: %.1f", dL_val),
+    @sprintf("L: %.1f", dL_val),
+    @sprintf("R: %.1f", dR_val),
+    @sprintf("D: %.1f", dM_val),
+    @sprintf("CB: %.1f", dR_val),
+    @sprintf("CB: %.1f", dR_val),
+    @sprintf("R: %.1f", dR_val),
+]
 
 barplot!(ax4, positions, bar_vals;
-    width = 0.80, color = bar_clrs,
+    stack = bar_stck, width = 0.80, color = bar_clrs,
     strokecolor = (:black, 0.65), strokewidth = 1.5,
-    bar_labels = [@sprintf("%s\n%.2f", bar_nms[k], bar_vals[k]) for k in 1:6],
-    label_position = :top, label_color = :black, label_size = 12,
+    bar_labels = bar_lbls,
+    label_position = :center, label_color = :black, label_size = 14,
 )
 
 hlines!(ax4, [0.0]; color = (:black, 0.55), linewidth = 1.5)
