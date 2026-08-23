@@ -17,11 +17,9 @@ const CURVE_COLOR   = RGBf(0.5, 0.0, 0.5)   # purple – IS, AD, asset demand
 const SUPPLY_COLOR  = RGBf(1.0, 0.5, 0.0)   # orange – IR, AS, asset supply
 const COUNTERFACT   = (CURVE_COLOR, 0.38)   # faded purple for dashed IR
 
-# Balance-sheet colours (Mathematica notebook palette)
-const BS_ASSET      = RGBf(0.20, 0.59, 0.86)   # blue
-const BS_LIABILITY  = RGBf(0.84, 0.25, 0.30)   # red
-const BS_ASSET_LT   = RGBf(0.35, 0.72, 0.93)   # light blue (reserves as asset)
-const BS_LIAB_LT    = RGBf(0.92, 0.50, 0.55)   # light red  (CB credit as liab)
+# Balance-sheet colours — matching curve palette (purple = assets, orange = liabilities)
+const BS_ASSET      = CURVE_COLOR     # purple for assets
+const BS_LIABILITY  = SUPPLY_COLOR    # orange for liabilities
 
 # ── 2. Helpers (matching Mathematica's style) ────────────────────────────
 const FONT_SIZE   = 20
@@ -31,9 +29,9 @@ const PLOT_RANGES = (
     IS_IR_X = (4.0, 10.0),
     IS_IR_Y = (0.06, 0.15),
     AD_AS_X = (5.0, 9.0),
-    AD_AS_Y = (0.9, 2.5),
+    AD_AS_Y = (1.2, 2.2),
     AM_X    = (0.6, 1.3),
-    AM_Y    = (0.7, 1.5),
+    AM_Y    = (0.7, 1.3),
 )
 
 # Percentage-axis tick formatter
@@ -110,8 +108,13 @@ lines!(ax1, y_range1, lower_ir_r;
 
 xlims!(ax1, PLOT_RANGES.IS_IR_X...)
 ylims!(ax1, PLOT_RANGES.IS_IR_Y...)
-axislegend(ax1; position = :rb, framevisible = false, labelsize = LEGEND_SIZE,
-    labelsize = LEGEND_SIZE)
+# Inline labels (no legend box) — relative coordinates guarantee inside chart
+text!(ax1, 0.08, 0.08; text = "IS", space = :relative,
+    color = CURVE_COLOR, fontsize = LEGEND_SIZE, align = (:left, :bottom))
+text!(ax1, 0.88, 0.88; text = "IR", space = :relative,
+    color = SUPPLY_COLOR, fontsize = LEGEND_SIZE, align = (:right, :top))
+text!(ax1, 0.88, 0.72; text = "IR (lower i₀)", space = :relative,
+    color = COUNTERFACT, fontsize = LEGEND_SIZE - 2, align = (:right, :top))
 
 # ─────────────────── Panel B: AD/AS (Output and Inflation Dynamics) ─────
 ax2 = Axis(
@@ -163,7 +166,13 @@ scatter!(ax2, [Y_eq], [P_eq]; color = :black, markersize = 12,
 
 xlims!(ax2, PLOT_RANGES.AD_AS_X...)
 ylims!(ax2, PLOT_RANGES.AD_AS_Y...)
-axislegend(ax2; position = :rb, framevisible = false, labelsize = LEGEND_SIZE)
+# Inline labels (no legend box) — relative coordinates
+text!(ax2, 0.10, 0.85; text = "AD", space = :relative,
+    color = CURVE_COLOR, fontsize = LEGEND_SIZE, align = (:left, :top))
+text!(ax2, 0.10, 0.68; text = "AD (lower i₀)", space = :relative,
+    color = (CURVE_COLOR, 0.38), fontsize = LEGEND_SIZE - 2, align = (:left, :top))
+text!(ax2, 0.88, 0.85; text = "AS", space = :relative,
+    color = SUPPLY_COLOR, fontsize = LEGEND_SIZE, align = (:right, :top))
 
 # ─────────────────── Panel C: Financial Market Dynamics (Asset Market) ───
 ax3 = Axis(
@@ -219,12 +228,18 @@ scatter!(ax3, [Q_eq], [AP_eq]; color = :black, markersize = 12,
 
 xlims!(ax3, PLOT_RANGES.AM_X...)
 ylims!(ax3, PLOT_RANGES.AM_Y...)
-axislegend(ax3; position = :rt, framevisible = false, labelsize = LEGEND_SIZE)
+# Inline labels (no legend box) — relative coordinates
+text!(ax3, 0.85, 0.85; text = "Asset Demand", space = :relative,
+    color = CURVE_COLOR, fontsize = LEGEND_SIZE - 1, align = (:right, :top))
+text!(ax3, 0.85, 0.10; text = "Asset Supply", space = :relative,
+    color = SUPPLY_COLOR, fontsize = LEGEND_SIZE - 1, align = (:right, :bottom))
+text!(ax3, 0.85, 0.68; text = "Demand (lower i₀)", space = :relative,
+    color = (CURVE_COLOR, 0.38), fontsize = LEGEND_SIZE - 3, align = (:right, :top))
 
 # ─────────────────── Panel D: Sector Balance Sheets ──────────────────────
 ax4 = Axis(
     fig[2, 2];
-    title = "Sector Balance Sheets",
+    title = rich("(D) ", "Sector Balance Sheets"; font = :bold),
     ylabel = "Amount",
     xgridvisible = false,
     ygridcolor = (:black, 0.08),
@@ -237,77 +252,48 @@ ax4 = Axis(
     rightspinecolor = :black,
 )
 
-# Build balance-sheet bar data (same logic as static_plotting.jl)
+# Balance-sheet values
 dL_val = vars[:dL]
 dM_val = vars[:dM]
 dR_val = vars[:dR]
 
-# Colour mapping following Mathematica graphtest-money.nb
-# Blue (#3366CC) for assets, red (#D6404D) for liabilities
-# Light variants for reserves (asset) and CB credit (liability)
+# 6 bars (3 sectors × Assets/Liabilities), spaced for sector separation
+positions = [1.0, 2.0, 4.0, 5.0, 7.0, 8.0]
+bar_vals = [dM_val, dL_val, dL_val, dM_val, dR_val, dR_val]
+bar_clrs = [BS_ASSET, BS_LIABILITY, BS_ASSET, BS_LIABILITY, BS_ASSET, BS_LIABILITY]
+bar_nms  = ["Deposits", "Loans", "Loans", "Deposits", "CB Credit", "Reserves"]
 
-# Positions: 6 bars (3 sectors × 2 sides)
-positions  = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-bar_groups = Int[1, 2, 3, 3, 4, 4, 5, 6]  # stack group per segment
-bar_heights = [dM_val, dL_val, dL_val, dR_val, dM_val, dR_val, dR_val, dR_val]
-bar_colors  = [
-    BS_ASSET,       # 1: PS Assets – deposits
-    BS_LIABILITY,   # 2: PS Liabilities – loans
-    BS_ASSET,       # 3a: Bank Assets – loans
-    BS_ASSET_LT,    # 3b: Bank Assets – reserves
-    BS_LIABILITY,   # 4a: Bank Liabilities – deposits
-    BS_LIAB_LT,     # 4b: Bank Liabilities – CB credit
-    BS_ASSET,       # 5: CB Assets – CB credit
-    BS_LIABILITY,   # 6: CB Liabilities – reserves
-]
-
-barplot!(ax4, [1, 2, 3, 3, 4, 4, 5, 6], bar_heights;
-    stack = bar_groups, width = 0.82, color = bar_colors,
+barplot!(ax4, positions, bar_vals;
+    width = 0.80, color = bar_clrs,
     strokecolor = (:black, 0.65), strokewidth = 1.5,
-    bar_labels = [
-        "Deposits\n$(round(dM_val; sigdigits=4))",
-        "Loans\n$(round(dL_val; sigdigits=4))",
-        "Loans\n$(round(dL_val; sigdigits=4))",
-        "Reserves\n$(round(dR_val; sigdigits=4))",
-        "Deposits\n$(round(dM_val; sigdigits=4))",
-        "CB Credit\n$(round(dR_val; sigdigits=4))",
-        "CB Credit\n$(round(dR_val; sigdigits=4))",
-        "Reserves\n$(round(dR_val; sigdigits=4))",
-    ],
-    label_position = :center, label_color = :black, label_size = 14,
+    bar_labels = [@sprintf("%s\n%.2f", bar_nms[k], bar_vals[k]) for k in 1:6],
+    label_position = :top, label_color = :black, label_size = 12,
 )
 
 hlines!(ax4, [0.0]; color = (:black, 0.55), linewidth = 1.5)
 
-# Sector labels (bold, above bars)
-max_y = max(dM_val, dL_val + dR_val) * 1.18
-text!(ax4, [1.5, 3.5, 5.5], fill(max_y * 0.90, 3);
-    text = ["Private Sector", "Banks", "Central Bank"],
-    align = (:center, :bottom), font = :bold, fontsize = TITLE_SIZE,
-    color = :black)
+# Sector separator lines
+vlines!(ax4, [3.0, 6.0]; color = (:black, 0.35), linewidth = 1.0, linestyle = :dash)
 
-# Annotation text (reserve ratio, total loans, risk indicator)
-rr = dR_val / dM_val
+# Indicator text in top-right corner
 risk = get(vars, :SD, 0.0) / dL_val
 annotation = join([
-    @sprintf("Reserve ratio: %.4f", rr),
-    @sprintf("Total loans: %.4f", dL_val),
-    @sprintf("Risk indicator: %.4f", risk),
+    @sprintf("Total Debt / GDP: %.2f", dL_val / Y_eq),
+    @sprintf("Speculative debt / Total Debt: %.2f", risk),
 ], '\n')
-text!(ax4, 0.98, 0.50; text = annotation, space = :relative,
-    align = (:right, :center), fontsize = FONT_SIZE, color = :black)
+text!(ax4, 0.97, 0.97; text = annotation, space = :relative,
+    align = (:right, :top), fontsize = FONT_SIZE - 2, color = (:black, 0.75))
 
-tick_labels = [
-    "Assets\nPrivate\nSector",
-    "Liabilities\nPrivate\nSector",
-    "Assets\nBanks",
-    "Liabilities\nBanks",
-    "Assets\nCentral\nBank",
-    "Liabilities\nCentral\nBank",
-]
-ax4.xticks = (positions, tick_labels)
-xlims!(ax4, 0.3, 6.7)
-ylims!(ax4, 0.0, max_y)
+# Sector labels (smaller, below the indicators)
+text!(ax4, [1.5, 4.5, 7.5], fill(5.5, 3);
+    text = ["Private Sector", "Banks", "Central Bank"],
+    align = (:center, :bottom), font = :bold, fontsize = FONT_SIZE,
+    color = :black)
+
+# x-ticks: alternating Assets / Liabilities
+ax4.xticks = (positions, ["Assets", "Liabilities", "Assets", "Liabilities", "Assets", "Liabilities"])
+xlims!(ax4, 0.3, 8.7)
+ylims!(ax4, 0.0, 6.0)
 
 # ── 5. Layout adjustments & save ─────────────────────────────────────────
 colgap!(fig.layout, 42)
@@ -333,7 +319,6 @@ println(@sprintf("r  = %.4f", r_eq))
 println(@sprintf("P  = %.4f", P_eq))
 println(@sprintf("AP = %.4f", AP_eq))
 println(@sprintf("AE = %.4f", AE_eq))
-println(@sprintf("dL = %.4f, dM = %.4f, dR = %.4f", dL_val, dM_val, dR_val))
-println(@sprintf("SD = %.4f", vars[:SD]))
-println(@sprintf("Reserve ratio = %.4f", rr))
-println(@sprintf("Risk indicator = %.4f", risk))
+println(@sprintf("dL = %.2f, dM = %.2f, dR = %.2f", dL_val, dM_val, dR_val))
+println(@sprintf("SD = %.2f", vars[:SD]))
+println(@sprintf("Risk indicator = %.2f", risk))
