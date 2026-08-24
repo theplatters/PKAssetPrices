@@ -2,41 +2,30 @@ module StaticPlotting
 
 using ..Static
 using CairoMakie
+using Printf
 
-const IS_COLOR = :royalblue
-const IR_COLOR = :crimson
-const ASSET_COLOR = Makie.wong_colors()[2] # orange
-const LIABILITY_COLOR = Makie.wong_colors()[4] # reddish pink
-const BALANCE_SHADE_LEVELS = (0.85f0, 0.9f0, 0.95f0, 1.0f0)
-const ASSET_SHADES = map(
-  level -> Makie.lerp(Makie.RGBAf(1, 1, 1, 1), ASSET_COLOR, level),
-  BALANCE_SHADE_LEVELS,
-)
-const LIABILITY_SHADES = map(
-  level -> Makie.lerp(Makie.RGBAf(1, 1, 1, 1), LIABILITY_COLOR, level),
-  BALANCE_SHADE_LEVELS,
-)
-const IS_IR_X_LIMITS = (3.0, 12.0)
-const IS_IR_Y_LIMITS = (0.05, 0.15)
-const AD_AS_X_LIMITS = (4.5, 9.0)
-const AD_AS_Y_LIMITS = (0.5, 2.5)
-const ASSET_X_LIMITS = (0.4, 1.6)
-const ASSET_Y_LIMITS = (0.5, 2.0)
-const BALANCE_SECTOR_GAP = 0.0
-const BALANCE_ANNOTATION_PADDING = 2.0
+const IS_COLOR = RGBf(0.5, 0.0, 0.5)
+const IR_COLOR = RGBf(1.0, 0.5, 0.0)
+const ASSET_COLOR = IS_COLOR
+const LIABILITY_COLOR = IR_COLOR
+const COUNTERFACTUAL = (IS_COLOR, 0.38)
+const IS_IR_X_LIMITS = (4.0, 10.0)
+const IS_IR_Y_LIMITS = (0.06, 0.15)
+const AD_AS_X_LIMITS = (5.0, 9.0)
+const AD_AS_Y_LIMITS = (1.2, 2.2)
+const ASSET_X_LIMITS = (0.6, 1.3)
+const ASSET_Y_LIMITS = (0.7, 1.3)
+const BALANCE_SECTOR_GAP = 1.0
 
 # These figures are included at `\textwidth` in `paper/teaching-note.tex`.
-# The asset-market panels are 2100 px wide, so font sizes need to be larger
-# than Makie's defaults to remain legible after they are scaled to the page.
-const FIGURE_FONT_SIZE = 30
-const FIGURE_TITLE_SIZE = 40
-const AXIS_TITLE_SIZE = 30
-const AXIS_LABEL_SIZE = 30
-const LEGEND_LABEL_SIZE = 28
-const BALANCE_BAR_LABEL_SIZE = 17
-const BALANCE_ACTOR_LABEL_SIZE = 30
-const BALANCE_ANNOTATION_SIZE = 35
-const BALANCE_TICK_LABEL_SIZE = 28
+const FIGURE_FONT_SIZE = 20
+const AXIS_TITLE_SIZE = 26
+const AXIS_LABEL_SIZE = 20
+const LEGEND_LABEL_SIZE = 20
+const BALANCE_BAR_LABEL_SIZE = 14
+const BALANCE_ACTOR_LABEL_SIZE = 20
+const BALANCE_ANNOTATION_SIZE = 18
+const BALANCE_TICK_LABEL_SIZE = 20
 
 abstract type PanelVariant end
 
@@ -66,19 +55,19 @@ end
 """Return the actor name used in balance-sheet plots."""
 balance_sheet_actor_name(name::Symbol) = display_name(name)
 
-"""Assign each instrument a shade from its asset or liability color family."""
+"""Use the same two-color palette for every balance-sheet side."""
 function balance_sheet_segment_colors(
   instruments::AbstractVector{<:AbstractString},
   sides::AbstractVector{Symbol},
 )
-  instrument_order = unique(instruments)
-  shade_index = Dict(
-    instrument => index for (index, instrument) in enumerate(instrument_order)
-  )
-  return map(instruments, sides) do instrument, side
-    shades = side == :asset ? ASSET_SHADES : LIABILITY_SHADES
-    shades[mod1(shade_index[instrument], length(shades))]
+  return map(sides) do side
+    side == :asset ? ASSET_COLOR : LIABILITY_COLOR
   end
+end
+
+function percentage_ticks()
+  values = collect(0.06:0.02:0.14)
+  return (values, ["$(round(Int, 100v))%" for v in values])
 end
 
 """Return a copy of a parametrization with a lower autonomous policy rate."""
@@ -137,7 +126,7 @@ function plot_is_lm(
     rate_range;
     color=IS_COLOR,
     linewidth=3,
-    label="IS curve",
+    label="IS",
   )
   lines!(
     ax,
@@ -145,20 +134,33 @@ function plot_is_lm(
     ir_values;
     color=IR_COLOR,
     linewidth=3,
-    label="IR curve",
+    label="IR",
   )
   lines!(
     ax,
     output_range,
     lower_ir_values;
-    color=(IR_COLOR, 0.38),
+    color=COUNTERFACTUAL,
     linewidth=2,
     linestyle=:dash,
-    label="IR curve (lower i₀)",
+    label="IR (lower i₀)",
   )
   xlims!(ax, IS_IR_X_LIMITS...)
   ylims!(ax, IS_IR_Y_LIMITS...)
-  axislegend(ax; position=:rb, framevisible=false, labelsize=LEGEND_LABEL_SIZE)
+  ax.xticks = LinearTicks(4)
+  ax.yticks = percentage_ticks()
+  text!(
+    ax, 0.08, 0.08; text="IS", space=:relative, color=IS_COLOR,
+    fontsize=LEGEND_LABEL_SIZE, align=(:left, :bottom)
+  )
+  text!(
+    ax, 0.88, 0.88; text="IR", space=:relative, color=IR_COLOR,
+    fontsize=LEGEND_LABEL_SIZE, align=(:right, :top)
+  )
+  text!(
+    ax, 0.88, 0.72; text="IR (lower i₀)", space=:relative, color=COUNTERFACTUAL,
+    fontsize=LEGEND_LABEL_SIZE - 2, align=(:right, :top)
+  )
   return ax
 end
 
@@ -169,7 +171,16 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=
     throw(ArgumentError("the model does not define aggregate ADc and ASc curves"))
 
   price_range = range(AD_AS_Y_LIMITS...; length=200)
-  output_range = range(AD_AS_X_LIMITS...; length=200)
+  ad_as_x_limits = AD_AS_X_LIMITS
+  equilibrium_output = sol.variables[:Y]
+  if !(first(ad_as_x_limits) <= equilibrium_output <= last(ad_as_x_limits))
+    padding = 0.25
+    ad_as_x_limits = (
+      min(first(AD_AS_X_LIMITS), equilibrium_output - padding),
+      max(last(AD_AS_X_LIMITS), equilibrium_output + padding),
+    )
+  end
+  output_range = range(ad_as_x_limits...; length=200)
 
   vars = copy(sol.variables)
   demand_values = map(price_range) do price
@@ -190,15 +201,13 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=
     return Static.eval_curve(lower_rate_model, vars).ADc
   end
 
-  output_eq = sol.variables[:Y]
-  price_eq = sol.variables[:P]
   lines!(
     ax,
     demand_values,
     price_range;
     color=IS_COLOR,
     linewidth=3,
-    label="Aggregate demand",
+    label="AD",
   )
   lines!(
     ax,
@@ -206,33 +215,32 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=
     supply_values;
     color=IR_COLOR,
     linewidth=3,
-    label="Aggregate supply",
+    label="AS",
   )
 
   lines!(
     ax,
     lower_ir_values,
     price_range;
-    color=IS_COLOR,
+    color=COUNTERFACTUAL,
     linewidth=2,
     linestyle=:dash,
-    label="AD curve (lower i₀)",
+    label="AD (lower i₀)",
   )
-
-  vlines!(ax, [output_eq]; color=(:black, 0.25), linestyle=:dot, linewidth=1.5)
-  hlines!(ax, [price_eq]; color=(:black, 0.25), linestyle=:dot, linewidth=1.5)
-  scatter!(
-    ax,
-    [output_eq],
-    [price_eq];
-    color=:black,
-    markersize=14,
-    strokecolor=:white,
-    strokewidth=2,
-  )
-  xlims!(ax, AD_AS_X_LIMITS...)
+  xlims!(ax, ad_as_x_limits...)
   ylims!(ax, AD_AS_Y_LIMITS...)
-  axislegend(ax; position=:rb, framevisible=false, labelsize=LEGEND_LABEL_SIZE)
+  text!(
+    ax, 0.08, 0.88; text="AD", space=:relative, color=IS_COLOR,
+    fontsize=LEGEND_LABEL_SIZE, align=(:left, :top)
+  )
+  text!(
+    ax, 0.08, 0.72; text="AD (lower i₀)", space=:relative, color=COUNTERFACTUAL,
+    fontsize=LEGEND_LABEL_SIZE - 2, align=(:left, :top)
+  )
+  text!(
+    ax, 0.88, 0.88; text="AS", space=:relative, color=IR_COLOR,
+    fontsize=LEGEND_LABEL_SIZE, align=(:right, :top)
+  )
   return ax
 end
 
@@ -256,10 +264,21 @@ function plot_asset_market(
   all(hasproperty(equilibrium_curves, curve) for curve in (:AMD, :AMS)) ||
     throw(ArgumentError("the model does not define AMD and AMS curves"))
 
-  asset_price_eq = sol.variables[:AP]
-  price_endpoints = iszero(asset_price_eq) ? (-1.0, 1.0) :
-                    sort((0.55 * asset_price_eq, 1.8 * asset_price_eq))
-  asset_price_range = range(first(price_endpoints), last(price_endpoints); length=200)
+  equilibrium_quantity = equilibrium_curves.AMD
+  asset_x_limits = ASSET_X_LIMITS
+  asset_y_limits = ASSET_Y_LIMITS
+  uses_reference_range =
+    first(ASSET_X_LIMITS) <= equilibrium_quantity <= last(ASSET_X_LIMITS) &&
+    first(ASSET_Y_LIMITS) <= sol.variables[:AP] <= last(ASSET_Y_LIMITS)
+  if !uses_reference_range
+    asset_x_range = equilibrium_range(equilibrium_quantity)
+    asset_y_range = equilibrium_range(sol.variables[:AP])
+    asset_x_limits = (first(asset_x_range), last(asset_x_range))
+    asset_y_limits = (first(asset_y_range), last(asset_y_range))
+  end
+  asset_price_range = uses_reference_range ?
+                      range(ASSET_X_LIMITS...; length=200) :
+                      range(asset_y_limits...; length=200)
 
   vars = copy(sol.variables)
   demand_values = map(asset_price_range) do asset_price
@@ -281,23 +300,13 @@ function plot_asset_market(
     return Static.eval_curve(sol.model, vars).AMS
   end
 
-  quantity_eq = (equilibrium_curves.AMD + equilibrium_curves.AMS) / 2
   lines!(
     ax,
     demand_values,
     asset_price_range;
     color=IS_COLOR,
     linewidth=3,
-    label="Demand at base price",
-  )
-  lines!(
-    ax,
-    lower_demand_values,
-    asset_price_range;
-    color=IS_COLOR,
-    linewidth=2,
-    linestyle=:dash,
-    label="Demand (lower i₀)",
+    label="Asset Demand",
   )
   lines!(
     ax,
@@ -305,23 +314,31 @@ function plot_asset_market(
     asset_price_range;
     color=IR_COLOR,
     linewidth=3,
-    label="Asset supply",
+    label="Asset Supply",
   )
-  vlines!(ax, [quantity_eq]; color=(:black, 0.25), linestyle=:dot, linewidth=1.5)
-  hlines!(ax, [asset_price_eq]; color=(:black, 0.25), linestyle=:dot, linewidth=1.5)
-  scatter!(
+  lines!(
     ax,
-    [quantity_eq],
-    [asset_price_eq];
-    color=:black,
-    markersize=14,
-    strokecolor=:white,
-    strokewidth=2,
+    lower_demand_values,
+    asset_price_range;
+    color=COUNTERFACTUAL,
+    linewidth=2,
+    linestyle=:dash,
+    label="Demand (lower i₀)",
   )
-
-  xlims!(ax, ASSET_X_LIMITS...)
-  ylims!(ax, ASSET_Y_LIMITS...)
-  axislegend(ax; position=:rt, framevisible=false, labelsize=LEGEND_LABEL_SIZE)
+  xlims!(ax, asset_x_limits...)
+  ylims!(ax, asset_y_limits...)
+  text!(
+    ax, 0.08, 0.88; text="Asset Demand", space=:relative, color=IS_COLOR,
+    fontsize=LEGEND_LABEL_SIZE - 1, align=(:left, :top)
+  )
+  text!(
+    ax, 0.08, 0.68; text="Demand (lower i₀)", space=:relative, color=COUNTERFACTUAL,
+    fontsize=LEGEND_LABEL_SIZE - 3, align=(:left, :top)
+  )
+  text!(
+    ax, 0.88, 0.88; text="Asset Supply", space=:relative, color=IR_COLOR,
+    fontsize=LEGEND_LABEL_SIZE - 1, align=(:right, :top)
+  )
   return ax
 end
 
@@ -403,53 +420,34 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
   data = balance_sheet_plot_data(sol)
   isempty(data.positions) && return ax
 
-  asset_indices = findall(==(:asset), data.sides)
-  liability_indices = findall(==(:liability), data.sides)
   segment_colors = balance_sheet_segment_colors(data.instruments, data.sides)
-
+  abbreviation(name) = begin
+    occursin("Deposit", name) ? "D" : occursin("Loan", name) ? "L" :
+    occursin("Reserve", name) ? "R" : occursin("Credit", name) ? "CB" : name
+  end
   barplot!(
-    ax,
-    data.positions[asset_indices],
-    data.values[asset_indices];
-    stack=data.stacks[asset_indices],
-    width=0.82,
-    color=segment_colors[asset_indices],
+    ax, data.positions, data.values;
+    stack=data.stacks, width=0.8, color=segment_colors,
     strokecolor=(:black, 0.65),
     strokewidth=1.5,
     bar_labels=[
-      "$(replace(data.instruments[index], ' ' => '\n'))\n$(round(data.raw_values[index]; sigdigits = 4))" for
-      index in asset_indices
+      @sprintf(
+        "%s: %.1f", abbreviation(data.instruments[index]),
+        data.raw_values[index]
+      ) for index in eachindex(data.positions)
     ],
+    gap=2,
     label_position=:center,
     label_color=:black,
     label_size=BALANCE_BAR_LABEL_SIZE,
-    label="Assets",
-  )
-  barplot!(
-    ax,
-    data.positions[liability_indices],
-    data.values[liability_indices];
-    stack=data.stacks[liability_indices],
-    width=0.82,
-    color=segment_colors[liability_indices],
-    strokecolor=(:black, 0.65),
-    strokewidth=1.5,
-    bar_labels=[
-      "$(replace(data.instruments[index], ' ' => '\n'))\n$(round(data.raw_values[index]; sigdigits = 4))" for
-      index in liability_indices
-    ],
-    label_position=:center,
-    label_color=:black,
-    label_size=BALANCE_BAR_LABEL_SIZE,
-    label="Liabilities",
   )
   hlines!(ax, [0.0]; color=(:black, 0.55), linewidth=1.5)
+  vlines!(ax, [3.0, 6.0]; color=(:black, 0.35), linewidth=1.0, linestyle=:dash, ymax=6.0 / 8.0)
 
-  max_total = max(maximum(data.totals), 1.0)
   text!(
     ax,
     data.actor_positions,
-    fill(1.025 * max_total, length(data.actor_positions));
+    fill(5.5, length(data.actor_positions));
     text=data.actor_labels,
     align=(:center, :bottom),
     font=:bold,
@@ -458,29 +456,22 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
   )
 
   ax.xticks = (data.tick_positions, data.tick_labels)
-  xlims!(
-    ax,
-    first(data.tick_positions) - 0.7,
-    last(data.tick_positions) + BALANCE_ANNOTATION_PADDING,
-  )
-  limit = max_total * 1.18
-  ylims!(ax, 0.0, limit)
+  xlims!(ax, 0.3, 8.7)
+  ylims!(ax, 0.0, 8.0)
   text!(
     ax,
-    0.98,
-    0.5;
+    0.97, 0.97;
     text=join(
       [
-        "Reserve ratio: $(round(reserve_ratio(sol); sigdigits = 4))",
-        "Total loans: $(round(total_loans(sol); sigdigits = 4))",
-        "Risk indicator: $(round(risk_indicator(sol); sigdigits = 4))",
+        @sprintf("Total Debt / GDP: %.2f", total_loans(sol) / sol.variables[:Y]),
+        @sprintf("Speculative debt / Total Debt: %.2f", risk_indicator(sol)),
       ],
       '\n',
     ),
     space=:relative,
-    align=(:right, :center),
+    align=(:right, :top),
     fontsize=BALANCE_ANNOTATION_SIZE,
-    color=:black,
+    color=(:black, 0.75),
   )
   return ax
 end
@@ -491,8 +482,7 @@ end
 
 Create a presentation-ready equilibrium and balance-sheet overview. The default
 method contains IS–IR, AD–AS, and balance-sheet plots. Dispatch on
-`AssetMarketPanel` to additionally show the asset market. Figure height grows
-with the number of balance-sheet entries so labels are not clipped.
+`AssetMarketPanel` to additionally show the asset market.
 """
 panel(
   sol::Static.Solution;
@@ -506,8 +496,7 @@ function panel(
   size=nothing,
   title="Static equilibrium overview",
 )
-  entry_count = sum(length(sheet.assets) + length(sheet.liabilities) for sheet in sol.sheets)
-  figure_size = isnothing(size) ? (1600, max(1120, 54 * entry_count + 620)) : size
+  figure_size = isnothing(size) ? (1400, 1000) : size
 
   figure = Figure(
     size=figure_size,
@@ -518,38 +507,38 @@ function panel(
 
   curve_axis = Axis(
     figure[1, 1];
-    title="Goods market and interest-rate rule",
-    xlabel="Output (Y)",
-    ylabel="Interest rate (r)",
-    xgridcolor=(:black, 0.08),
-    ygridcolor=(:black, 0.08),
+    title=rich("(A) ", "Goods Market Dynamics"; font=:bold),
+    xlabel="Output Y", ylabel="interest rate r",
+    xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
     titlesize=AXIS_TITLE_SIZE,
     xlabelsize=AXIS_LABEL_SIZE,
     ylabelsize=AXIS_LABEL_SIZE,
+    bottomspinecolor=:black, topspinecolor=:black,
+    leftspinecolor=:black, rightspinecolor=:black,
   )
   ad_as_axis = Axis(
     figure[1, 2];
-    title="Aggregate demand and supply",
-    xlabel="Output (Y)",
-    ylabel="Price level (P)",
-    xgridcolor=(:black, 0.08),
-    ygridcolor=(:black, 0.08),
+    title=rich("(B) ", "Output and Inflation Dynamics"; font=:bold),
+    xlabel="Output Y", ylabel="Price Level P",
+    xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
     titlesize=AXIS_TITLE_SIZE,
     xlabelsize=AXIS_LABEL_SIZE,
     ylabelsize=AXIS_LABEL_SIZE,
+    bottomspinecolor=:black, topspinecolor=:black,
+    leftspinecolor=:black, rightspinecolor=:black,
   )
   balance_axis = Axis(
     figure[2, 1:2];
-    title="Sector balance sheets",
+    title=rich("(C) ", "Sector Balance Sheets"; font=:bold),
     ylabel="Amount",
     xgridvisible=false,
     ygridcolor=(:black, 0.08),
     titlesize=AXIS_TITLE_SIZE,
     xlabelsize=AXIS_LABEL_SIZE,
     ylabelsize=AXIS_LABEL_SIZE,
+    bottomspinecolor=:black, topspinecolor=:black,
+    leftspinecolor=:black, rightspinecolor=:black,
     xticklabelsize=BALANCE_TICK_LABEL_SIZE,
-    xticklabelrotation=pi / 4,
-    xticklabelalign=(:right, :center),
   )
 
   plot_is_lm(sol, curve_axis)
@@ -558,7 +547,8 @@ function panel(
 
   colgap!(figure.layout, 42)
   rowgap!(figure.layout, 22)
-  rowsize!(figure.layout, 2, Relative(0.48))
+  rowsize!(figure.layout, 1, Relative(0.5))
+  rowsize!(figure.layout, 2, Relative(0.5))
   return figure
 end
 
@@ -568,8 +558,7 @@ function panel(
   size=nothing,
   title="Static equilibrium overview",
 )
-  entry_count = sum(length(sheet.assets) + length(sheet.liabilities) for sheet in sol.sheets)
-  figure_size = isnothing(size) ? (2100, max(1120, 54 * entry_count + 620)) : size
+  figure_size = isnothing(size) ? (1400, 1000) : size
 
   figure = Figure(
     size=figure_size,
@@ -580,49 +569,50 @@ function panel(
 
   curve_axis = Axis(
     figure[1, 1];
-    title="Goods market and interest-rate rule",
-    xlabel="Output (Y)",
-    ylabel="Interest rate (r)",
-    xgridcolor=(:black, 0.08),
-    ygridcolor=(:black, 0.08),
+    title=rich("(A) ", "Goods Market Dynamics"; font=:bold),
+    xlabel="Output Y", ylabel="interest rate r",
+    xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
     titlesize=AXIS_TITLE_SIZE,
     xlabelsize=AXIS_LABEL_SIZE,
     ylabelsize=AXIS_LABEL_SIZE,
+    bottomspinecolor=:black, topspinecolor=:black,
+    leftspinecolor=:black, rightspinecolor=:black,
   )
   ad_as_axis = Axis(
     figure[1, 2];
-    title="Aggregate demand and supply",
-    xlabel="Output (Y)",
-    ylabel="Price level (P)",
-    xgridcolor=(:black, 0.08),
-    ygridcolor=(:black, 0.08),
+    title=rich("(B) ", "Output and Inflation Dynamics"; font=:bold),
+    xlabel="Output Y", ylabel="Price Level P",
+    xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
     titlesize=AXIS_TITLE_SIZE,
     xlabelsize=AXIS_LABEL_SIZE,
     ylabelsize=AXIS_LABEL_SIZE,
+    bottomspinecolor=:black, topspinecolor=:black,
+    leftspinecolor=:black, rightspinecolor=:black,
   )
   asset_market_axis = Axis(
-    figure[1, 3];
-    title="Asset market",
+    figure[2, 1];
+    title=rich("(C) ", "Financial Market Dynamics"; font=:bold),
     xlabel="Base-price-equivalent quantity",
-    ylabel="Asset price (AP)",
-    xgridcolor=(:black, 0.08),
-    ygridcolor=(:black, 0.08),
+    ylabel="Asset Price AP",
+    xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
     titlesize=AXIS_TITLE_SIZE,
     xlabelsize=AXIS_LABEL_SIZE,
     ylabelsize=AXIS_LABEL_SIZE,
+    bottomspinecolor=:black, topspinecolor=:black,
+    leftspinecolor=:black, rightspinecolor=:black,
   )
   balance_axis = Axis(
-    figure[2, 1:3];
-    title="Sector balance sheets",
+    figure[2, 2];
+    title=rich("(D) ", "Sector Balance Sheets"; font=:bold),
     ylabel="Amount",
     xgridvisible=false,
     ygridcolor=(:black, 0.08),
     titlesize=AXIS_TITLE_SIZE,
     xlabelsize=AXIS_LABEL_SIZE,
     ylabelsize=AXIS_LABEL_SIZE,
+    bottomspinecolor=:black, topspinecolor=:black,
+    leftspinecolor=:black, rightspinecolor=:black,
     xticklabelsize=BALANCE_TICK_LABEL_SIZE,
-    xticklabelrotation=pi / 4,
-    xticklabelalign=(:right, :center),
   )
 
   plot_is_lm(sol, curve_axis)
@@ -632,7 +622,8 @@ function panel(
 
   colgap!(figure.layout, 42)
   rowgap!(figure.layout, 22)
-  rowsize!(figure.layout, 2, Relative(0.48))
+  rowsize!(figure.layout, 1, Relative(0.5))
+  rowsize!(figure.layout, 2, Relative(0.5))
   return figure
 end
 
