@@ -1,8 +1,10 @@
 module Dynamic
 
 import NonlinearSolve as NLS
+import SciMLBase
 using ADTypes
-import ..BaseModels: AbstractModel, Equation
+import ..ModelCore: AbstractModel, Equation
+import ..ModelCore
 import ..PKAssetPrices: solve_model
 
 abstract type AbstractTimeDomain end
@@ -36,6 +38,8 @@ end
 struct DynamicSolution{F, G, T, U}
     model::DynamicParametrization{F, G, T, U}
     paths::Dict{Symbol, Vector{T}}
+    retcodes::Vector
+    max_residuals::Vector{Float64}
 end
 
 include("model_macros.jl")
@@ -116,21 +120,52 @@ function eval_model(dp::DynamicParametrization, values::Dict{Symbol, Float64}, l
 end
 
 
-function solve_model(dp::DynamicParametrization{F, G, T, U}) where {F, G, T, U}
+function _dynamic_model_label(model::DynamicModel)
+    for name in names(@__MODULE__, all = true, imported = false)
+        isdefined(@__MODULE__, name) || continue
+        value = getfield(@__MODULE__, name)
+        value isa DynamicParametrization && value.model === model && return string(name)
+    end
+    return "Dynamic.DynamicModel"
+end
+
+function solve_model(dp::DynamicParametrization{F, G, T, U}; alg=nothing,
+                     abstol=nothing, reltol=nothing, maxiters=nothing,
+                     strict::Bool=true) where {F, G, T, U}
     time_span = length(dp.model.time.grid)
     m = dp.model
     paths = init_paths(m, time_span, T)
 
 
     u = copy(dp.u0)
+    retcodes = Any[]
+    max_residuals = Float64[]
+    options = (; (name => value for (name, value) in
+        ((:abstol => abstol), (:reltol => reltol), (:maxiters => maxiters))
+        if !isnothing(value))...)
 
     for t in 1:time_span
         θt = build_context(dp, t, paths)
 
         prob = NLS.NonlinearProblem(m.nulls, u, θt)
-        sol = NLS.solve(prob, NLS.NewtonRaphson(; autodiff = ADTypes.AutoForwardDiff()))
+        solver_alg = isnothing(alg) ?
+            NLS.NewtonRaphson(; autodiff = ADTypes.AutoForwardDiff()) : alg
+        sol = if isempty(options)
+            NLS.solve(prob, solver_alg)
+        else
+            NLS.solve(prob, solver_alg; options...)
+        end
 
         ut = sol.u
+        residual = m.nulls(ut, θt)
+        max_residual = isempty(residual) ? 0.0 : maximum(abs, residual)
+        push!(retcodes, sol.retcode)
+        push!(max_residuals, max_residual)
+        if !SciMLBase.successful_retcode(sol)
+            label = _dynamic_model_label(m)
+            message = "$label failed at period $t with retcode $(sol.retcode), max residual $(max_residual)"
+            strict ? error(message) : @warn(message)
+        end
 
         # store period t solution into paths
         for i in eachindex(sol.u)
@@ -141,7 +176,7 @@ function solve_model(dp::DynamicParametrization{F, G, T, U}) where {F, G, T, U}
         u = ut
     end
 
-    return DynamicSolution(dp, paths)
+    return DynamicSolution(dp, paths, retcodes, max_residuals)
 end
 
 

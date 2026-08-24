@@ -2,7 +2,7 @@
     Name = @model begin ... end
 
 Define a static model and return its [`Parametrization`](@ref). The body
-supports `@variables`, `@parameters`, and `@equations`, with optional
+supports `@variables`, `@parameters`, `@init`, and `@equations`, with optional
 `@curves` and `@balances` blocks. A balance block contains `@sheet` blocks,
 which in turn contain `@asset` and `@liability` entries.
 
@@ -15,6 +15,10 @@ Example = @model begin
     @parameters begin
         c = 0.8, "consumption share"
         G = 0.4, "autonomous spending"
+    end
+    @init begin
+        Y = 1.0
+        C = 1.0
     end
     @equations begin
         Y == C
@@ -40,6 +44,10 @@ macro model(body)
     parameters = Dict{Symbol, Float64}()
     param_descriptions = Dict{Symbol, String}()
     equations = Equation[]
+    variable_names = Symbol[]
+    parameter_names = Symbol[]
+    init_names = Symbol[]
+    init_values = Dict{Symbol, Float64}()
     curves = Curve[]
     balance_sheets = BalanceSheet[]
 
@@ -47,30 +55,47 @@ macro model(body)
     for expr in body.args
         expr isa LineNumberNode && continue
 
-        if expr isa Expr && expr.head == :macrocall
-            macro_name = expr.args[1]
-            macro_body = expr.args[3]
+        expr isa Expr && expr.head == :macrocall ||
+            error("Invalid static @model entry (expected a macro block): $expr")
+        length(expr.args) == 3 || error("Malformed static macro block: $expr")
+        macro_name = expr.args[1]
+        macro_body = expr.args[3]
 
-            if macro_name == Symbol("@variables")
-                parse_variables!(variables, var_descriptions, macro_body)
-            elseif macro_name == Symbol("@parameters")
-                parse_parameters!(parameters, param_descriptions, macro_body)
-            elseif macro_name == Symbol("@equations")
-                parse_equations!(equations, macro_body)
-            elseif macro_name == Symbol("@curves")
-                parse_curves!(curves, macro_body)
-            elseif macro_name == Symbol("@balances")
-                parse_balances!(balance_sheets, macro_body)
-            end
+        if macro_name == Symbol("@variables")
+            parse_variables!(variables, var_descriptions, macro_body; declaration_names=variable_names)
+        elseif macro_name == Symbol("@parameters")
+            parse_parameters!(parameters, param_descriptions, macro_body; declaration_names=parameter_names)
+        elseif macro_name == Symbol("@init")
+            parse_init!(init_values, init_names, macro_body)
+        elseif macro_name == Symbol("@equations")
+            parse_equations!(equations, macro_body)
+        elseif macro_name == Symbol("@curves")
+            parse_curves!(curves, macro_body)
+        elseif macro_name == Symbol("@balances")
+            parse_balances!(balance_sheets, macro_body)
+        else
+            error("Unknown static @model block $macro_name. Valid blocks: @variables, @parameters, @init, @equations, @curves, @balances")
         end
     end
 
 
+    source = "$(__source__.file):$(__source__.line)"
+    ModelCore.validate_model(:static, source, variable_names, parameter_names, equations)
+    label = "static @model at $source"
+    duplicate_init = unique(v for v in init_names if count(==(v), init_names) > 1)
+    isempty(duplicate_init) || error(
+        "$label: duplicate @init variable(s): $(join(duplicate_init, ", ")). " *
+        "Initialize each variable at most once.")
+    unknown_init = [v for v in init_names if !(v in variable_names)]
+    isempty(unknown_init) || error(
+        "$label: @init names not declared as variables: $(join(unique(unknown_init), ", ")). " *
+        "Declare the variable or remove the initializer.")
     sort_equations_by_variables!(equations, variables)
     nulls = generate_get_nulls(variables, parameters, equations)
     curve_funcs = generate_curve_eval(curves, variables, parameters)
 
 
+    u0_values = [get(init_values, variable, 1.0) for variable in variables]
     return esc(
         quote
             Parametrization(
@@ -86,11 +111,38 @@ macro model(body)
                     $balance_sheets
                 ),
                 $parameters,
-                ones($(length(variables)))
+                $(u0_values)
             )
         end
     )
 
+end
+
+function _numeric_literal(value)
+    value isa Real && !(value isa Bool) && return Float64(value)
+    if value isa Expr && value.head == :call && length(value.args) == 2 &&
+            value.args[1] in (:+, :-)
+        value.args[2] isa Real && !(value.args[2] isa Bool) || return nothing
+        return Float64(value.args[1] == :+ ? value.args[2] : -value.args[2])
+    end
+    return nothing
+end
+
+function parse_init!(values::Dict{Symbol, Float64}, names::Vector{Symbol}, body)
+    body isa Expr && body.head == :block ||
+        error("Expected a begin...end block for @init, got: $body")
+    for line in body.args
+        line isa LineNumberNode && continue
+        line isa Expr && line.head == :(=) && length(line.args) == 2 ||
+            error("Invalid @init entry (expected `variable = numeric_literal`): $line")
+        name, value_expr = line.args
+        name isa Symbol || error("@init variable name must be a Symbol in: $line")
+        value = _numeric_literal(value_expr)
+        isnothing(value) && error("@init value must be a numeric literal in: $line")
+        push!(names, name)
+        values[name] = value
+    end
+    return
 end
 
 "Evaluate a Symbol/Expr/Number given variable values and parameter values."
@@ -179,102 +231,107 @@ function sort_equations_by_variables!(equations::Vector{Equation}, variables::Ve
 end
 
 
-function solve_model(model::Parametrization)::Static.Solution
+function _static_model_label(model::Model)
+    for name in names(@__MODULE__, all = true, imported = false)
+        isdefined(@__MODULE__, name) || continue
+        value = getfield(@__MODULE__, name)
+        value isa Parametrization && value.model === model && return string(name)
+    end
+    return "Static.Model"
+end
+
+function solve_model(model::Parametrization; alg=nothing, abstol=nothing, reltol=nothing,
+                     maxiters=nothing, strict::Bool=true, u0=nothing)::Static.Solution
+    initial = if isnothing(u0)
+        copy(model.u0)
+    else
+        u0 isa AbstractVector || error("Static.solve_model u0 must be a vector")
+        length(u0) == length(model.model.variables) ||
+            error("Static.solve_model u0 length $(length(u0)) does not match $(length(model.model.variables)) variables")
+        all(x -> x isa Real, u0) || error("Static.solve_model u0 must contain only real values")
+        Float64.(collect(u0))
+    end
     nulls! = model.model.nulls
-    p = (; model.params...)   # OrderedDict/Dic -> NamedTuple
-    prob = NonlinearProblem(nulls!, model.u0, p)
-    sol = solve(prob)
+    p = isempty(model.params) ? nothing : (; model.params...)   # OrderedDict/Dict -> NamedTuple
+    prob = NonlinearProblem(nulls!, initial, p)
+    options = (; (name => value for (name, value) in
+        ((:abstol => abstol), (:reltol => reltol), (:maxiters => maxiters))
+        if !isnothing(value))...)
+    sol = if isnothing(alg)
+        isempty(options) ? solve(prob) : solve(prob; options...)
+    else
+        solve(prob, alg; options...)
+    end
     variables = Dict{Symbol, Float64}((v => sol.u[i] for (i, v) in enumerate(model.model.variables)))
+    residual = nulls!(sol.u, p)
+    max_residual = isempty(residual) ? 0.0 : maximum(abs, residual)
+    label = _static_model_label(model.model)
     if !SciMLBase.successful_retcode(sol)
-        @warn sol.retcode
-        @warn "Model solution did not converge: $(sol.retcode)"
+        message = "$label failed with retcode $(sol.retcode), max residual $(max_residual)"
+        strict ? error(message) : @warn(message)
     end
 
     sheets = fill_balance_sheets(model, sol.u)
-    return Solution(variables, model, sheets)
+    return Solution(variables, model, sheets, sol.retcode, max_residual)
 end
 
 
-function parse_variables!(variables, descriptions, body)
-    for line in body.args
-        line isa LineNumberNode && continue
-
-        if line isa Expr && line.head == :(=)
-            var_name = line.args[1]
-            var_desc = line.args[2]
-
-            if var_name isa Expr && var_name.head == :(call)
-                error("Only allowed in dynamic models")
-            end
-            push!(variables, var_name)
-            descriptions[var_name] = var_desc
-        elseif line isa Symbol
-            # Just variable name
-            push!(variables, line)
-            descriptions[line] = ""
-        end
+function parse_variables!(variables, descriptions, body; declaration_names=Symbol[])
+    for (var_name, var_desc) in ModelCore.parse_variable_entries(
+            body)
+        push!(variables, var_name)
+        push!(declaration_names, var_name)
+        descriptions[var_name] = var_desc
     end
     return
 end
 
-function parse_parameters!(parameters, descriptions, body)
-    for line in body.args
-        line isa LineNumberNode && continue
-
-        if line isa Expr && line.head == :(=)
-            lhs = line.args[1]
-            rhs = line.args[2]
-
-            # Check if lhs has a description
-            if rhs isa Expr && rhs.head == :tuple
-                # Pattern: param  = value, "description"
-                param_name = lhs
-                param_desc = rhs.args[2]
-                parameters[param_name] = rhs.args[1]
-                descriptions[param_name] = param_desc
-            else
-                # Pattern: param = value
-                parameters[lhs] = rhs
-                descriptions[lhs] = ""
-            end
-        end
+function parse_parameters!(parameters, descriptions, body; declaration_names=Symbol[])
+    for (name, value_desc) in ModelCore.parse_parameter_entries(body)
+        value, desc = value_desc
+        parameters[name] = value
+        push!(declaration_names, name)
+        descriptions[name] = desc
     end
     return
 end
 
 function parse_equations!(equations, body)
-    for line in body.args
-        line isa LineNumberNode && continue
-
-        if line isa Expr && line.head == :call && line.args[1] == :(==)
-            push!(equations, Equation(line.args[2], line.args[3]))
-        end
+    for (lhs, rhs) in ModelCore.parse_equation_entries(body)
+        push!(equations, Equation(lhs, rhs))
     end
     return
 end
 
 function parse_curves!(curves, body)
+    body isa Expr && body.head == :block || error("Expected a begin...end block for @curves, got: $body")
     for line in body.args
         line isa LineNumberNode && continue
 
-        if line isa Expr && line.head == :(=)
+        if line isa Expr && line.head == :(=) && length(line.args) == 2
             lhs = line.args[1]
             rhs = line.args[2]
 
-            if lhs isa Expr && lhs.head == :call
-                curve_name = lhs.args[1]
-                curve_args = lhs.args[2]
-                push!(curves, Curve(curve_name, curve_args, rhs))
-            end
+            lhs isa Expr && lhs.head == :call && length(lhs.args) == 2 &&
+                lhs.args[1] isa Symbol && lhs.args[2] isa Symbol ||
+                error("Invalid curve entry (expected `name(argument) = expression`): $line")
+            push!(curves, Curve(lhs.args[1], lhs.args[2], rhs))
+        else
+            error("Invalid curve entry (expected `name(argument) = expression`): $line")
         end
     end
     return
 end
 
 function parse_balance!(body)
-
+    body isa Expr && body.head == :macrocall && length(body.args) == 4 ||
+        error("Malformed @sheet block: $body")
+    body.args[1] == Symbol("@sheet") || error("Expected @sheet, got: $body")
     balance_sheet_name = body.args[3]
     balance_sheet_body = body.args[4]
+    balance_sheet_name isa Symbol || error("@sheet name must be a Symbol in: $body")
+    balance_sheet_body isa Expr && balance_sheet_body.head == :block ||
+        error("@sheet $balance_sheet_name must contain a begin...end block")
     fields = Symbol[]
     assets = Symbol[]
     liabilities = Symbol[]
@@ -282,20 +339,30 @@ function parse_balance!(body)
 
     for line in balance_sheet_body.args
         line isa LineNumberNode && continue
-        if line isa Expr && line.head == :(macrocall)
+        if line isa Expr && line.head == :(macrocall) && length(line.args) == 3
             is_liability = line.args[1] == Symbol("@liability")
             is_asset = line.args[1] == Symbol("@asset")
             if !(is_liability || is_asset)
-                error("Value is neither asset nor liability")
+                error("Unknown @sheet entry (expected @asset or @liability): $line")
             end
 
-            field_name = line.args[3].args[1]
+            assignment = line.args[3]
+            assignment isa Expr && assignment.head == :(=) && length(assignment.args) == 2 ||
+                error("Malformed asset/liability entry: $line")
+            field_name = assignment.args[1]
+            field_name isa Symbol || error("Asset/liability name must be a Symbol in: $line")
+            assignment.args[2] isa Union{Expr, Symbol} ||
+                error("Asset/liability value must be an expression or Symbol in: $line")
             is_liability && push!(liabilities, field_name)
             is_asset && push!(assets, field_name)
 
             push!(fields, field_name)
-            equations[field_name] = line.args[3].args[2]
+            equations[field_name] = assignment.args[2]
 
+        elseif line isa LineNumberNode
+            continue
+        else
+            error("Invalid @sheet entry (expected @asset or @liability): $line")
         end
     end
     return BalanceSheet(
@@ -308,33 +375,26 @@ function parse_balance!(body)
 end
 
 function parse_balances!(balance_sheets, body)
+    body isa Expr && body.head == :block || error("Expected a begin...end block for @balances, got: $body")
     for line in body.args
         line isa LineNumberNode && continue
 
-        if line isa Expr && line.head == :(macrocall) && line.args[1] == Symbol("@sheet")
+        if line isa Expr && line.head == :(macrocall) && length(line.args) == 4 && line.args[1] == Symbol("@sheet")
 
             balance_sheet = parse_balance!(line)
             push!(balance_sheets, balance_sheet)
+        elseif line isa LineNumberNode
+            continue
+        else
+            error("Invalid @balances entry (expected @sheet): $line")
         end
     end
     return
 end
 
 
-function generate_get_nulls(variables, parameters, equations)
-    var_tuple = Expr(:tuple, variables...)
-    param_syms = collect(keys(parameters))
-
-    residuals = [:($(eq.lhs) - $((eq.rhs))) for eq in equations]
-
-    return quote
-        function (u, p)
-            (; $(param_syms...)) = p
-            $var_tuple = u
-            return [$(residuals...)]
-        end
-    end
-end
+generate_get_nulls(variables, parameters, equations) =
+    ModelCore.generate_residual_closure(variables, collect(keys(parameters)), equations)
 
 
 function generate_curve_eval(curves, variables, parameters)
@@ -360,23 +420,6 @@ function generate_curve_eval(curves, variables, parameters)
             return (; $(fields...))
         end
     end
-end
-
-
-function generate_balance_sheets(balance_sheets, model_name)
-    balance_sheet_quoted = Expr[]
-    for balance_sheet in balance_sheets
-
-        balance_sheet_name = Symbol(model_name, balance_sheet.name)
-        push!(
-            balance_sheet_quoted, quote
-                struct $balance_sheet_name <: BalanceSheet
-                    $(balance_sheet.fields...)
-                end
-            end
-        )
-    end
-    return balance_sheet_quoted
 end
 
 
@@ -432,11 +475,13 @@ sol2 = solve_model(scen2)
 """
 macro scenario(model, body)
     assigns = Expr[]
-    for ex in body.args
-        ex isa LineNumberNode && continue
-        if ex isa Expr && ex.head == :(=)
-            push!(assigns, :(params[$(QuoteNode(ex.args[1]))] = $(ex.args[2])))
-        end
+    for (name, value) in ModelCore.parse_scenario_entries(body)
+        unknown_message = "@scenario parameter $(name) is not declared in the base model"
+        push!(assigns, quote
+            haskey(params, $(QuoteNode(name))) ||
+                error($unknown_message)
+            params[$(QuoteNode(name))] = $value
+        end)
     end
 
     return esc(
@@ -444,7 +489,7 @@ macro scenario(model, body)
             local m = $model
             local params = copy(m.params)   # copy if you don't want to mutate the model
             $(assigns...)
-            Parametrization(m.model, params, m.u0)  # note: no "&" in Julia
+            Parametrization(m.model, params, copy(m.u0))  # note: no "&" in Julia
         end
     )
 end

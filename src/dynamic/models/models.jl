@@ -414,7 +414,6 @@ Dynα = @model begin
         AD = "Asset demand"
         AP = "Asset price"
         AS = "Asset supply"
-        AQ = "Asset amount"
         α = "turnover 2"
     end
 
@@ -549,4 +548,3 @@ WorkingModel = @model begin
         c == c₀ - c₁ * SD #alternatively SD[t-1]
     end
 end
-

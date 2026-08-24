@@ -2,7 +2,7 @@
 
 julia_version = "1.12.7"
 manifest_format = "2.0"
-project_hash = "baf313c9d495986386ad07ad9eaa2a75c3a5ea43"
+project_hash = "7cd80407824e25128a001cf2af47feb786e8eba9"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "f7304359109c768cf32dc5fa2d371565bb63b68a"
@@ -1543,7 +1543,7 @@ weakdeps = ["StatsBase"]
     StatsBaseExt = "StatsBase"
 
 [[deps.PKAssetPrices]]
-deps = ["ADTypes", "CSV", "CairoMakie", "Dash", "DataFrames", "ForwardDiff", "MacroTools", "NonlinearSolve", "OrderedCollections", "PrettyTables", "Printf", "StatsBase"]
+deps = ["ADTypes", "CSV", "CairoMakie", "Dash", "DataFrames", "ForwardDiff", "MacroTools", "NonlinearSolve", "OrderedCollections", "PrettyTables", "Printf", "SciMLBase", "StatsBase"]
 path = "."
 uuid = "5fa4aa55-4e4c-4901-99b7-08200d3ce2d7"
 version = "0.1.0"

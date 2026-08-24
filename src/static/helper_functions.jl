@@ -88,7 +88,8 @@ function show(io::IO, sol::Solution{F, C}) where {F <: Function, C <: Function}
     if get(io, :compact, false)
         return print(
             io, "Solution(", length(sol.variables), " vars, ",
-            length(sol.sheets), " sheets)"
+            length(sol.sheets), " sheets, retcode=", sol.retcode,
+            ", max_residual=", sol.max_residual, ")"
         )
     end
 
@@ -99,6 +100,8 @@ function show(io::IO, sol::Solution{F, C}) where {F <: Function, C <: Function}
     println(io, "────────")
     println(io, "Variables:      ", length(sol.variables), " values")
     println(io, "Sheets:         ", length(sol.sheets))
+    println(io, "Retcode:        ", sol.retcode)
+    println(io, "Max residual:   ", sol.max_residual)
     println(
         io, "Model:          ", length(m.variables), " vars, ",
         length(m.parameters), " params, ",

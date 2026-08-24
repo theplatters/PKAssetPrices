@@ -141,7 +141,6 @@ PQCA = @model begin
         s1 = 1.0, "speculative debt induced by interest"
         γ0 = 0.0, "autonomous asset demand"
         γ = 0.5, "turnover asset selling"
-        α₀ = 0.1, "turnover 2"
         gₐ = 0.03, "rate of assets being created"
         AQ = 6.0, "asset amount"
         α₀ = 0.1, "turnover 2"
@@ -427,7 +426,6 @@ PQCrDIFFA = @model begin
         AMD(AP) = (p1 * ((s0 - r * s1) / (AP * (1 - γ)) + γ0)) / AP
     end
 
-    notebooks / Compare - template.ipynb
     @balances begin
         @sheet Private begin
             @asset deposits = dM

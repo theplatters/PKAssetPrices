@@ -3,6 +3,8 @@ using PKAssetPrices
 
 @testset "PKAssetPrices" begin
     include("test_core.jl")
+    include("test_validation.jl")
+    include("test_solving.jl")
     include("test_static.jl")
     include("test_helpers.jl")
     include("test_dynamic.jl")

@@ -8,7 +8,7 @@ const D = PKAssetPrices.Dynamic
 
 const STATIC_MODELS = (
     :Baseline, :PQC, :PQCr, :PQCrDIFF, :FirmsRation,
-    :PQA, :PQCA, :PQCrA, :PQCrDIFFA, :PC, :SimplePK,
+    :PQA, :PQCA, :PQCrA, :PQCrDIFFA, :SimplePK,
 )
 
 const DYNAMIC_MODELS = (

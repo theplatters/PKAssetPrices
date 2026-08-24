@@ -1,69 +1,41 @@
-import ..BaseModels: Equation
+import ..ModelCore: Equation
 
 "Parse a @flows or @stocks block: x = \"desc\" or just x"
 function _parse_dynvars!(out::Vector{DynVar}, body)
-    for line in body.args
-        line isa LineNumberNode && continue
-        if line isa Symbol
-            push!(out, DynVar(line, ""))
-        elseif line isa Expr && line.head == :(=)
-            name = line.args[1]
-            desc = line.args[2]
-            name isa Symbol || error("Expected Symbol on LHS in @flows/@stocks, got $name")
-            push!(out, DynVar(name, String(desc)))
-        else
-            error("Invalid entry in @flows/@stocks: $line")
-        end
+    for (name, desc) in ModelCore.parse_variable_entries(body; stringify_description=true)
+        push!(out, DynVar(name, desc))
     end
     return
 end
 
 "Parse @parameters: a = 0.5, \"desc\"  OR  a = 0.5"
 function _parse_params!(params::Vector{DynVar}, defaults::Dict{Symbol, Any}, body)
-    for line in body.args
-        line isa LineNumberNode && continue
-        if line isa Expr && line.head == :(=)
-            k = line.args[1]
-            rhs = line.args[2]
-            k isa Symbol || error("Parameter name must be a Symbol, got $k")
-
-            if rhs isa Expr && rhs.head == :tuple
-                defaults[k] = rhs.args[1]     # can be scalar or vector expression
-                desc = rhs.args[2]
-                push!(params, DynVar(k, String(desc)))
-            else
-                defaults[k] = rhs
-                push!(params, DynVar(k, ""))
-            end
-        else
-            error("Invalid parameter specification: $line")
-        end
+    for (k, value_desc) in ModelCore.parse_parameter_entries(body; stringify_description=true)
+        value, desc = value_desc
+        defaults[k] = value
+        push!(params, DynVar(k, desc))
     end
     return
 end
 
 "Parse @equations: lhs == rhs"
 function _parse_equations!(eqs::Vector{Equation}, body)
-    for line in body.args
-        line isa LineNumberNode && continue
-        if line isa Expr && line.head == :call && line.args[1] == :(==)
-            push!(eqs, Equation(line.args[2], line.args[3]))
-        else
-            error("@equations entries must be `lhs == rhs`, got: $line")
-        end
+    for (lhs, rhs) in ModelCore.parse_equation_entries(body)
+        push!(eqs, Equation(lhs, rhs))
     end
     return
 end
 
 function _parse_init!(init, body)
+    body isa Expr && body.head == :block || error("Expected a begin...end block for @init, got: $body")
     for line in body.args
         line isa LineNumberNode && continue
-        if line isa Expr && line.head == :(=)
+        if line isa Expr && line.head == :(=) && length(line.args) == 2 && line.args[1] isa Symbol
             name = line.args[1]
             value = line.args[2]
             init[name] = vcat(eval(value))
         else
-            error("@equations entries must be `lhs == rhs`, got: $line")
+            error("@init entries must be `name = value`, got: $line")
         end
     end
     return
@@ -92,6 +64,8 @@ end
 function check_expr(ex)
     ex isa Expr || return
     if ex.head == :ref
+        length(ex.args) == 2 ||
+            error("Time references must have exactly one index: $ex")
         base = ex.args[1]
         base isa Symbol || error("Invalid time indexing: $ex")
 
@@ -141,6 +115,13 @@ function _rewrite_time_refs(expr, stockset::Set{Symbol})
     return Expr(expr.head, (_rewrite_time_refs(a, stockset) for a in expr.args)...)
 end
 
+function _rewrite_equations(eqs::Vector{Equation}, variable_set::Set{Symbol})
+    return [Equation(
+        _rewrite_time_refs(eq.lhs, variable_set),
+        _rewrite_time_refs(eq.rhs, variable_set),
+    ) for eq in eqs]
+end
+
 function _collect_symbols!(symbols::Set{Symbol}, expr)
     if expr isa Symbol
         push!(symbols, expr)
@@ -181,28 +162,13 @@ function _generate_nulls(variables::Vector{DynVar}, params::Vector{DynVar}, eqs:
     # rewrite equations to:
     # - current stocks as symbols in u
     # - lagged values as synthetic symbols that will be destructured from p
-    rewritten = Equation[]
-    for eq in eqs
-        push!(
-            rewritten, Equation(
-                _rewrite_time_refs(eq.lhs, variable_set),
-                _rewrite_time_refs(eq.rhs, variable_set),
-            )
-        )
-    end
+    rewritten = _rewrite_equations(eqs, variable_set)
 
     # Destructure only the lagged values referenced by this model.
     lag_syms = _required_lag_symbols(rewritten, variable_syms)
 
-    residuals = [:($(eq.lhs) - $(eq.rhs)) for eq in rewritten]
-
-    return quote
-        function (u, p)
-            (; $(param_syms...), $(lag_syms...)) = p
-            $var_tuple = u
-            return [$(residuals...)]
-        end
-    end
+    return ModelCore.generate_residual_closure(
+        variables, param_syms, rewritten; lag_symbols=lag_syms)
 end
 
 
@@ -216,16 +182,7 @@ function _generate_eval(variables::Vector{DynVar}, params::Vector{DynVar}, eqs::
     # - x[t]   -> x
     # - x[t-1] -> Symbol("x[t - 1]")
     # - x[t-2] -> Symbol("x[t - 2]")
-    rewritten = Equation[]
-    for eq in eqs
-        push!(
-            rewritten,
-            Equation(
-                _rewrite_time_refs(eq.lhs, variable_set),
-                _rewrite_time_refs(eq.rhs, variable_set),
-            ),
-        )
-    end
+    rewritten = _rewrite_equations(eqs, variable_set)
 
     # Lagged variable symbols expected in p.
     lag_syms = _required_lag_symbols(rewritten, variable_syms)
@@ -285,9 +242,9 @@ macro model(body)
 
     for expr in body.args
         expr isa LineNumberNode && continue
-        if !(expr isa Expr && expr.head == :macrocall)
-            continue
-        end
+        expr isa Expr && expr.head == :macrocall ||
+            error("Invalid dynamic @model entry (expected a macro block): $expr")
+        length(expr.args) == 3 || error("Malformed dynamic macro block: $expr")
         mac = expr.args[1]
         blk = expr.args[3]
 
@@ -302,12 +259,20 @@ macro model(body)
             _parse_equations!(eqs, blk)
         elseif mac == Symbol("@init")
             _parse_init!(init, blk)
+        else
+            error("Unknown dynamic @model block $mac. Valid blocks: @time, @variables, @parameters, @init, @equations")
         end
     end
 
     time_expr === nothing && error("Dynamic @model requires a @time block, e.g. @time 0.0:1.0:100.0")
 
     _validate_time_indexing!(eqs)
+
+    source = "$(__source__.file):$(__source__.line)"
+    rewritten_for_validation = _rewrite_equations(eqs, Set(v.name for v in variables))
+    ModelCore.validate_model(
+        :dynamic, source, [v.name for v in variables], [p.name for p in params],
+        rewritten_for_validation)
 
     eval_fun = _generate_eval(variables, params, eqs)
 
@@ -338,11 +303,13 @@ end
 
 macro scenario(model, body)
     assigns = Expr[]
-    for ex in body.args
-        ex isa LineNumberNode && continue
-        if ex isa Expr && ex.head == :(=)
-            push!(assigns, :(params[$(QuoteNode(ex.args[1]))] = $(ex.args[2])))
-        end
+    for (name, value) in ModelCore.parse_scenario_entries(body)
+        unknown_message = "@scenario parameter $(name) is not declared in the base model"
+        push!(assigns, quote
+            haskey(params, $(QuoteNode(name))) ||
+                error($unknown_message)
+            params[$(QuoteNode(name))] = $value
+        end)
     end
 
     return esc(
@@ -350,7 +317,7 @@ macro scenario(model, body)
             local m = $model
             local params = copy(m.params)
             $(assigns...)
-            Dynamic.DynamicParametrization(m.model, params, m.init, m.u0)  # note: no "&" in Julia
+            Dynamic.DynamicParametrization(m.model, params, deepcopy(m.init), copy(m.u0))  # note: no "&" in Julia
         end
     )
 end

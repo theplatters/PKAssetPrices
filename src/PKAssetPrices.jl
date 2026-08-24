@@ -6,6 +6,7 @@ export solve_model
 
 function solve_model() end
 
+include("core/ModelCore.jl")
 include("base.jl")
 include("static/static_model.jl")
 include("dynamic/dynamic_model.jl")

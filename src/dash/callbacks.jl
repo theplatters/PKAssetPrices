@@ -15,6 +15,18 @@ function component_id_value(id, key::Symbol)
     return id[string(key)]
 end
 
+function static_simulation_error(model_name, exception)
+    @error "Static dashboard simulation failed" model_name exception = (
+        exception,
+        catch_backtrace(),
+    )
+    return html_div(className = "simulation-error") do
+        html_div("Simulation interrupted", className = "eyebrow"),
+        html_h3("The selected parameterization did not converge."),
+        html_p("Restore the default values or adjust the parameters and try again.")
+    end
+end
+
 function register_comparison_callbacks!(app, model_options)
     callback!(
         app,
@@ -81,7 +93,11 @@ function register_comparison_callbacks!(app, model_options)
             parameters = copy(base.params)
             merge!(parameters, get(configured, column, Dict{Symbol, Float64}()))
             parametrization = Static.Parametrization(base.model, parameters, base.u0)
-            push!(solutions, solve_cached(parametrization))
+            try
+                push!(solutions, solve_cached(parametrization))
+            catch exception
+                return static_simulation_error(model_name, exception)
+            end
             push!(labels, "$(model_name) · $(lpad(string(column), 2, '0'))")
         end
 
@@ -142,7 +158,11 @@ function register_callbacks!(
             all_parameter_names[model_name],
             parameter_values,
         )
-        return solution_component(solve_cached(parametrization))
+        try
+            return solution_component(solve_cached(parametrization))
+        catch exception
+            return static_simulation_error(model_name, exception)
+        end
     end
 
     register_comparison_callbacks!(app, model_options)

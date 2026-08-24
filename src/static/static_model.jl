@@ -3,7 +3,9 @@ module Static
 using NonlinearSolve
 using PrettyTables
 using CairoMakie 
-import ..BaseModels: AbstractModel, Equation
+import SciMLBase
+import ..ModelCore: AbstractModel, Equation
+import ..ModelCore
 import ..PKAssetPrices: solve_model
 
 import Base: show, getproperty
@@ -53,6 +55,8 @@ struct Solution{F <: Function, C <: Function}
     variables::Dict{Symbol, Float64}
     model::Parametrization{F, C}
     sheets::Vector{BalanceSheetFilled}
+    retcode
+    max_residual::Float64
 end
 
 include("model_macros.jl")
@@ -61,5 +65,4 @@ include("helper_functions.jl")
 
 include("models/asset_model.jl")
 include("models/end_alpha.jl")
-include("models/pc_model.jl")
 end
