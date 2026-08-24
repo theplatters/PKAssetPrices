@@ -154,8 +154,8 @@ end
 
 function ad_as_curve_component(solution::Static.Solution)
     asset_price = solution.variables[:AP]
-    asset_supply = solution.variables[:AS]
-    asset_demand = solution.variables[:AD]
+    asset_supply = solution.variables[:AQ]
+    asset_demand = solution.variables[:AE]
     price_range = range(asset_price * 0.2, asset_price * 3.0; length = 200)
 
     demand_values = Float64[]

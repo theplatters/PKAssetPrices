@@ -344,8 +344,8 @@ end
 function ad_as_component(solution::Static.Solution)
 
     AP_eq = solution.variables[:AP]
-    AS_eq = solution.variables[:AS]
-    AD_eq = solution.variables[:AD]
+    AS_eq = solution.variables[:AQ]
+    AD_eq = solution.variables[:AE]
 
     AP_min = AP_eq * 0.2
     AP_max = AP_eq * 3.0
@@ -403,8 +403,8 @@ function ad_as_comparison_component(
 
     for (i, (solution, label)) in enumerate(zip(solutions, labels))
         AP_eq = solution.variables[:AP]
-        AS_eq = solution.variables[:AS]
-        AD_eq = solution.variables[:AD]
+        AS_eq = solution.variables[:AQ]
+        AD_eq = solution.variables[:AE]
 
         AP_range = range(AP_eq * 0.2, AP_eq * 3.0; length = 200)
 
