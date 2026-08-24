@@ -84,12 +84,16 @@ function dynamic_parametrization_with_horizon(parametrization, horizon)
 
     model = parametrization.model
     truncated_model = Dynamic.DynamicModel(
-        Dynamic.DiscreteTime(full_grid[1:period_count]),
-        model.variables,
-        model.params,
-        model.equations,
-        model.nulls,
-        model.eval,
+        time = Dynamic.DiscreteTime(full_grid[1:period_count]),
+        variables = model.variables,
+        params = model.params,
+        equations = model.equations,
+        nulls = model.nulls,
+        eval = model.eval,
+        stocks = model.stocks,
+        stocks_eval = model.stocks_eval,
+        balance_sheets = model.balance_sheets,
+        sheet_eval = model.sheet_eval,
     )
     return Dynamic.DynamicParametrization(
         truncated_model,
@@ -102,6 +106,8 @@ end
 function solve_dynamic_cached(parametrization::Dynamic.DynamicParametrization)
     key = hash((
         parametrization.model.equations,
+        parametrization.model.stocks,
+        parametrization.model.balance_sheets,
         parametrization.model.time.grid,
         parametrization.params,
         parametrization.init,

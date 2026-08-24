@@ -106,6 +106,10 @@ liabilities(sh::BalanceSheetFilled) = sum(p.second for p in sh.liabilities)
 assets(sol::Solution) = sum(assets(sh) for sh in sol.sheets)
 liabilities(sol::Solution) = sum(liabilities(sh) for sh in sol.sheets)
 
+function ModelCore.check_accounting(sol::Solution; tol=1e-8, strict=false)
+    return ModelCore._accounting_result(sol.sheets; tol=tol, strict=strict)
+end
+
 
 function show(io::IO, sh::BalanceSheetFilled)
     digits = 3  # change if you want, or make it configurable via IOContext later

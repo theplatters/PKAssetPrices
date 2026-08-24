@@ -3,9 +3,12 @@ module Dynamic
 import NonlinearSolve as NLS
 import SciMLBase
 using ADTypes
-import ..ModelCore: AbstractModel, Equation
+import ..ModelCore: AbstractModel, Equation, lag_key, BalanceSheet, BalanceSheetFilled
 import ..ModelCore
 import ..PKAssetPrices: solve_model
+
+export DynamicModel, DynamicParametrization, DynamicSolution, sheets, check_accounting, @model, @scenario
+const check_accounting = ModelCore.check_accounting
 
 abstract type AbstractTimeDomain end
 
@@ -19,86 +22,76 @@ struct DynVar
     desc::String
 end
 
-struct DynamicModel{F, G} <: AbstractModel
+struct DynamicModel{F, G, H} <: AbstractModel
     time::DiscreteTime
     variables::Vector{DynVar}
     params::Vector{DynVar}
     equations::Vector{Equation}
     nulls::F
     eval::G
+    stocks::Vector{Symbol}
+    stocks_eval::H
+    balance_sheets::Vector{BalanceSheet}
+    sheet_eval::Function
 end
 
-struct DynamicParametrization{F, G, T <: Real, U}
-    model::DynamicModel{F, G}
+# Structs do not get a useful keyword constructor automatically.  In
+# particular, the dashboard reconstructs models when changing the horizon.
+function DynamicModel(; time, variables, params, equations, nulls, eval,
+                       stocks=Symbol[], stocks_eval=(context -> Float64[]),
+                       balance_sheets=BalanceSheet[], sheet_eval=(context -> BalanceSheetFilled[]))
+    return DynamicModel(time, variables, params, equations, nulls, eval,
+                        Symbol[stocks...], stocks_eval, balance_sheets, sheet_eval)
+end
+
+struct DynamicParametrization{F, G, H, T <: Real, U}
+    model::DynamicModel{F, G, H}
     params::Dict{Symbol, T}
     init::Dict{Symbol, U}
     u0::Vector{Float64}
 end
 
-struct DynamicSolution{F, G, T, U}
-    model::DynamicParametrization{F, G, T, U}
+struct DynamicSolution{F, G, H, T, U}
+    model::DynamicParametrization{F, G, H, T, U}
     paths::Dict{Symbol, Vector{T}}
     retcodes::Vector
     max_residuals::Vector{Float64}
+    sheets::Vector{Vector{BalanceSheetFilled}}
 end
 
 include("model_macros.jl")
 
 
-function build_context(dp::DynamicParametrization{F, G, T, U}, t::Int, paths) where {F, G, T, U <: Real}
+function _build_context(dp::DynamicParametrization, t::Int, paths, depths)
     lag_pairs = Pair{Symbol, Any}[]
+
     for variable in dp.model.variables
         name = variable.name
-        initial = get(dp.init, name, zero(U))
-        val_t1 = isone(t) ? initial : paths[name][t - 1]
-        val_t2 = if isone(t)
-            zero(initial)
-        elseif t == 2
-            initial
-        else
-            paths[name][t - 2]
+        raw_init = get(dp.init, name, Float64[])
+        history_length = length(raw_init)
+        for k in 1:max(2, get(depths, name, 0))
+            period = t - k
+            value = if period >= 1 && haskey(paths, name)
+                paths[name][period]
+            elseif period <= 0 && 1 <= history_length + period <= history_length
+                raw_init[history_length + period]
+            else
+                zero(eltype(raw_init))
+            end
+            push!(lag_pairs, lag_key(name, k) => value)
         end
-        push!(lag_pairs, Symbol(name, "[t - 1]") => val_t1)
-        push!(lag_pairs, Symbol(name, "[t - 2]") => val_t2)
     end
+
     lag_nt = (; lag_pairs...)
     return merge(NamedTuple(dp.params), lag_nt)
 end
 
-function build_context(dp::DynamicParametrization{F, G, T, U}, t::Int, paths) where {F, G, T, U <: AbstractVector}
-    lag_pairs = Pair{Symbol, Any}[]
-
-    for s in dp.model.variables
-        name = s.name
-        sym_t1 = Symbol(name, "[t - 1]")
-        sym_t2 = Symbol(name, "[t - 2]")
-
-        # 1. Safely fetch initialization array (default to empty if missing)
-        raw_init = get(dp.init, name, Float64[])
-
-        # 2. Left pad with 0.0 to ensure length is at least 2
-        n_missing = max(0, 2 - length(raw_init))
-        init_vals = n_missing > 0 ? vcat(fill(0.0, n_missing), raw_init) : raw_init
-
-        # Now init_vals is guaranteed to have at least 2 elements
-        if isone(t)
-            # init_vals[1] is t-2, init_vals[2] is t-1
-            val_t1 = init_vals[2]
-            val_t2 = init_vals[1]
-        elseif t == 2
-            val_t1 = haskey(paths, name) ? paths[name][t - 1] : 0.0
-            val_t2 = init_vals[2]
-        else
-            val_t1 = haskey(paths, name) ? paths[name][t - 1] : 0.0
-            val_t2 = haskey(paths, name) ? paths[name][t - 2] : 0.0
-        end
-
-        push!(lag_pairs, sym_t1 => val_t1)
-        push!(lag_pairs, sym_t2 => val_t2)
-    end
-
-    lag_nt = (; lag_pairs...)
-    return merge(NamedTuple(dp.params), lag_nt)
+function build_context(dp::DynamicParametrization, t::Int, paths)
+    equations = vcat(dp.model.equations,
+        [Equation(:_sheet, rhs) for bs in dp.model.balance_sheets for rhs in values(bs.calculations)])
+    depths = _required_lag_depths(_discover_lags(equations,
+        [variable.name for variable in dp.model.variables]))
+    return _build_context(dp, t, paths, depths)
 end
 
 
@@ -112,7 +105,23 @@ end
 
 function eval_model(dp::DynamicParametrization, values::Dict{Symbol, Float64}, lag::Dict{Symbol, Float64})
     par_nt = (; (k => v for (k, v) in dp.params)...)
-    lag_pairs = [Symbol(k, :[t - 1]) => v for (k, v) in lag]
+    equations = vcat(dp.model.equations,
+        [Equation(:_sheet, rhs) for bs in dp.model.balance_sheets for rhs in Base.values(bs.calculations)])
+    depths = _required_lag_depths(_discover_lags(equations, [v.name for v in dp.model.variables]))
+    lag_values = Dict{Symbol, Float64}()
+    for variable in dp.model.variables
+        name = variable.name
+        history = get(dp.init, name, Float64[])
+        for k in 1:max(2, get(depths, name, 0))
+            value = length(history) >= k ? history[end - k + 1] : 0.0
+            lag_values[lag_key(name, k)] = value
+        end
+    end
+    # Bare entries are, by documented convention, t-1 values.
+    for (name, value) in lag
+        lag_values[lag_key(name, 1)] = value
+    end
+    lag_pairs = collect(lag_values)
     lag_nt = (; lag_pairs...)
     context = merge(par_nt, lag_nt, NamedTuple(values))
 
@@ -129,23 +138,34 @@ function _dynamic_model_label(model::DynamicModel)
     return "Dynamic.DynamicModel"
 end
 
-function solve_model(dp::DynamicParametrization{F, G, T, U}; alg=nothing,
+function solve_model(dp::DynamicParametrization{F, G, H, T, U}; alg=nothing,
                      abstol=nothing, reltol=nothing, maxiters=nothing,
-                     strict::Bool=true) where {F, G, T, U}
+                      strict::Bool=true) where {F, G, H, T, U}
     time_span = length(dp.model.time.grid)
     m = dp.model
+    equations = vcat(m.equations,
+        [Equation(:_sheet, rhs) for bs in m.balance_sheets for rhs in values(bs.calculations)])
+    depths = _required_lag_depths(_discover_lags(equations, [v.name for v in m.variables]))
     paths = init_paths(m, time_span, T)
 
 
     u = copy(dp.u0)
     retcodes = Any[]
     max_residuals = Float64[]
+    sheets = Vector{BalanceSheetFilled}[]
     options = (; (name => value for (name, value) in
         ((:abstol => abstol), (:reltol => reltol), (:maxiters => maxiters))
         if !isnothing(value))...)
 
     for t in 1:time_span
-        θt = build_context(dp, t, paths)
+        θt = _build_context(dp, t, paths, depths)
+        if !isempty(m.stocks)
+            stock_values = m.stocks_eval(θt)
+            length(stock_values) == length(m.stocks) ||
+                error("Dynamic stock evaluator returned $(length(stock_values)) values, " *
+                    "expected $(length(m.stocks)).")
+            θt = merge(θt, NamedTuple(m.stocks .=> stock_values))
+        end
 
         prob = NLS.NonlinearProblem(m.nulls, u, θt)
         solver_alg = isnothing(alg) ?
@@ -167,16 +187,39 @@ function solve_model(dp::DynamicParametrization{F, G, T, U}; alg=nothing,
             strict ? error(message) : @warn(message)
         end
 
-        # store period t solution into paths
-        for i in eachindex(sol.u)
-            paths[m.variables[i].name][t] = ut[i]
+        # Store predetermined stocks and solved flows separately.  Only flows
+        # are warm-started: stocks are recomputed from history every period.
+        for (i, name) in enumerate(m.stocks)
+            paths[name][t] = θt[name]
+        end
+        flow_index = 0
+        for variable in m.variables
+            variable.name in m.stocks && continue
+            flow_index += 1
+            paths[variable.name][t] = ut[flow_index]
         end
 
+        sheet_context = merge(θt, NamedTuple(variable.name => paths[variable.name][t] for variable in m.variables))
+        push!(sheets, m.sheet_eval(sheet_context))
+
         # warm start next period
-        u = ut
+        u = copy(ut)
     end
 
-    return DynamicSolution(dp, paths, retcodes, max_residuals)
+    return DynamicSolution(dp, paths, retcodes, max_residuals, sheets)
+end
+
+"Return the filled balance sheets for period `t`; invalid periods throw BoundsError."
+sheets(sol::DynamicSolution, t::Int) = sol.sheets[t]
+
+function ModelCore.check_accounting(sol::DynamicSolution; tol=1e-8, strict=false)
+    periods = [ModelCore._accounting_result(x; tol=tol, strict=strict, period=i)
+               for (i, x) in enumerate(sol.sheets)]
+    return (consistent=all(x -> x.consistent, periods), periods=periods)
+end
+
+function ModelCore.check_accounting(sol::DynamicSolution, t::Int; tol=1e-8, strict=false)
+    return ModelCore._accounting_result(sol.sheets[t]; tol=tol, strict=strict, period=t)
 end
 
 

@@ -9,28 +9,18 @@ import ..ModelCore
 import ..PKAssetPrices: solve_model
 
 import Base: show, getproperty
-export BalanceSheet, BalanceSheetFilled, Curve, Model, Parametrization, Solution
+export BalanceSheet, BalanceSheetFilled, Curve, Model, Parametrization, Solution, check_accounting
 export @model, @scenario
+const check_accounting = ModelCore.check_accounting
 
 
-struct BalanceSheet
-    name::Symbol
-    fields::Vector{Symbol}
-    assets::Vector{Symbol}
-    liabilities::Vector{Symbol}
-    calculations::Dict{Symbol, Union{Symbol, Expr}}
-end
+const BalanceSheet = ModelCore.BalanceSheet
+const BalanceSheetFilled = ModelCore.BalanceSheetFilled
 
 struct Curve
     name::Symbol
     arg::Symbol
     body::Expr
-end
-
-struct BalanceSheetFilled
-    sector_name::Symbol
-    assets::Vector{Pair{Symbol, Float64}}
-    liabilities::Vector{Pair{Symbol, Float64}}
 end
 
 struct Model{F <: Function, C <: Function} <: AbstractModel
@@ -43,6 +33,7 @@ struct Model{F <: Function, C <: Function} <: AbstractModel
     curve_eval::C
     nulls::F
     balance_sheets::Vector{BalanceSheet}
+    sheet_eval::Function
 end
 
 struct Parametrization{F <: Function, C <: Function}

@@ -72,7 +72,7 @@ macro model(body)
         elseif macro_name == Symbol("@curves")
             parse_curves!(curves, macro_body)
         elseif macro_name == Symbol("@balances")
-            parse_balances!(balance_sheets, macro_body)
+            ModelCore.parse_balances!(balance_sheets, macro_body)
         else
             error("Unknown static @model block $macro_name. Valid blocks: @variables, @parameters, @init, @equations, @curves, @balances")
         end
@@ -93,13 +93,17 @@ macro model(body)
     sort_equations_by_variables!(equations, variables)
     nulls = generate_get_nulls(variables, parameters, equations)
     curve_funcs = generate_curve_eval(curves, variables, parameters)
+    sheet_eval = ModelCore.generate_sheet_eval(
+        balance_sheets, variables, collect(keys(parameters)); source=source)
 
 
     u0_values = [get(init_values, variable, 1.0) for variable in variables]
+    parametrization_type = GlobalRef(@__MODULE__, :Parametrization)
+    model_type = GlobalRef(@__MODULE__, :Model)
     return esc(
         quote
-            Parametrization(
-                Model(
+            $parametrization_type(
+                $model_type(
                     $variables,
                     $(collect(keys(parameters))),
                     $var_descriptions,
@@ -108,7 +112,8 @@ macro model(body)
                     $curves,
                     $curve_funcs,
                     $nulls,
-                    $balance_sheets
+                    $balance_sheets,
+                    $sheet_eval
                 ),
                 $parameters,
                 $(u0_values)
@@ -128,6 +133,11 @@ function _numeric_literal(value)
     return nothing
 end
 
+function fill_balance_sheets(model::Parametrization, sol_u::AbstractVector{<:Real})
+    vars = (; (v => Float64(sol_u[i]) for (i, v) in enumerate(model.model.variables))...)
+    return model.model.sheet_eval(merge(NamedTuple(model.params), vars))
+end
+
 function parse_init!(values::Dict{Symbol, Float64}, names::Vector{Symbol}, body)
     body isa Expr && body.head == :block ||
         error("Expected a begin...end block for @init, got: $body")
@@ -144,77 +154,6 @@ function parse_init!(values::Dict{Symbol, Float64}, names::Vector{Symbol}, body)
     end
     return
 end
-
-"Evaluate a Symbol/Expr/Number given variable values and parameter values."
-function _eval_calc(x, vars::Dict{Symbol, Float64}, params::Dict{Symbol, Float64})
-    if x isa Number
-        return Float64(x)
-    elseif x isa Symbol
-        if haskey(vars, x)
-            return vars[x]
-        end
-        if haskey(params, x)
-            return params[x]
-        end
-        error("Unknown symbol in balance sheet calculation: $x")
-    elseif x isa Expr
-        # Evaluate expression in a local scope with bindings from vars/params
-        # (simple, but uses eval; OK if expressions are trusted and module-scoped)
-        assigns = Any[
-            :($(k) = $(v)) for (k, v) in vars
-        ]
-        append!(
-            assigns, Any[
-                :($(k) = $(v)) for (k, v) in params
-            ]
-        )
-
-        return Base.eval(
-            @__MODULE__, quote
-                let
-                    $(assigns...)
-                    $(x)
-                end
-            end
-        ) |> Float64
-    else
-        error("Unsupported calc type: $(typeof(x))")
-    end
-end
-
-function fill_balance_sheets(model::Parametrization, sol_u::AbstractVector{<:Real})
-    # solved variables dict
-    vars = Dict{Symbol, Float64}(
-        model.model.variables[i] => Float64(sol_u[i])
-            for i in eachindex(model.model.variables)
-    )
-    params = model.params
-
-    filled = BalanceSheetFilled[]
-    for bs in model.model.balance_sheets
-        # compute all calculations once
-        calcvals = Dict{Symbol, Float64}()
-        for (name, expr) in bs.calculations
-            calcvals[name] = _eval_calc(expr, vars, params)
-        end
-
-        assets = Pair{Symbol, Float64}[]
-        for a in bs.assets
-            v = haskey(calcvals, a) ? calcvals[a] : _eval_calc(a, vars, params)
-            push!(assets, a => v)
-        end
-
-        liabilities = Pair{Symbol, Float64}[]
-        for l in bs.liabilities
-            v = haskey(calcvals, l) ? calcvals[l] : _eval_calc(l, vars, params)
-            push!(liabilities, l => v)
-        end
-
-        push!(filled, BalanceSheetFilled(bs.name, assets, liabilities))
-    end
-    return filled
-end
-
 
 function sort_equations_by_variables!(equations::Vector{Equation}, variables::Vector{Symbol})
     varpos = Dict{Symbol, Int}(v => i for (i, v) in pairs(variables))
@@ -323,76 +262,6 @@ function parse_curves!(curves, body)
     return
 end
 
-function parse_balance!(body)
-    body isa Expr && body.head == :macrocall && length(body.args) == 4 ||
-        error("Malformed @sheet block: $body")
-    body.args[1] == Symbol("@sheet") || error("Expected @sheet, got: $body")
-    balance_sheet_name = body.args[3]
-    balance_sheet_body = body.args[4]
-    balance_sheet_name isa Symbol || error("@sheet name must be a Symbol in: $body")
-    balance_sheet_body isa Expr && balance_sheet_body.head == :block ||
-        error("@sheet $balance_sheet_name must contain a begin...end block")
-    fields = Symbol[]
-    assets = Symbol[]
-    liabilities = Symbol[]
-    equations = Dict{Symbol, Union{Expr, Symbol}}()
-
-    for line in balance_sheet_body.args
-        line isa LineNumberNode && continue
-        if line isa Expr && line.head == :(macrocall) && length(line.args) == 3
-            is_liability = line.args[1] == Symbol("@liability")
-            is_asset = line.args[1] == Symbol("@asset")
-            if !(is_liability || is_asset)
-                error("Unknown @sheet entry (expected @asset or @liability): $line")
-            end
-
-            assignment = line.args[3]
-            assignment isa Expr && assignment.head == :(=) && length(assignment.args) == 2 ||
-                error("Malformed asset/liability entry: $line")
-            field_name = assignment.args[1]
-            field_name isa Symbol || error("Asset/liability name must be a Symbol in: $line")
-            assignment.args[2] isa Union{Expr, Symbol} ||
-                error("Asset/liability value must be an expression or Symbol in: $line")
-            is_liability && push!(liabilities, field_name)
-            is_asset && push!(assets, field_name)
-
-            push!(fields, field_name)
-            equations[field_name] = assignment.args[2]
-
-        elseif line isa LineNumberNode
-            continue
-        else
-            error("Invalid @sheet entry (expected @asset or @liability): $line")
-        end
-    end
-    return BalanceSheet(
-        balance_sheet_name,
-        fields,
-        assets,
-        liabilities,
-        equations
-    )
-end
-
-function parse_balances!(balance_sheets, body)
-    body isa Expr && body.head == :block || error("Expected a begin...end block for @balances, got: $body")
-    for line in body.args
-        line isa LineNumberNode && continue
-
-        if line isa Expr && line.head == :(macrocall) && length(line.args) == 4 && line.args[1] == Symbol("@sheet")
-
-            balance_sheet = parse_balance!(line)
-            push!(balance_sheets, balance_sheet)
-        elseif line isa LineNumberNode
-            continue
-        else
-            error("Invalid @balances entry (expected @sheet): $line")
-        end
-    end
-    return
-end
-
-
 generate_get_nulls(variables, parameters, equations) =
     ModelCore.generate_residual_closure(variables, collect(keys(parameters)), equations)
 
@@ -431,6 +300,8 @@ end
     end
 
 Create a specific scenario of a previously defined model with custom parameter values.
+Static scenarios are deliberately parameter-only: equation overrides could
+invalidate the model's `@curves` closures and are therefore not supported.
 
 The scenario macro allows you to quickly instantiate a model with modified parameters without 
 having to manually create the parameter struct. The base model is inferred from the given name.
@@ -484,12 +355,13 @@ macro scenario(model, body)
         end)
     end
 
+    parametrization_type = GlobalRef(@__MODULE__, :Parametrization)
     return esc(
         quote
             local m = $model
             local params = copy(m.params)   # copy if you don't want to mutate the model
             $(assigns...)
-            Parametrization(m.model, params, copy(m.u0))  # note: no "&" in Julia
+            $parametrization_type(m.model, params, copy(m.u0))
         end
     )
 end

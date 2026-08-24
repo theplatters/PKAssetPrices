@@ -66,3 +66,33 @@ function parse_scenario_entries(body)
     end
     return entries
 end
+
+"Parse the dynamic scenario grammar, leaving block contents unevaluated."
+function parse_dynamic_scenario_entries(body)
+    body isa Expr && body.head == :block ||
+        error("Expected a begin...end block for @scenario, got: $body")
+    params = Pair{Symbol, Any}[]
+    names = Set{Symbol}()
+    equations = nothing
+    init = nothing
+    for line in body.args
+        line isa LineNumberNode && continue
+        if line isa Expr && line.head == :(=) && length(line.args) == 2
+            name = line.args[1]
+            name isa Symbol || error("@scenario parameter name must be a Symbol in source expression: $line")
+            name in names && error("Duplicate @scenario parameter $name in source expression `$line`. Set each parameter once.")
+            push!(names, name); push!(params, name => line.args[2])
+        elseif line isa Expr && line.head == :macrocall && length(line.args) == 3
+            block_name, block = line.args[1], line.args[3]
+            block_name == Symbol("@equations") && isnothing(equations) && (equations = block; continue)
+            block_name == Symbol("@init") && isnothing(init) && (init = block; continue)
+            if block_name in (Symbol("@equations"), Symbol("@init"))
+                error("Duplicate dynamic @scenario block $block_name in source/offending expression `$line`; remove the duplicate block.")
+            end
+            error("Unknown dynamic @scenario block $block_name in source/offending expression `$line`; valid blocks are @equations and @init.")
+        else
+            error("Dynamic @scenario entries must be parameter assignments or @equations/@init blocks, got source/offending expression: $line")
+        end
+    end
+    return params, equations, init
+end

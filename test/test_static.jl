@@ -91,14 +91,13 @@ end
     @test S.eval_curve(solution, :x, [1.0, 2.0, 4.0], :LINE) ≈ [5.0, 7.0, 11.0]
 end
 
-@testset "Balance-sheet expression evaluation" begin
-    vars = Dict(:x => 2.0)
-    params = Dict(:a => 3.0)
-    @test S._eval_calc(4, vars, params) == 4.0
-    @test S._eval_calc(:x, vars, params) == 2.0
-    @test S._eval_calc(:a, vars, params) == 3.0
-    @test S._eval_calc(:(x + a), vars, params) == 5.0
-    @test_throws ErrorException S._eval_calc(:missing, vars, params)
+@testset "Generated balance-sheet evaluation" begin
+    generated = StaticFixture.model.sheet_eval((; x=2.0, y=5.0, a=3.0, b=3.0))
+    @test generated[1].assets == [:cash => 2.0]
+    @test generated[1].liabilities == [:funding => 2.0]
+    baseline = S.solve_model(Static.Baseline)
+    @test length(baseline.sheets) == length(Static.Baseline.model.balance_sheets)
+    @test all(sh -> sh isa BalanceSheetFilled, baseline.sheets)
 end
 
 end

@@ -251,8 +251,8 @@ end
         end))
 
     @test_throws r"exactly one index" PKAssetPrices.Dynamic.check_expr(:(x[t, 2]))
-    @test_throws r"Only \[t\].*Found" PKAssetPrices.Dynamic.check_expr(:(x[t + 1]))
-    @test_throws r"Only \[t\].*Found" PKAssetPrices.Dynamic.check_expr(:(x[t - 3]))
+    @test_throws r"Invalid time reference x\[t \+ 1\].*future" PKAssetPrices.Dynamic.check_expr(:(x[t + 1]))
+    @test_nowarn PKAssetPrices.Dynamic.check_expr(:(x[t - 3]))
 
     @test_throws r"indexed reference.*static equation" expand_static(
         :(@model begin
@@ -278,7 +278,7 @@ end
         end
     end))
 
-    @test_nowarn expand_dynamic(:(@model begin
+    @test_logs (:warn, r"y requires history length 1") (:warn, r"x requires history length 2") expand_dynamic(:(@model begin
         @time 0.0:1.0:2.0
         @variables begin
             x = "x"

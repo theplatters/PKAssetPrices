@@ -3,10 +3,12 @@ module PKAssetPrices
 
 export Dashboard, Dynamic, Static, DynamicPlotting, StaticPlotting
 export solve_model
+export ModelCore, check_accounting
 
 function solve_model() end
 
 include("core/ModelCore.jl")
+const check_accounting = ModelCore.check_accounting
 include("base.jl")
 include("static/static_model.jl")
 include("dynamic/dynamic_model.jl")

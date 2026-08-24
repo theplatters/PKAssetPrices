@@ -85,8 +85,8 @@ end
 
 "Validate the structural and symbol-level invariants of a model definition."
 function validate_model(face::Symbol, source, variable_names, parameter_names,
-                        equations::Vector{Equation})
-    label = "$face @model at $(source)"
+                        equations::Vector{Equation}; discovered_lags=nothing, label=nothing)
+    label = isnothing(label) ? "$face @model at $(source)" : "$(label) at $(source)"
     vars = Symbol[variable_names...]
     params = Symbol[parameter_names...]
 
@@ -141,9 +141,12 @@ function validate_model(face::Symbol, source, variable_names, parameter_names,
         face === :static && _reject_static_refs!(label, eq.rhs, eq)
         found = Set{Symbol}()
         _free_rhs_symbols!(found, eq.rhs)
-        # Synthetic lag names are produced by the dynamic rewrite and are
-        # valid when their base variable was declared.
-        allowed_lags = Set(Symbol(v, "[t - ", lag, "]") for v in vars for lag in (1, 2))
+        # Synthetic lag names are valid only when their discovered base
+        # variable was declared.  lag_key remains their sole representation.
+        allowed_lags = Set{Symbol}()
+        for lag in something(discovered_lags, ())
+            lag.var in vars && push!(allowed_lags, lag_key(lag.var, lag.k))
+        end
         unknown = sort!(collect(setdiff(found, union(declared, _MODEL_MATH_NAMES, allowed_lags))))
         isempty(unknown) || _validation_error(
             label, "unknown symbol(s) in equation $index (`$(eq)`): $(join(unknown, ", ")). " *
