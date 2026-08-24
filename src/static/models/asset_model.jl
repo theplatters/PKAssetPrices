@@ -125,7 +125,6 @@ AssetModel = @model begin
     γ = 0.5, "share of asset-sale receipts reinvested"
     α = 0.1, "asset turnover"
     gₐ = 0.03, "rate of assets being created"
-    AQ = 6.0, "asset amount"
     AQ_bar = 0.78, "asset amount"
     credit_sd_channel = 0.0, "activate credit rationing through speculative debt"
     policy_ap_channel = 0.0, "activate the asset-price policy response"
