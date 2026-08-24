@@ -2,9 +2,7 @@ module Static
 
 using NonlinearSolve
 using PrettyTables
-using DataFrames
 using CairoMakie 
-using OrderedCollections
 import ..BaseModels: AbstractModel, Equation
 import ..PKAssetPrices: solve_model
 
