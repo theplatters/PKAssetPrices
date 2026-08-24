@@ -3,89 +3,99 @@
   \caption{End-of-period balance-sheet matrix with asset-market extension}
   \label{tab:stockmatrix_assets}
   \renewcommand{\arraystretch}{1.2}
-  \begin{tabular}{lrrrrr}
-    \toprule
-    Instrument
-      & Households
-      & Firms
-      & Banks
-      & Central bank
-      & Total
-    \\
-    \midrule
+    \begin{tabular}{lrrrrrr}
+      \toprule
+      Instrument
+        & Households
+        & Firms
+        & \makecell{Private\\(H+F)}
+        & Banks
+        & Central bank
+        & Total
+      \\
+      \midrule
 
-    Capital $K_t$
-      & $0$
-      & $+K_t$
-      & $0$
-      & $0$
-      & $+K_t$
-    \\
+      Capital $K_t$
+        & $0$
+        & $+K_t$
+        & $+K_t$
+        & $0$
+        & $0$
+        & $+K_t$
+      \\
 
-    \newterm{Speculative assets $A_t$}
-      & \newterm{$+A_t$}
-      & $0$
-      & $0$
-      & $0$
-      & \newterm{$+A_t$}
-    \\
+      \newterm{Speculative assets $A_t$}
+        & \newterm{$+A_t$}
+        & $0$
+        & \newterm{$+A_t$}
+        & $0$
+        & $0$
+        & \newterm{$+A_t$}
+      \\
 
-    Deposits $M_t$
-      & $+M_t$
-      & $0$
-      & $-M_t$
-      & $0$
-      & $0$
-    \\
+      Deposits $M_t$
+        & $+M_t$
+        & $0$
+        & $+M_t$
+        & $-M_t$
+        & $0$
+        & $0$
+      \\
 
-    Productive loans $L^P_t$
-      & $0$
-      & $-L^P_t$
-      & $+L^P_t$
-      & $0$
-      & $0$
-    \\
+      Productive loans $L^P_t$
+        & $0$
+        & $-L^P_t$
+        & $-L^P_t$
+        & $+L^P_t$
+        & $0$
+        & $0$
+      \\
 
-    \newterm{Speculative loans $L^S_t$}
-      & \newterm{$-L^S_t$}
-      & $0$
-      & \newterm{$+L^S_t$}
-      & $0$
-      & \newterm{$0$}
-    \\
+      \newterm{Speculative loans $L^S_t$}
+        & \newterm{$-L^S_t$}
+        & $0$
+        & \newterm{$-L^S_t$}
+        & \newterm{$+L^S_t$}
+        & $0$
+        & \newterm{$0$}
+      \\
 
-    Central-bank credit $F^{CB}_t$
-      & $0$
-      & $0$
-      & $-F^{CB}_t$
-      & $+F^{CB}_t$
-      & $0$
-    \\
+      Central-bank credit $F^{CB}_t$
+        & $0$
+        & $0$
+        & $0$
+        & $-F^{CB}_t$
+        & $+F^{CB}_t$
+        & $0$
+      \\
 
-    Reserves $R_t$
-      & $0$
-      & $0$
-      & $+R_t$
-      & $-R_t$
-      & $0$
-    \\
+      Reserves $R_t$
+        & $0$
+        & $0$
+        & $0$
+        & $+R_t$
+        & $-R_t$
+        & $0$
+      \\
 
-    Net worth
-      & $-V^H_t$
-      & $-V^F_t$
-      & $-V^B_t$
-      & $-V^{CB}_t$
-      & $-V_t$
-    \\
-    \midrule
+      Net worth
+        & $-V^H_t$
+        & $-V^F_t$
+        & $-(V^H_t+V^F_t)$
+        & $-V^B_t$
+        & $-V^{CB}_t$
+        & $-V_t$
+      \\
+      \midrule
 
-    Column sum
-      & $0$
-      & $0$
-      & $0$
-      & $0$
-      & $0$
-    \\
-    \bottomrule
-  \end{tabular}
+      Column sum
+        & $0$
+        & $0$
+        & $0$
+        & $0$
+        & $0$
+        & $0$
+      \\
+      \bottomrule
+    \end{tabular}
 \end{table}

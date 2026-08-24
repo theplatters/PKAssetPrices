@@ -1,208 +1,227 @@
-\begin{table}[htbp]
+\begin{sidewaystable}[htbp]
   \centering
   \caption{Transactions-flow matrix with asset-market extension}
   \label{tab:assetpk-flow}
   \renewcommand{\arraystretch}{1.2}
-  \begin{tabular}{lrrrrr}
-    \toprule
-    Transaction
-      & Households
-      & Firms
-      & Banks
-      & \makecell{Central\\bank}
-      & Total
-    \\
-    \midrule
+    \begin{tabular}{lrrrrrr}
+      \toprule
+      Transaction
+        & Households
+        & Firms
+        & \makecell{Private\\(H+F)}
+        & Banks
+        & \makecell{Central\\bank}
+        & Total
+      \\
+      \midrule
 
-    % ---------------------------------------------------------------
-    % 1. Real economy
-    % ---------------------------------------------------------------
+      % ---------------------------------------------------------------
+      % 1. Real economy
+      % ---------------------------------------------------------------
 
-    \multicolumn{6}{l}{\textit{Key model dynamics (real economy)}}
-    \\
-    \midrule
+      \multicolumn{7}{l}{\textit{Key model dynamics (real economy)}}
+      \\
+      \midrule
 
-    Consumption $C_t$
-      & $-C_t$
-      & $+C_t$
-      & $0$
-      & $0$
-      & $0$
-    \\
+      Consumption $C_t$
+        & $-C_t$
+        & $+C_t$
+        & $0$
+        & $0$
+        & $0$
+        & $0$
+      \\
 
-    Investment output $I_t$
-      & $0$
-      & $+I_t$
-      & $0$
-      & $0$
-      & $+I_t$
-    \\
+      Investment output $I_t$
+        & $0$
+        & $+I_t$
+        & $+I_t$
+        & $0$
+        & $0$
+        & $+I_t$
+      \\
 
-    Investment expenditure $I_t$
-      & $0$
-      & $-I_t$
-      & $0$
-      & $0$
-      & $-I_t$
-    \\
+      Investment expenditure $I_t$
+        & $0$
+        & $-I_t$
+        & $-I_t$
+        & $0$
+        & $0$
+        & $-I_t$
+      \\
 
-    Wages $W_tN_t$
-      & $+W_tN_t$
-      & $-W_tN_t$
-      & $0$
-      & $0$
-      & $0$
-    \\
+      Wages $W_tN_t$
+        & $+W_tN_t$
+        & $-W_tN_t$
+        & $0$
+        & $0$
+        & $0$
+        & $0$
+      \\
 
-    % ---------------------------------------------------------------
-    % 2. Asset market
-    % ---------------------------------------------------------------
+      % ---------------------------------------------------------------
+      % 2. Asset market
+      % ---------------------------------------------------------------
 
-    \midrule
-    \multicolumn{6}{l}{\newterm{\textit{Key model dynamics (asset market)}}}
-    \\
-    \midrule
+      \midrule
+      \multicolumn{7}{l}{\newterm{\textit{Key model dynamics (asset market)}}}
+      \\
+      \midrule
 
-    % \newterm{Speculative borrowing $SD_t$}
-    %   & \newterm{$+SD_t$}
-    %   & $0$
-    %   & \newterm{$-SD_t$}
-    %   & $0$
-    %   & $0$
-    % \\
+      % \newterm{Speculative borrowing $SD_t$}
+      %   & \newterm{$+SD_t$}
+      %   & $0$
+      %   & \newterm{$+SD_t$}
+      %   & \newterm{$-SD_t$}
+      %   & $0$
+      %   & $0$
+      % \\
 
-    \newterm{Speculative asset purchases $AE_t$}
-      & \newterm{$+AE_t$}
-      & $0$
-      & $0$
-      & $0$
-      & \newterm{$+AE_t$}
-    \\
+      \newterm{Speculative asset purchases $AE_t$}
+        & \newterm{$+AE_t$}
+        & $0$
+        & \newterm{$+AE_t$}
+        & $0$
+        & $0$
+        & \newterm{$+AE_t$}
+      \\
 
-    \newterm{Speculative asset sales $AE_t$}
-      & \newterm{$-AE_t$}
-      & $0$
-      & $0$
-      & $0$
-      & \newterm{$-AE_t$}
-    \\
+      \newterm{Speculative asset sales $AE_t$}
+        & \newterm{$-AE_t$}
+        & $0$
+        & \newterm{$-AE_t$}
+        & $0$
+        & $0$
+        & \newterm{$-AE_t$}
+      \\
 
-    % ---------------------------------------------------------------
-    % 3. Intertemporal consistency
-    % ---------------------------------------------------------------
+      % ---------------------------------------------------------------
+      % 3. Intertemporal consistency
+      % ---------------------------------------------------------------
 
-    \midrule
-    \multicolumn{6}{l}{\textit{Implicit relations for intertemporal consistency}}
-    \\
-    \midrule
+      \midrule
+      \multicolumn{7}{l}{\textit{Implicit relations for intertemporal consistency}}
+      \\
+      \midrule
 
-    \textcolor{gray}{\makecell[l]{Interest: loans $r_tL^P_{t-1}$}}
-      & \textcolor{gray}{$0$}
-      & \textcolor{gray}{$-r_tL^P_{t-1}$}
-      & \textcolor{gray}{$+r_tL^P_{t-1}$}
-      & \textcolor{gray}{$0$}
-      & \textcolor{gray}{$0$}
-    \\
+      \textcolor{gray}{\makecell[l]{Interest: loans $r_tL^P_{t-1}$}}
+        & \textcolor{gray}{$0$}
+        & \textcolor{gray}{$-r_tL^P_{t-1}$}
+        & \textcolor{gray}{$-r_tL^P_{t-1}$}
+        & \textcolor{gray}{$+r_tL^P_{t-1}$}
+        & \textcolor{gray}{$0$}
+        & \textcolor{gray}{$0$}
+      \\
 
-    \textcolor{gray}{\makecell[l]{Interest: speculative loans $r_tL^S_{t-1}$}}
-      & \textcolor{gray}{$0$}
-      & \textcolor{gray}{$-r_tL^S_{t-1}$}
-      & \textcolor{gray}{$+r_tL^S_{t-1}$}
-      & \textcolor{gray}{$0$}
-      & \textcolor{gray}{$0$}
-    \\
+      \textcolor{gray}{\makecell[l]{Interest: speculative loans $r_tL^S_{t-1}$}}
+        & \textcolor{gray}{$0$}
+        & \textcolor{gray}{$-r_tL^S_{t-1}$}
+        & \textcolor{gray}{$-r_tL^S_{t-1}$}
+        & \textcolor{gray}{$+r_tL^S_{t-1}$}
+        & \textcolor{gray}{$0$}
+        & \textcolor{gray}{$0$}
+      \\
 
-    \textcolor{gray}{\makecell[l]{Interest: deposits $r^D_tM_{t-1}$}}
-      & \textcolor{gray}{$+r^D_tM_{t-1}$}
-      & \textcolor{gray}{$0$}
-      & \textcolor{gray}{$-r^D_tM_{t-1}$}
-      & \textcolor{gray}{$0$}
-      & \textcolor{gray}{$0$}
-    \\
+      \textcolor{gray}{\makecell[l]{Interest: deposits $r^D_tM_{t-1}$}}
+        & \textcolor{gray}{$+r^D_tM_{t-1}$}
+        & \textcolor{gray}{$0$}
+        & \textcolor{gray}{$+r^D_tM_{t-1}$}
+        & \textcolor{gray}{$-r^D_tM_{t-1}$}
+        & \textcolor{gray}{$0$}
+        & \textcolor{gray}{$0$}
+      \\
 
-    % ---------------------------------------------------------------
-    % 4. Financial sector closure
-    % ---------------------------------------------------------------
+      % ---------------------------------------------------------------
+      % 4. Financial sector closure
+      % ---------------------------------------------------------------
 
-    \midrule
-    \multicolumn{6}{l}{\textit{Financial-sector closure}}
-    \\
-    \midrule
+      \midrule
+      \multicolumn{7}{l}{\textit{Financial-sector closure}}
+      \\
+      \midrule
 
-    Distributed bank profits $d\Pi^B_t$
-      & $+d\Pi^B_t$
-      & $0$
-      & $-d\Pi^B_t$
-      & $0$
-      & $0$
-    \\
+      Distributed bank profits $d\Pi^B_t$
+        & $+d\Pi^B_t$
+        & $0$
+        & $+d\Pi^B_t$
+        & $-d\Pi^B_t$
+        & $0$
+        & $0$
+      \\
 
-    Change in bank equity $\Delta E^B_t$
-      & $-\Delta E^B_t$
-      & $0$
-      & $+\Delta E^B_t$
-      & $0$
-      & $0$
-    \\
+      Change in bank equity $\Delta E^B_t$
+        & $-\Delta E^B_t$
+        & $0$
+        & $-\Delta E^B_t$
+        & $+\Delta E^B_t$
+        & $0$
+        & $0$
+      \\
 
-    % ---------------------------------------------------------------
-    % 5. Closing balances
-    % ---------------------------------------------------------------
+      % ---------------------------------------------------------------
+      % 5. Closing balances
+      % ---------------------------------------------------------------
 
-    \midrule
-    \multicolumn{6}{l}{\textit{Closing balances: correcting stocks for changes in the current period}}
-    \\
-    \midrule
+      \midrule
+      \multicolumn{7}{l}{\textit{Closing balances: correcting stocks for changes in the current period}}
+      \\
+      \midrule
 
-    New productive loans $\Delta L^P_t$
-      & $0$
-      & $+cD_t$
-      & $-cD_t$
-      & $0$
-      & $0$
-    \\
+      New productive loans $\Delta L^P_t$
+        & $0$
+        & $+cD_t$
+        & $+cD_t$
+        & $-cD_t$
+        & $0$
+        & $0$
+      \\
 
-    New speculative loans $\Delta L^S_t$
-      & \newterm{$SD_t$}
-      & $0$
-      & \newterm{$-SD_t$}
-      & $0$
-      & $0$
-    \\
+      New speculative loans $\Delta L^S_t$
+        & \newterm{$SD_t$}
+        & $0$
+        & \newterm{$SD_t$}
+        & \newterm{$-SD_t$}
+        & $0$
+        & $0$
+      \\
 
-    New deposits $\Delta M_t$
-      & $-(cD_t+\newterm{SD_t})$
-      & $0$
-      & $+(cD_t+\newterm{SD_t})$
-      & $0$
-      & $0$
-    \\
+      New deposits $\Delta M_t$
+        & $-(cD_t+\newterm{SD_t})$
+        & $0$
+        & $-(cD_t+\newterm{SD_t})$
+        & $+(cD_t+\newterm{SD_t})$
+        & $0$
+        & $0$
+      \\
 
-    Central-bank credit $\Delta F^{CB}_t$
-      & $0$
-      & $0$
-      & $+\Delta F^{CB}_t$
-      & $-\Delta F^{CB}_t$
-      & $0$
-    \\
+      Central-bank credit $\Delta F^{CB}_t$
+        & $0$
+        & $0$
+        & $0$
+        & $+\Delta F^{CB}_t$
+        & $-\Delta F^{CB}_t$
+        & $0$
+      \\
 
-    New reserves $\Delta R_t$
-      & $0$
-      & $0$
-      & $-\Delta R_t$
-      & $+\Delta R_t$
-      & $0$
-    \\
+      New reserves $\Delta R_t$
+        & $0$
+        & $0$
+        & $0$
+        & $-\Delta R_t$
+        & $+\Delta R_t$
+        & $0$
+      \\
 
-    \midrule
+      \midrule
 
-    Column sum
-      & $0$
-      & $0$
-      & $0$
-      & $0$
-      & $0$
-    \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+      Column sum
+        & $0$
+        & $0$
+        & $0$
+        & $0$
+        & $0$
+        & $0$
+      \\
+      \bottomrule
+    \end{tabular}
+\end{sidewaystable}

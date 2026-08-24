@@ -12,6 +12,7 @@
 \addbibresource{ref.bib}
 \addbibresource{speculation-refs.bib}
 \usepackage{graphicx}
+\usepackage{rotating}
 \usepackage{diagbox}
 \usepackage{enumitem}
 \usepackage{todonotes}
@@ -73,9 +74,8 @@ On this basis, we then present a simple static model in section \ref{sec:model} 
 
 \section{Keynes on money and speculation} \label{sec:historyofthought}
 
-It is a quite well-known fact  that the \GT and the \treatise do rest on fundamentally different conceptions of \emph{money itself} \parencite[e.g.][]{smithinKeynessTheoriesMoney2013}.
-The \treatise{} is more preoccupied with the mechanics of credit creation and provides a detailed classification of how bank credit eventually creates bank deposits so that the \treatise is effectively driven by a view of money as \emph{endogenous}: the banking system creates purchasing power through lending, and the supply of money responds to the needs of industry and finance. The \GT{}, in contrast, shelves this institutional apparatus. Money enters the analysis as a simple stock of base money $M=\bar{M}$, determined by the monetary authority, and the analytical effort shifts entirely to the demand side---the liquidity preference schedule. The banking system fades into the background; what matters is the portfolio choice between holding money and holding assets.
-\todo{find REFs}
+It is a quite well-known fact  that the \GT and the \treatise do rest on fundamentally different conceptions of \emph{money itself} \parencite[e.g.][]{smithinKeynessTheoriesMoney2013, patinkinKeynesMonetaryThought1976}.
+The \treatise{} is more preoccupied with the mechanics of credit creation and provides a detailed classification of how bank credit eventually creates bank deposits so that the \treatise is effectively driven by a view of money as \emph{endogenous}: the banking system creates purchasing power through lending, and the money supply expands with bank credit. This is a credit-based rather than a horizontalist form of endogeneity: banks ration credit in line with their own liquidity and risk concerns, and the central bank continues to steer the quantity of money through the bank rate \parencite{cardimdecarvalhoKeynesEndogeneityMoney2013}. The \GT{}, in contrast, shelves this institutional apparatus. Money enters the analysis as a simple stock of base money $M=\bar{M}$, determined by the monetary authority, and the analytical effort shifts entirely to the demand side---the liquidity preference schedule. The banking system fades into the background; what matters is the portfolio choice between holding money and holding assets \parencite{chickMacroeconomicsAfterKeynes1983}.
 
 Such portfolio choice thereby also touches on the role of speculation, as portfolios might also cover more speculative assets, that are held not because of their productive capacities and associated economic return, but because their owners expect (or, hope for) an increase of their underlying market price.
 Speculation is, thereby, distinct from investment as it channels liquidity into purposes that do not facilitate further economic activity. The fact that speculative activity does not enter GDP directly often motivates bracketing out speculative behavior completely in both, teaching and research contexts. 
@@ -140,29 +140,22 @@ There is no limit to the amount of bank money which the banks can safely create 
 
 Keynes elaborates on this in the \treatise[Vol.~1, Ch.~3] by classifying bank deposits into two main categories according to their economic function: income-deposits (households' transaction balances) and business-deposits (firms' working capital) for transactions to ensure daily production and provisioning, and savings-deposits (interest-bearing savings accounts) as well deposits for financial transactions of firm dedicate to organize financial investments. The classification is reproduced in Table~\ref{tab:treatise-balance} and summarized in \treatise[Vol.~1, Ch.~15] under two broader headings, where real and financial circulation a are separated into two different spheres.
 
-\todo{make table below nicer, like that above}
-
 \begin{table}[h]
 \centering
 \caption{Keynes's Classification of Bank Deposits (from
 \treatise[Vol.~1, Chs.~3 and 15])}\label{tab:treatise-balance}
-\begin{tabular}{llc}
+\begin{tabular}{lc}
 \toprule
-& \shortstack{\textbf{Description}}
 & \shortstack{\textbf{Circulation}} \\
 \midrule
-\makecell[l]{\textbf{Income-deposits}}
- & Households' transaction balances
+\makecell[l]{\textbf{Income-deposits} \\ \hspace{1em}(households' transaction balances)}
  & \multirow{2}{*}{Industrial} \\
-\makecell[l]{\textbf{Operative Business-deposits}}
- & Firms' working capital
+\makecell[l]{\textbf{Operative Business-deposits} \\ \hspace{1em}(firms' working capital)}
  & \\
 \midrule
-\makecell[l]{\textbf{Savings-deposits}}
- & Interest-bearing savings
+\makecell[l]{\textbf{Savings-deposits} \\ \hspace{1em}(interest-bearing savings)}
  & \multirow{2}{*}{Financial} \\
-\makecell[l]{\textbf{Speculative Business-deposits}}
- & Financial transactions
+\makecell[l]{\textbf{Speculative Business-deposits} \\ \hspace{1em}(financial transactions)}
  & \\
 \bottomrule
 \end{tabular}
@@ -389,7 +382,27 @@ with loans creating deposits one-for-one ($dM=dL$), $\mu$ measures the flow of n
 \end{figure}
 
 Building on the baseline accounting structure as shown in tables \ref{tab:stockmatrix_simple} and \ref{tab:flowmatrix_simple}, we now show  how the introduction of an asset market impacts the stock-flow characteristics of th economy. Indicatively for the relevant changes are the introduction of real assets $A_t$ household's asset side and the new role of speculative loans given to households (both shown in Table \ref{tab:sfc-asset-stock}), where the flow matrix 
-%TODO: ich glaube die balance sheets stimmen jetzt. aber wir sollten noch zwei sachen machen: (1) eine aggregierte saldonull für AE und I bauen und (2) in den captions genau ausweisen, was die underlying definitions für die closures sind. eventuell sollte man auch die fixe zuordnung der neuen deposits aufheben und das flexibel über households und firms schreiben. aber dann bricht die klare defnition...
+To make the stock-flow consistency of the asset-market extension transparent we consolidate the two private-sector blocks --- households (the asset-expenditure side, $AE$) and firms (the investment side, $I$) --- into a single \emph{private sector} column, shown in Tables \ref{tab:stockmatrix_assets} and \ref{tab:assetpk-flow}. Summing the household and firm rows yields the following aggregated \emph{Saldonull} identities, which must hold sector-wide irrespective of the allocation of individual instruments between $AE$ and $I$.
+
+On the stock side the private sector's net worth equals its real and speculative assets minus its borrowing from banks:
+\begin{equation}
+  V^H_t + V^F_t
+  = \underbrace{K_t + A_t}_{\text{private assets}}
+    - \underbrace{L^P_t + L^S_t}_{\text{loans from banks}} .
+  \tag{Private stock identity}
+  \label{eq:saldonull-stock}
+\end{equation}
+
+On the flow side the private sector's net acquisition of financial assets in the period equals its net borrowing from the banking sector. Using the closing-balance rows of Table \ref{tab:assetpk-flow},
+\begin{align}
+  \Delta M_t + \Delta L^S_t + \Delta L^P_t \Big|_{H+F}
+  &= -(cD_t + SD_t) + SD_t + cD_t = 0 ,
+  \tag{Private flow identity}
+  \label{eq:saldonull-flow}
+\end{align}
+so that the new deposits created to finance both productive and speculative positions are exactly matched by the corresponding new loans. The speculative trading block $+AE_t$ and $-AE_t$ cancels \emph{within} the private sector, confirming that gross asset expenditure is a purely internal reallocation of the existing stock $A_t$ and never appears as a net private-sector flow. These two identities constitute the consolidated Saldonull for $AE$ and $I$ and verify that the asset-market extension preserves stock-flow consistency.
+
+%TODO: (2) in den captions genau ausweisen, was die underlying definitions für die closures sind. eventuell sollte man auch die fixe zuordnung der neuen deposits aufheben und das flexibel über households und firms schreiben. aber dann bricht die klare definition...
 
 \input{tables/StockMatrix_assets.tex} \label{tab:sfc-asset-stock}
 %expand? -- (1) das ist traditionell geschrieben, aber man könnte auch die rentiers auskoppeln und als eigene Klasse darstellen. (machen wir mal eher nicht...?) 
@@ -607,9 +620,9 @@ The mechanisms captured by our model variants are not merely theoretical artefac
 Between March 2020 and early 2022, the Federal Reserve purchased roughly \$1.33~trillion in mortgage-backed securities---nearly 90\% of the growth in eligible mortgages \citep{klein2025}. Combined with near-zero interest rates and comparable programmes at other major central banks, this produced what market participants called an ``everything rally'': equities, bonds, real estate, commodities, and crypto-assets all rose in synchrony \citep{ft2020everything, handwiki}. The Brookings Institution estimates that US home values rose by approximately \$100,000 on average, adding \$12~trillion in household equity and generating \$480--840~billion in additional consumption through the housing wealth effect \citep{klein2025}. The first part of this sequence is represented by Eqs.~\ref{eq:sd}--\ref{eq:ap}: a lower lending rate raises speculative debt, gross asset demand, and the asset price. The observed wealth effect is not present in the teaching variants, whose real feedbacks instead operate through credit rationing, the policy rate, or firms' investment demand; adding consumption out of wealth would require a further equation.
 
 \paragraph{Monetary tightening and the ``crypto winter.''}
-When the Fed began raising rates in March 2022, the effect was felt immediately in the most leveraged corner of the financial circulation. An IMF study of the ``crypto cycle'' finds that a one-percentage-point rise in the shadow federal funds rate produces a persistent 0.15 standard-deviation decline in the common factor driving crypto-asset prices, with the entire market losing over \$1.7~trillion in value from its November 2021 peak \citep{che2023}. The authors attribute this to the risk-taking channel: tighter monetary policy raises the effective risk aversion of the marginal investor, who responds by deleveraging. This maps onto the asset block common to all variants: rising \(i \to\) rising \(r \to\) falling \(SD\) \(\to\) falling \(AE \to\) falling \(AP\). PQCr adds the reverse contemporaneous link, from \(AP\) to the policy rate, whereas PQCrDIFF strengthens the direct cost of speculative borrowing through \(r_{AP}=i_{AP}r\).
+When the Fed began raising rates in March 2022, the effect was felt immediately in the most leveraged corner of the financial circulation. An IMF study of the ``crypto cycle'' finds that a one-percentage-point rise in the shadow federal funds rate produces a persistent 0.15 standard-deviation decline in the common factor driving crypto-asset prices, with the entire market losing over \$1.7~trillion in value from its November 2021 peak \citep{cheCryptoCycleUS2023}. The authors attribute this to the risk-taking channel: tighter monetary policy raises the effective risk aversion of the marginal investor, who responds by deleveraging. This maps onto the asset block common to all variants: rising \(i \to\) rising \(r \to\) falling \(SD\) \(\to\) falling \(AE \to\) falling \(AP\). PQCr adds the reverse contemporaneous link, from \(AP\) to the policy rate, whereas PQCrDIFF strengthens the direct cost of speculative borrowing through \(r_{AP}=i_{AP}r\).
 
-The fact that the post-2020 correlation between crypto and equity markets rose sharply, and that the sensitivity of crypto prices to monetary policy became significant only after institutional investors entered the market \citep{che2023}, is also instructive. It suggests that the ``turnover multiplier'' \(1/(1-\gamma)\) advanced in our model is not a fixed structural parameter but a function of institutional participation---as more institutional investors trade crypto, the effective turnover rate \(\gamma\) rises, the multiplier increases, and the sensitivity of asset demand to changes in speculative debt grows.
+The fact that the post-2020 correlation between crypto and equity markets rose sharply, and that the sensitivity of crypto prices to monetary policy became significant only after institutional investors entered the market \citep{cheCryptoCycleUS2023}, is also instructive. It suggests that the ``turnover multiplier'' \(1/(1-\gamma)\) advanced in our model is not a fixed structural parameter but a function of institutional participation---as more institutional investors trade crypto, the effective turnover rate \(\gamma\) rises, the multiplier increases, and the sensitivity of asset demand to changes in speculative debt grows.
 
 \paragraph{The two-way street.}
 Our model emphasizes the arrow from monetary conditions to asset prices, but recent experience also illustrates the reverse: the housing wealth effect from QE generated additional consumption, contributing to the post-2021 inflation that forced the Fed to tighten in the first place \citep{klein2025}. This creates a closed loop that our static model cannot fully capture but that the dynamic extensions of the \texttt{PKAssetPrices} framework are designed to explore: easy money \(\to\) rising asset prices \(\to\) rising consumption \(\to\) inflation \(\to\) tighter money \(\to\) falling asset prices. Keynes's insight that the speculative motive connects financial and industrial circulations in \emph{both} directions is borne out by the data.
