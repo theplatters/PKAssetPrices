@@ -57,8 +57,7 @@ In this paper we build on \citet{fontanaSimpleTeachableMacroeconomic2009} to dev
 
 Aside from its core purpose to rationally reconstruct key stances on money and finance developed by Keynes, we find that the resulting model can also be used to introduce students to the concept of endogenous money as a key starting point for understanding and modeling interactions between real and financial sectors.
 
-To also provide a historically coherent account, we first trace Keynes' original arguments in the \treatise and the \GT in section \ref{sec:historyofthought} and discuss how Keynes used these different approaches to describe monetary policy and financial activities under different historical and institutional conditions.
-Following the Keynesian adage that economists should focusing on "choosing models that are relevant to the contemporary world" \citep{Keynes1938HarrodLetter}, we suggest recombining different arguments made in both works to arrive at a convincing representations of contemporary monetary systems.
+To also provide a historically coherent account, we first trace Keynes' original arguments in the \treatise and the \GT in section \ref{sec:historyofthought} and discuss how Keynes used these different approaches to describe monetary policy and financial activities under different historical and institutional conditions. Following the Keynesian adage that economists should focusing on "choosing models that are relevant to the contemporary world" \citep{Keynes1938HarrodLetter}, we suggest recombining different arguments made in both works to arrive at a convincing representations of contemporary monetary systems.
 
 On this basis, we then present a simple static model in section \ref{sec:model} that integrates key insights of Keynes on money and speculation. We use this model to illustrate the impact of speculation on the real economy under different model assumptions in section \ref{sec:impact}. To better connect this discussion with real-world developments successive section explore the implications of the model for both policy-making (in section TODO) and financial market dynamics (in section TODO) with a topical focus of notions on stability and instability.
 
@@ -88,10 +87,6 @@ In the \GT{} (1936), however, this cordon is removed: speculative motives are ca
 The shift from the \treatise{} to the \GT{} is therefore not a single change but a \emph{double shift}: one along the speculation--real-economy dimension, another along the endogenous--exogenous money dimension.
 These two shifts can be represented by the simple typology, shown in Table~\ref{tab:typology}.
 
-%NOTE: Should we better write something like "post-Keynesian intuition" oder "heterodox economics" (dann wüde man oben links vllt auch einfach "neclassical economics" schreiben?) instead of "our model"?
-% Hm hab Angst, dass "heterodox economics" begrifflich dann bisschen überladen ist. Lieber post-Keynesian intuition
-
-
 \begin{table}[h]
 \centering
 \caption{Two dimensions of the \treatise{}--\GT{}
@@ -107,7 +102,7 @@ shift}\label{tab:typology}
 \midrule
 \makecell[l]{\textbf{Endogenous money} \\ \hspace{1em}(credit money,\\ \hspace{1em}loans create deposits)}
  & \treatise{}
- & Our model \\
+ & post-Keynesian intuition \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -118,16 +113,13 @@ In the top left corner money is as ``neutral'' as it goes: here, base money is a
 In contrast, the \treatise conventionally proceeds on the assumption that such speculative activity, while relevant to for financial stability in an endogenous money context, does not directly impact on credit provided for investment (or consumption) purposes.
 Hence, as indicated in the bottom left cell of table \ref{tab:typology}, the link between speculation and real economic developments is absent and the focus is directed on the internal dynamics of the banking sector and the inflation and contraction of balance sheets of financial market actors. 
 
-Finally, the bottom-right bracket poses a scenario, where we allow for both, endogenous money and real-world impacts of speculative motives and tendencies.
-In principle, such an account resonates well with a Post-Keynesian stance, which is typically associated with both, the assumption of endogenous money and the conviction that financial markets are not neutral intermediaries. However, at the same time models in the Post-Keynesian tradition often avoid making the impact of speculation explicit, because modeling the impact of speculation on GDP and employment requires the introduction of specific assumptions that make this link explicit, which has the potential to substantially complicate otherwise simple model setups.\footnote{See, however, these REFs for some exceptions.}
+Finally, the bottom-right bracket poses a scenario, where we allow for both, endogenous money and real-world impacts of speculative motives and tendencies. As indicated, such an account resonates well with a Post-Keynesian stance, which is typically associated with both, the assumption of endogenous money and the conviction that financial markets are not neutral intermediaries \citep{Chick.2002}. However, at the same time models in the Post-Keynesian tradition often avoid making the impact of speculation explicit, because this would require the introduction of specific assumptions that make this link explicit, which has the potential to substantially complicate otherwise simple model setups.\footnote{See, however, these REFs for some exceptions.}
 \todo{add REFs in footnote – hast du da mal was gefunden franz?}
 
 In section \ref{sec:model} further below we provide a simple model that focuses on the bottom row of table \ref{tab:typology} and compares different variants of bringing endogenous money in a simple modeling framework. This framework makes  the different channels and arguments, by which speculative behavior might indeed impact on the development of the real economy, explicit.
 However, before doing so we revisit key instances in Keynes' original works to better substantiate our summary as well as the successive modeling efforts.
 
-\todo{Wir könnten uns hier fragen: Wollen wir auch einen Variante für oben links und oben rechts als Modell haben – als nicht nur "bottom row" wie im text? Ich denke sowas haben wir in der genauen Form gerade nicht...
--- man könnte aber dort ansetzen wo wir schon sind und verschiedene challenges darstellen, die so einen kanal aufmachen. 
-NOTE/UPDATE: HABS MAL SO UMGESCHRIEBEN, DASS WIR DAS NICHT MACHEN SONDERN BEI ENDOGENEN SZEANRIEN BLEIBEN. WIR KÖNNEN JA NOCHMAL ÜBERLEGEN WENN WIR DAS SETUP FÜR DIE GRAPHS HABEN}
+%expand?{Wir könnten uns hier fragen: Wollen wir auch einen Variante für oben links und oben rechts als Modell haben – als nicht nur "bottom row" wie im text? Ich denke sowas haben wir in der genauen Form gerade nicht... NOTE/UPDATE: HABS MAL SO UMGESCHRIEBEN, DASS WIR DAS NICHT MACHEN SONDERN BEI ENDOGENEN SZEANRIEN BLEIBEN. WIR KÖNNEN JA NOCHMAL ÜBERLEGEN WENN WIR DAS SETUP FÜR DIE GRAPHS HABEN
 
 \subsection{Keynes on endogenous vs.\ exogenous Money} \label{subsec:endogenous-money}
 
@@ -140,8 +132,6 @@ There is no limit to the amount of bank money which the banks can safely create 
 \todo{recheck quotation and add reference}
 
 Keynes elaborates on this in the \treatise[Vol.~1, Ch.~3] by classifying bank deposits into two main categories according to their economic function: income-deposits (households' transaction balances) and business-deposits (firms' working capital) for transactions to ensure daily production and provisioning, and savings-deposits (interest-bearing savings accounts) as well deposits for financial transactions of firm dedicate to organize financial investments. The classification is reproduced in Table~\ref{tab:treatise-balance} and summarized in \treatise[Vol.~1, Ch.~15] under two broader headings, where real and financial circulation a are separated into two different spheres.
-
-\todo{make table below nicer, like that above}
 
 \begin{table}[h]
 \centering
@@ -182,10 +172,10 @@ The left-hand side $M$ is the total quantity of money, now treated as a variable
 
 As large parts of the \GT treat bonds as the main category of speculative assets, the interest rate $r$ and the price of speculative assets behave proportionally: the greater the price of speculative assets, the higher the demand for money (as people wait for falling asset prices), which effectively drives the price of cash (in form of $r$). While such a channel from speculative to interest rate seems plausible in principle -- e.g., when central banks respond to speculative frenzies by financial market tightening --, this setups results in a very peculiar and specific scenario, where speculative dynamics are the sole main driver of real interest rates. 
 
-However, at the same time, high real interest rates might easily feed back on asset prices -- e.g., via lack of cheap credit to sustain high asset prices --, an aspect that is not directly incorporated in the above setup of the \GT. So while there seems to be some consensus that simultaneity is at work, when it comes to the relationship between interest rates and asset prices, the \GT provides a very specific interpretation of this causal channel: it effectively abstracts from both, other forces impacting on the interest rate as well as possible feedback effects from the interest rate on asset prices. This specific construction, somewhat ironically, actually limits the generality of the \GT, which does not model the interplay of interest rates and asset prices in great detail. In contrast, as we will show further below, the treatment found in the \treatise offers a more open and flexible starting point to model this simultaneous relationship.
+However, at the same time, high real interest rates might easily feed back on asset prices -- e.g., via lack of cheap credit to sustain high asset prices --, an aspect that is not directly incorporated in the above setup of the \GT. So while there seems to be some consensus that simultaneity is at work, when it comes to the relationship between interest rates and asset prices, the \GT provides a very specific interpretation of this causal channel: it effectively abstracts from both, other forces impacting on the interest rate as well as possible feedback effects from the interest rate on asset prices. This specific construction, somewhat ironically, actually limits the generality of the \GT, which does not model the interplay of interest rates and asset prices in great detail. In contrast, the treatment found in the \treatise offers a more open and flexible starting point to model this simultaneous relationship.
 
-\todo{Wir hatten eine Variante mit so einem interplay und eventuell sollten wir die auf Basis dieser Einfügung später auch mal bringen...}
-\todo{eventuell könnte man mit verweis auf die liquidity preference auch nochmal diese turnover sache besprechen. eventuell wäre es einfach sinnvoller zu sagen, die liquidity preference bestimmt $\gamma$ im (dynamischen) modell... – das schiene mir an sich recht plausibel... im gegensatz zu dem was in der \GT so direkt steht..}
+%expand?{Wir hatten eine Variante mit so einem interplay und eventuell sollten wir die auf Basis dieser Einfügung später auch mal bringen...}
+%NOTE: eventuell könnte man mit verweis auf die liquidity preference auch nochmal diese turnover sache besprechen. eventuell wäre es einfach sinnvoller zu sagen, die liquidity preference bestimmt $\gamma$ im (dynamischen) modell... – das schiene mir an sich recht plausibel... im gegensatz zu dem was in der \GT so direkt steht HABE ICH UNTEN MAL GEMACHT, KANN MAN GGF. LÖSCHEN
 
 A further consequence of this assumption is that the banking system as a credit-creating institution is essentially absent from the analysis in the \GT; loans, deposits, and reserve management are no longer explicitly modeled.Consequently, the famous classification in the \treatise[Vol.~1, Ch.~3] is collapsed into a single sentence in the \GT[Ch.~15]:
 
@@ -355,7 +345,7 @@ Equations~\ref{eq:sd}--\ref{eq:ap} form a simultaneous but linear feedback loop.
 \end{equation}
 provided $QA>0$ and $0\leq\gamma<1$. The negative price-deviation term in speculative debt raises the denominator and therefore dampens, rather than amplifies, the contemporaneous price response. 
 
-This simple static model gives only a stylized representation and does not represent the full spectrum of forces influencing speculative demand. In particular, it contains the deviation of the current asset-price index from its normalized reference level but neither past nor expected price changes. One may interpret $\gamma$ as a reduced-form indicator of market sentiment: expected price increases encourage sellers to reinvest more of their receipts, whereas pessimism reduces this within-period recycling. Such an interpretation resonates with the \treatise{} emphasis on bullish and bearish expectations discussed in Section~\ref{subsec:speculation}, but expectations remain exogenous in the present model.
+This simple static model gives only a stylized representation and does not represent the full spectrum of forces influencing speculative demand. In particular, it contains the deviation of the current asset-price index from its normalized reference level but neither past nor expected price changes. One may interpret $\gamma$ as a reduced-form indicator of market sentiment: expected price increases encourage sellers to reinvest more of their receipts, whereas pessimism reduces this within-period recycling. Such an interpretation resonates with the \treatise{} emphasis on bullish and bearish expectations discussed in Section~\ref{subsec:speculation}, but expectations remain exogenous in the present model. However, from the perspective of the \GT{}, $\gamma$ can be interpreted as a reduced-form representation of the liquidity preference function: here, $\gamma$ captures the degree to which agents are willing to hold onto the receipts from sold assets for future investment versus reinvesting them immediately.
 
 AS indicated, speculative debt now appears as a liability of the private sector and
 an asset of the banking system alongside productive loans $cD$. Consequently,
@@ -393,8 +383,7 @@ Building on the baseline accounting structure as shown in tables \ref{tab:stockm
 %TODO: ich glaube die balance sheets stimmen jetzt. aber wir sollten noch zwei sachen machen: (1) eine aggregierte saldonull für AE und I bauen und (2) in den captions genau ausweisen, was die underlying definitions für die closures sind. eventuell sollte man auch die fixe zuordnung der neuen deposits aufheben und das flexibel über households und firms schreiben. aber dann bricht die klare defnition...
 
 \input{tables/StockMatrix_assets.tex} \label{tab:sfc-asset-stock}
-%expand? -- (1) das ist traditionell geschrieben, aber man könnte auch die rentiers auskoppeln und als eigene Klasse darstellen. (machen wir mal eher nicht...?) 
-% Find ich würd dann einen zu großen anderen Punkt auchmachen mm lieber nicht
+%expand? -- (1) das ist traditionell geschrieben, aber man könnte auch die rentiers auskoppeln und als eigene Klasse darstellen. (machen wir mal eher nicht...?) – FS: Find ich würd dann einen zu großen anderen Punkt auchmachen mm lieber nicht. --> DANN LASSEN WIR ES MAL SO!
 
 \input{tables/FlowMatrix_assets.tex} \label{tab:sfc-asset-flow}
 
