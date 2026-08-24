@@ -248,31 +248,32 @@ end
 # -------- public macros --------
 
 """
-Dynamic model DSL:
+    Name = @model begin ... end
 
-@model begin
-@time 0.0:1.0:100.0
+Define a dynamic model and return a [`DynamicParametrization`](@ref). The
+body requires `@time` and supports `@variables`, `@parameters`, `@init`, and
+`@equations`. Variables may be indexed at `t`, `t-1`, or `t-2` in the
+equations.
 
-@flows begin
-  Y = "output"
-  C = "consumption"
+```julia
+Example = @model begin
+    @time 0.0:1.0:10.0
+    @variables begin
+        Y = "output"
+        K = "capital"
+    end
+    @parameters begin
+        a = 0.5, "capital share"
+    end
+    @init begin
+        K = [1.0]
+    end
+    @equations begin
+        Y[t] == a * K[t - 1]
+        K[t] == K[t - 1] + Y[t]
+    end
 end
-
-@stocks begin
-  K = "capital"
-  B = "debt"
-end
-
-@parameters begin
-  α = 0.3, "share"
-  β = ones(101), "time varying"  # allowed; used by your solver build_context
-end
-
-@equations begin
-  Y == C + I
-  K[t] == K[t-1] + I - δ*K[t-1]
-end
-end
+```
 """
 macro model(body)
     time_expr = nothing

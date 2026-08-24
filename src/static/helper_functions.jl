@@ -257,7 +257,7 @@ function build_table_from_solutions(solutions, scenario_names = ["Baseline", "Ex
     end
 
     table *= "</table>"
-    return HTML{String}(table)
+    return Base.HTML{String}(table)
 end
 
 function eval_curve(param::Parametrization, input::Dict{Symbol, Float64})

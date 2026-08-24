@@ -1,136 +1,37 @@
 """
-    @model name begin
-        @variables begin
-            var1 = "description"
-            var2 = "description"
-            ...
-        end
-        
-        @parameters begin
-            param1 = value, "description"
-            param2 = value, "description"
-            ...
-        end
-        
-        @equations begin
-            var1 == expression
-            var2 == expression
-            ...
-        end
-        
-        @curves begin
-            CurveName(arg) = expression
-            ...
-        end
-        
-        @balances begin
-            @sheet SheetName begin
-                @asset field1 = expression
-                @liability field2 = expression
-                ...
-            end
-        end
-    end
+    Name = @model begin ... end
 
-Define a macroeconomic model with variables, parameters, equations, and balance sheets.
+Define a static model and return its [`Parametrization`](@ref). The body
+supports `@variables`, `@parameters`, and `@equations`, with optional
+`@curves` and `@balances` blocks. A balance block contains `@sheet` blocks,
+which in turn contain `@asset` and `@liability` entries.
 
-# Arguments
-- `name::Symbol`: The name of the model (e.g., SimplePK2)
-
-# Nested Macros
-
-## @variables
-Defines the endogenous variables of the model. Each variable can have a description.
-
-**Example:**
 ```julia
-@variables begin
-    Y = "Output"
-    N = "Employment"
-    P = "Price level"
-end
-```
-
-## @parameters
-Defines the exogenous parameters and their default values. Each parameter requires a value and can have a description.
-}
-**Example:**
-```julia
-@parameters begin
-    b = 0.5, "consumption rate"
-    c = 0.8, "credit rationing"
-    k = 0.3, "reserve share"
-end
-```
-
-## @equations
-Defines the equilibrium equations that must hold in the model. Uses equality (==) to specify relationships.
-
-**Example:**
-```julia
-@equations begin
-    Y == ND + c * D
-    P == (1 + n) * a * W
-    N == a * Y
-end
-```
-
-## @curves
-Defines special curves (e.g., IS, LM, ADc, ASc) as functions of variables for analysis.
-
-**Example:**
-```julia
-@curves begin
-    IS(r) = (1/(1-b)) * (c * (d₀ - d₁ * r))
-    ADc(P) = (1/(1-b)) * (c * (d₀ - d₁ * ((1 + m) * (i₀ + i₁ * P))))
-end
-```
-
-## @balances
-Defines balance sheets with assets and liabilities that must sum correctly.
-
-**Example:**
-```julia
-@balances begin
-    @sheet Bank begin
-        @asset loans = dL
-        @liability deposits = dM
-    end
-end
-```
-
-# Output
-Generates:
-- Parameter struct (`nameParams`): holds all parameters
-- Model struct (`nameModel`): holds parameters and initial conditions
-- Solution struct (`nameSolution`): holds solved variable values and balance sheets
-- Functions for solving the model and computing curves
-
-# Example
-```julia
-@model SimplePK2 begin
+Example = @model begin
     @variables begin
-        Y = "Output"
-        N = "Employment"
+        Y = "output"
+        C = "consumption"
     end
-    
     @parameters begin
-        b = 0.5, "consumption rate"
-        a = 0.8, "production efficiency"
+        c = 0.8, "consumption share"
     end
-    
     @equations begin
-        Y == b * Y
-        N == a * Y
+        Y == C
+        C == c * Y
+    end
+    @curves begin
+        demand(Y) = c * Y
+    end
+    @balances begin
+        @sheet Household begin
+            @asset wealth = Y
+            @liability debt = 0.0
+        end
     end
 end
-
-# Solve the model
-sol = solve_model(SimplePK)
-println(sol.sol.Y)
 ```
 
-See also: [`@scenario`](@ref)
+See also: [`@scenario`](@ref).
 """
 macro model(body)
     variables = Symbol[]
