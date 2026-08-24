@@ -14,18 +14,19 @@ Example = @model begin
     end
     @parameters begin
         c = 0.8, "consumption share"
+        G = 0.4, "autonomous spending"
     end
     @equations begin
         Y == C
-        C == c * Y
+        C == c * Y + G
     end
     @curves begin
-        demand(Y) = c * Y
+        demand(Y) = c * Y + G
     end
     @balances begin
         @sheet Household begin
             @asset wealth = Y
-            @liability debt = 0.0
+            @liability equity = Y
         end
     end
 end
