@@ -8,6 +8,7 @@ const IS_COLOR = RGBf(0.5, 0.0, 0.5)
 const IR_COLOR = RGBf(1.0, 0.5, 0.0)
 const ASSET_COLOR = IS_COLOR
 const LIABILITY_COLOR = IR_COLOR
+const REFERENCE_COLOR = RGBf(0.45, 0.45, 0.45)
 const COUNTERFACTUAL = (IS_COLOR, 0.38)
 const IS_IR_X_LIMITS = (4.0, 10.0)
 const IS_IR_Y_LIMITS = (0.06, 0.15)
@@ -97,6 +98,7 @@ function plot_is_lm(
   sol::Static.Solution,
   ax::Makie.Axis;
   lower_i0_factor::Real=0.0,
+  reference_solution::Union{Nothing, Static.Solution}=nothing,
 )
   output_range = range(IS_IR_X_LIMITS...; length=200)
   rate_range = range(IS_IR_Y_LIMITS...; length=200)
@@ -145,6 +147,21 @@ function plot_is_lm(
     linestyle=:dash,
     label="IR (lower i₀)",
   )
+  if !isnothing(reference_solution)
+    reference_vars = copy(reference_solution.variables)
+    reference_is_values = map(rate_range) do r
+      reference_vars[:r] = r
+      return Static.eval_curve(reference_solution.model, reference_vars).IS
+    end
+    lines!(
+      ax,
+      reference_is_values,
+      rate_range;
+      color=REFERENCE_COLOR,
+      linewidth=2.5,
+      label="IS (base)",
+    )
+  end
   xlims!(ax, IS_IR_X_LIMITS...)
   ylims!(ax, IS_IR_Y_LIMITS...)
   ax.xticks = LinearTicks(4)
@@ -161,11 +178,22 @@ function plot_is_lm(
     ax, 0.88, 0.72; text="IR (lower i₀)", space=:relative, color=COUNTERFACTUAL,
     fontsize=LEGEND_LABEL_SIZE - 2, align=(:right, :top)
   )
+  if !isnothing(reference_solution)
+    text!(
+      ax, 0.42, 0.06; text="IS (base)", space=:relative, color=REFERENCE_COLOR,
+      fontsize=LEGEND_LABEL_SIZE - 2, align=(:left, :bottom)
+    )
+  end
   return ax
 end
 
 """Plot aggregate demand and aggregate supply in output–price space."""
-function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=0.0)
+function plot_ad_as(
+  sol::Static.Solution,
+  ax::Makie.Axis;
+  lower_i0_factor::Real=0.0,
+  reference_solution::Union{Nothing, Static.Solution}=nothing,
+)
   equilibrium_curves = Static.eval_curve(sol)
   all(hasproperty(equilibrium_curves, curve) for curve in (:ADc, :ASc)) ||
     throw(ArgumentError("the model does not define aggregate ADc and ASc curves"))
@@ -227,6 +255,39 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=
     linestyle=:dash,
     label="AD (lower i₀)",
   )
+  if !isnothing(reference_solution)
+    reference_vars = copy(reference_solution.variables)
+    reference_demand_values = map(price_range) do price
+      reference_vars[:P] = price
+      return Static.eval_curve(reference_solution.model, reference_vars).ADc
+    end
+    lowered_reference_model = lower_autonomous_policy_rate(
+      reference_solution.model;
+      factor=lower_i0_factor,
+    )
+    lowered_reference_solution = Static.solve_model(lowered_reference_model)
+    lowered_reference_vars = copy(lowered_reference_solution.variables)
+    lowered_reference_demand_values = map(price_range) do price
+      lowered_reference_vars[:P] = price
+      return Static.eval_curve(lowered_reference_solution.model, lowered_reference_vars).ADc
+    end
+    lines!(
+      ax,
+      reference_demand_values,
+      price_range;
+      color=REFERENCE_COLOR,
+      linewidth=2.5,
+      label="AD (base)",
+    )
+    lines!(
+      ax,
+      lowered_reference_demand_values,
+      price_range;
+      color=REFERENCE_COLOR,
+      linewidth=2.5,
+      linestyle=:dash,
+    )
+  end
   xlims!(ax, ad_as_x_limits...)
   ylims!(ax, AD_AS_Y_LIMITS...)
   text!(
@@ -241,6 +302,12 @@ function plot_ad_as(sol::Static.Solution, ax::Makie.Axis; lower_i0_factor::Real=
     ax, 0.88, 0.88; text="AS", space=:relative, color=IR_COLOR,
     fontsize=LEGEND_LABEL_SIZE, align=(:right, :top)
   )
+  if !isnothing(reference_solution)
+    text!(
+      ax, 0.42, 0.30; text="AD (base)", space=:relative, color=REFERENCE_COLOR,
+      fontsize=LEGEND_LABEL_SIZE - 2, align=(:left, :bottom)
+    )
+  end
   return ax
 end
 
@@ -255,6 +322,7 @@ function plot_asset_market(
   sol::Static.Solution,
   ax::Makie.Axis;
   lower_i0_factor::Real=0.0,
+  reference_solution::Union{Nothing, Static.Solution}=nothing,
 )
   required_variables = (:AP, :AE, :AQ)
   all(haskey(sol.variables, variable) for variable in required_variables) ||
@@ -325,6 +393,39 @@ function plot_asset_market(
     linestyle=:dash,
     label="Demand (lower i₀)",
   )
+  if !isnothing(reference_solution)
+    reference_vars = copy(reference_solution.variables)
+    reference_demand_values = map(asset_price_range) do asset_price
+      reference_vars[:AP] = asset_price
+      return Static.eval_curve(reference_solution.model, reference_vars).AMD
+    end
+    lowered_reference_model = lower_autonomous_policy_rate(
+      reference_solution.model;
+      factor=lower_i0_factor,
+    )
+    lowered_reference_solution = Static.solve_model(lowered_reference_model)
+    lowered_reference_vars = copy(lowered_reference_solution.variables)
+    lowered_reference_demand_values = map(asset_price_range) do asset_price
+      lowered_reference_vars[:AP] = asset_price
+      return Static.eval_curve(lowered_reference_solution.model, lowered_reference_vars).AMD
+    end
+    lines!(
+      ax,
+      reference_demand_values,
+      asset_price_range;
+      color=REFERENCE_COLOR,
+      linewidth=2.5,
+      label="Asset Demand (base)",
+    )
+    lines!(
+      ax,
+      lowered_reference_demand_values,
+      asset_price_range;
+      color=REFERENCE_COLOR,
+      linewidth=2.5,
+      linestyle=:dash,
+    )
+  end
   xlims!(ax, asset_x_limits...)
   ylims!(ax, asset_y_limits...)
   text!(
@@ -339,6 +440,13 @@ function plot_asset_market(
     ax, 0.88, 0.88; text="Asset Supply", space=:relative, color=IR_COLOR,
     fontsize=LEGEND_LABEL_SIZE - 1, align=(:right, :top)
   )
+  if !isnothing(reference_solution)
+    text!(
+      ax, 0.42, 0.08; text="Asset Demand (base)", space=:relative,
+      color=REFERENCE_COLOR, fontsize=LEGEND_LABEL_SIZE - 2,
+      align=(:left, :bottom)
+    )
+  end
   return ax
 end
 
@@ -478,11 +586,16 @@ end
 
 """
     panel(sol; size = nothing, title = "Static equilibrium overview")
-    panel(sol, AssetMarketPanel(); size = nothing, title = "Static equilibrium overview")
+    panel(sol, AssetMarketPanel(); size = nothing, title = "Static equilibrium overview",
+          reference_solution = nothing, lower_i0_factor = 0.0)
 
 Create a presentation-ready equilibrium and balance-sheet overview. The default
 method contains IS–IR, AD–AS, and balance-sheet plots. Dispatch on
-`AssetMarketPanel` to additionally show the asset market.
+`AssetMarketPanel` to additionally show the asset market. The
+`AssetMarketPanel` method accepts `lower_i0_factor` and `reference_solution`;
+when a reference solution is supplied, the three curve plots show grey base
+reference curves (and dashed lower-policy-rate reference curves where
+applicable). The existing, unused `title` keyword remains accepted unchanged.
 """
 panel(
   sol::Static.Solution;
@@ -557,6 +670,8 @@ function panel(
   ::AssetMarketPanel;
   size=nothing,
   title="Static equilibrium overview",
+  reference_solution=nothing,
+  lower_i0_factor=0.0,
 )
   figure_size = isnothing(size) ? (1400, 1000) : size
 
@@ -615,9 +730,24 @@ function panel(
     xticklabelsize=BALANCE_TICK_LABEL_SIZE,
   )
 
-  plot_is_lm(sol, curve_axis)
-  plot_ad_as(sol, ad_as_axis)
-  plot_asset_market(sol, asset_market_axis)
+  plot_is_lm(
+    sol,
+    curve_axis;
+    reference_solution,
+    lower_i0_factor,
+  )
+  plot_ad_as(
+    sol,
+    ad_as_axis;
+    reference_solution,
+    lower_i0_factor,
+  )
+  plot_asset_market(
+    sol,
+    asset_market_axis;
+    reference_solution,
+    lower_i0_factor,
+  )
   plot_balance_sheets(sol, balance_axis)
 
   colgap!(figure.layout, 42)

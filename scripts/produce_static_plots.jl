@@ -2,20 +2,46 @@ using PKAssetPrices.Static: Baseline, FirmsRation, PQC, PQCr, PQCrDIFF,
   SimplePK, solve_model
 using CairoMakie
 using PKAssetPrices
+using Printf
 
+
+function print_equilibrium(name, solution)
+  println("Model: $name")
+  for (k, v) in sort(collect(solution.variables))
+    @printf("  %12s = %.6f\n", k, v)
+  end
+end
+
+function save_figure(output_dir, stem, figure)
+  pdf_path = joinpath(output_dir, "$(stem).pdf")
+  save(pdf_path, figure; pt_per_unit = 2)
+  println("Saved static equilibrium panel to $pdf_path")
+
+  png_path = joinpath(output_dir, "$(stem).png")
+  save(png_path, figure)
+  println("Saved static equilibrium panel to $png_path")
+end
 
 function (@main)(ARGS)
   default_output_dir = normpath(joinpath(@__DIR__, "..", "plots"))
   output_dir = isempty(ARGS) ? default_output_dir : abspath(first(ARGS))
   mkpath(output_dir)
 
-  baseline = StaticPlotting.panel(solve_model(SimplePK))
-  baseline_path = joinpath(output_dir, "simplepk_equilibrium_panel.pdf")
-  save(baseline_path, baseline)
-  println("Saved static equilibrium panel to $baseline_path")
+  simplepk_solution = solve_model(SimplePK)
+  simplepk_figure = StaticPlotting.panel(simplepk_solution)
+  save_figure(output_dir, "simplepk_equilibrium_panel", simplepk_figure)
+  print_equilibrium("SimplePK", simplepk_solution)
+
+  baseline_solution = solve_model(Baseline)
+  baseline_figure = StaticPlotting.panel(
+    baseline_solution,
+    StaticPlotting.AssetMarketPanel();
+    reference_solution = nothing,
+  )
+  save_figure(output_dir, "baseline_equilibrium_panel", baseline_figure)
+  print_equilibrium("Baseline", baseline_solution)
 
   asset_market_models = (
-    ("baseline", Baseline),
     ("pqc", PQC),
     ("pqcr", PQCr),
     ("pqcrdiff", PQCrDIFF),
@@ -26,11 +52,10 @@ function (@main)(ARGS)
     figure = StaticPlotting.panel(
       solution,
       StaticPlotting.AssetMarketPanel();
-      title="Static equilibrium overview — linear speculative-debt variant",
+      reference_solution = baseline_solution,
     )
-    output_path = joinpath(output_dir, "$(name)_equilibrium_panel.pdf")
-    save(output_path, figure)
-    println("Saved static equilibrium panel to $output_path")
+    save_figure(output_dir, "$(name)_equilibrium_panel", figure)
+    print_equilibrium(name, solution)
   end
 
   return 0

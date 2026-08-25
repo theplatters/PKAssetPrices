@@ -20,8 +20,9 @@ visual style of `graphtest-money.nb`.
 | IS curve, AD curve, Asset Demand | Purple `RGBf(0.5, 0, 0.5)` |
 | IR curve, AS curve, Asset Supply | Orange `RGBf(1, 0.5, 0)` |
 | Counterfactual curves (lower i₀) | Faded purple, dashed |
-| Balance-sheet assets | Blue `RGBf(0.20, 0.59, 0.86)` |
-| Balance-sheet liabilities | Red `RGBf(0.84, 0.25, 0.30)` |
+| Balance-sheet assets | Purple `RGBf(0.5, 0, 0.5)` (same palette as IS/AD) |
+| Balance-sheet liabilities | Orange `RGBf(1, 0.5, 0)` (same palette as IR/AS) |
+| Reference/base overlays (`static_plotting` `reference_solution`) | Grey `RGBf(0.45, 0.45, 0.45)` |
 
 ## Subplot layout
 
@@ -53,12 +54,51 @@ Output: `plots/baseline_mathematica_style.pdf` and `.png`.
 Open `notebooks/MathematicaStyleBaseline.ipynb` and run all cells. Output
 appears inline; the last cell exports the PDF/PNG.
 
-## Key differences from `static_plotting.jl`
+## Relationship to `static_plotting.jl`
 
 | Aspect | `static_plotting.jl` | This script |
 |--------|----------------------|-------------|
-| Color | royalblue / crimson | purple / orange |
-| Panel titles | "Goods market and interest-rate rule" | "(A) Goods Market Dynamics" |
-| Interest ticks | linear | percentage labels (6%, 8%, …) |
-| Layout | 1×2 top + full-width bottom | strict 2×2 grid |
-| Frame style | default | black frame, gridlines |
+| Color | purple / orange | purple / orange |
+| Scope | Reusable standard and asset-market panels | Standalone Baseline panel |
+| Reference curves | Optional grey Baseline overlays | None (plots Baseline itself) |
+| Layout | Standard or strict 2×2 asset-market layout | Strict 2×2 grid |
+
+Both `static_plotting.jl` and this script use the same purple/orange palette:
+IS, AD and Asset Demand use purple (`RGBf(0.5, 0, 0.5)`), while IR, AS and
+Asset Supply use orange (`RGBf(1, 0.5, 0)`). The balance-sheet bars also use
+purple for assets and orange for liabilities (not blue/red).
+
+## `produce_static_plots.jl`
+
+Renders one equilibrium panel per model and exports both a PDF and a PNG for
+each, printing the sorted equilibrium variables to the console.
+
+| File | Description |
+|------|-------------|
+| `scripts/produce_static_plots.jl` | Standalone Julia script generating per-model panels |
+
+### Reference overlays
+
+`SimplePK` uses `StandardPanel`, which has no reference-overlay keyword.
+`Baseline` uses `AssetMarketPanel` with `reference_solution = nothing`. The four
+scenario asset-market models — `PQC`, `PQCr`, `PQCrDIFF`, and `FirmsRation` —
+pass `reference_solution = baseline_solution`, so each receives the grey
+Baseline reference layers (including `PQCrDIFF`).
+
+### Outputs
+
+- Six models are exported, producing **six PDF and six PNG** files with the
+  stems `simplepk_equilibrium_panel`, `baseline_equilibrium_panel`,
+  `pqc_equilibrium_panel`, `pqcr_equilibrium_panel`, `pqcrdiff_equilibrium_panel`,
+  and `firmsration_equilibrium_panel`.
+- PDFs are saved with `pt_per_unit = 2`; PNGs use the default unit scaling.
+- Equilibrium reporting prints the model's `variables` **sorted by name**.
+
+### Usage
+
+```bash
+cd PKAssetPrices
+julia --project=. scripts/produce_static_plots.jl [output_dir]
+```
+
+The optional `output_dir` argument defaults to `plots/`.

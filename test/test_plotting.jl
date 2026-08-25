@@ -175,6 +175,103 @@ const DP = PKAssetPrices.DynamicPlotting
     @test lower_simple_rate.params[:i₀] == 0.0 * baseline.model.params[:i₀]
     @test_throws ArgumentError SP.panel(baseline, SP.AssetMarketPanel())
     @test size(SP.panel(solution).scene) == (1400, 1000)
+
+    @test SP.REFERENCE_COLOR == RGBf(0.45, 0.45, 0.45)
+
+    sol = PKAssetPrices.solve_model(S.PQC)
+    ref = PKAssetPrices.solve_model(S.Baseline)
+
+    # --- plot_is_lm reference overlay ---------------------------------------
+    is_lm_fig = Figure()
+    is_lm_ax = Axis(is_lm_fig[1, 1])
+    @test SP.plot_is_lm(sol, is_lm_ax; reference_solution = ref) === is_lm_ax
+    @test length(is_lm_ax.scene.plots) == 8
+    is_lm_lines = filter(plot -> plot isa Lines, is_lm_ax.scene.plots)
+    # line 4 is the grey reference IS curve: solid, linewidth 2.5
+    @test is_lm_lines[4].color[] == RGBAf(SP.REFERENCE_COLOR)
+    @test is_lm_lines[4].linewidth[] == 2.5
+    @test is_lm_lines[4].linestyle[] == nothing
+    # x-coordinates match ref.model .IS over the same rate coordinate range
+    rate_range = range(SP.IS_IR_Y_LIMITS...; length = 200)
+    ref_vars = copy(ref.variables)
+    expected_is_x = map(rate_range) do r
+        ref_vars[:r] = r
+        return S.eval_curve(ref.model, ref_vars).IS
+    end
+    @test [point[1] for point in is_lm_lines[4][1][]] ≈ expected_is_x
+    is_lm_texts = vcat([plot.text[] for plot in is_lm_ax.scene.plots if plot isa Makie.Text]...)
+    @test "IS (base)" in is_lm_texts
+
+    # --- plot_ad_as reference overlay ---------------------------------------
+    ad_as_fig = Figure()
+    ad_as_ax = Axis(ad_as_fig[1, 1])
+    @test SP.plot_ad_as(sol, ad_as_ax; reference_solution = ref) === ad_as_ax
+    @test length(ad_as_ax.scene.plots) == 9
+    ad_lines = filter(plot -> plot isa Lines, ad_as_ax.scene.plots)
+    # lines 4 and 5 are grey reference curves
+    @test ad_lines[4].color[] == RGBAf(SP.REFERENCE_COLOR)
+    @test ad_lines[5].color[] == RGBAf(SP.REFERENCE_COLOR)
+    @test ad_lines[4].linewidth[] == 2.5
+    @test ad_lines[5].linewidth[] == 2.5
+    @test ad_lines[4].linestyle[] == nothing
+    @test ad_lines[5].linestyle[] == Float32[0, 3, 6]
+    # line 5 values match .ADc from the solved lowered reference model over P
+    price_range = range(SP.AD_AS_Y_LIMITS...; length = 200)
+    lowered_ref_model = SP.lower_autonomous_policy_rate(ref.model)
+    lowered_ref_solution = PKAssetPrices.solve_model(lowered_ref_model)
+    lowered_ref_vars = copy(lowered_ref_solution.variables)
+    expected_lower_ad = map(price_range) do price
+        lowered_ref_vars[:P] = price
+        return S.eval_curve(lowered_ref_solution.model, lowered_ref_vars).ADc
+    end
+    @test [point[1] for point in ad_lines[5][1][]] ≈ expected_lower_ad
+    ad_texts = vcat([plot.text[] for plot in ad_as_ax.scene.plots if plot isa Makie.Text]...)
+    @test "AD (base)" in ad_texts
+
+    # --- plot_asset_market reference overlay --------------------------------
+    asset_fig = Figure()
+    asset_ax = Axis(asset_fig[1, 1])
+    @test SP.plot_asset_market(sol, asset_ax; reference_solution = ref) === asset_ax
+    @test length(asset_ax.scene.plots) == 9
+    asset_lines = filter(plot -> plot isa Lines, asset_ax.scene.plots)
+    # lines 4 and 5 are grey reference curves: 4 solid, 5 dashed
+    @test asset_lines[4].color[] == RGBAf(SP.REFERENCE_COLOR)
+    @test asset_lines[5].color[] == RGBAf(SP.REFERENCE_COLOR)
+    @test asset_lines[4].linewidth[] == 2.5
+    @test asset_lines[5].linewidth[] == 2.5
+    @test asset_lines[4].linestyle[] == nothing
+    @test asset_lines[5].linestyle[] == Float32[0, 3, 6]
+    # line 4 values match ref.model .AMD over the plotted asset-price range
+    eq_curves = S.eval_curve(sol)
+    uses_reference_range = first(SP.ASSET_X_LIMITS) <= eq_curves.AMD <= last(SP.ASSET_X_LIMITS) &&
+                          first(SP.ASSET_Y_LIMITS) <= sol.variables[:AP] <= last(SP.ASSET_Y_LIMITS)
+    asset_price_range = uses_reference_range ?
+                        range(SP.ASSET_X_LIMITS...; length = 200) :
+                        range(SP.ASSET_Y_LIMITS...; length = 200)
+    ref_asset_vars = copy(ref.variables)
+    expected_ref_demand = map(asset_price_range) do ap
+        ref_asset_vars[:AP] = ap
+        return S.eval_curve(ref.model, ref_asset_vars).AMD
+    end
+    @test [point[1] for point in asset_lines[4][1][]] ≈ expected_ref_demand
+    asset_texts = vcat([plot.text[] for plot in asset_ax.scene.plots if plot isa Makie.Text]...)
+    @test "Asset Demand (base)" in asset_texts
+
+    # --- panel-level reference rendering ------------------------------------
+    ref_panel = SP.panel(sol, SP.AssetMarketPanel(); reference_solution = ref, size = (900, 700))
+    @test count(content -> content isa Axis, ref_panel.content) == 4
+
+    asset_models = (S.Baseline, S.PQC, S.PQCr, S.PQCrDIFF, S.FirmsRation)
+    for model in asset_models
+        model_solution = PKAssetPrices.solve_model(model)
+        @test SP.panel(model_solution, SP.AssetMarketPanel(); reference_solution = ref, size = (900, 700)) isa Figure
+    end
+
+    # StandardPanel signature remains unchanged: reference_solution is rejected
+    baseline_solution = PKAssetPrices.solve_model(S.Baseline)
+    @test_throws MethodError SP.panel(baseline_solution, SP.StandardPanel(); reference_solution = ref)
+    @test SP.panel(baseline_solution; size = (900, 700)) isa Figure
+    @test SP.panel(baseline_solution, SP.StandardPanel(); size = (900, 700)) isa Figure
 end
 
 @testset "Dynamic plotting" begin
