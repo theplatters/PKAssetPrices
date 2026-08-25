@@ -9,6 +9,7 @@ using PKAssetPrices
     include("test_helpers.jl")
     include("test_dynamic.jl")
     include("test_sfc.jl")
+    include("test_shocks.jl")
     include("test_models.jl")
     include("test_dashboard.jl")
     include("test_plotting.jl")

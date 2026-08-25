@@ -40,6 +40,59 @@ dynamic_parameter_descriptions(parametrization::Dynamic.DynamicParametrization) 
     parameter.name => parameter.desc for parameter in parametrization.model.params
 )
 
+function dynamic_shock_row(parametrization::Dynamic.DynamicParametrization, index)
+    options = [(label = isempty(parameter.desc) ? string(parameter.name) : parameter.desc,
+                value = string(parameter.name)) for parameter in parametrization.model.params]
+    first_parameter = first(parametrization.model.params).name
+    return html_div(className = "dynamic-shock-row") do
+        dcc_dropdown(id = (type = "dynamic-shock-param", index = index),
+            options = options, value = string(first_parameter), clearable = false,
+            className = "dynamic-shock-param"),
+        dcc_input(id = (type = "dynamic-shock-from", index = index), type = "number",
+            value = 0, className = "parameter-input"),
+        dcc_input(id = (type = "dynamic-shock-until", index = index), type = "number",
+            placeholder = "persistent", className = "parameter-input"),
+        dcc_input(id = (type = "dynamic-shock-value", index = index), type = "number",
+            value = parametrization.params[first_parameter], className = "parameter-input"),
+        html_button("×", id = (type = "dynamic-shock-remove", index = index), n_clicks = 0,
+            className = "dynamic-shock-remove", title = "Remove shock")
+    end
+end
+
+_finite_dashboard_real(x) = x isa Real && !(x isa Bool) && isfinite(x)
+
+function dynamic_shocks_from_rows(base::Dynamic.DynamicParametrization, params, froms, untils, values)
+    declared = Set(parameter.name for parameter in base.model.params)
+    grid = base.model.time.grid
+    shocks = Dynamic.Shock[]
+    seen = Set{Tuple{Symbol,Float64,Union{Float64,Nothing},Float64}}()
+    for (param, from, until, value) in zip(params, froms, untils, values)
+        symbol = try
+            param isa Symbol ? param : Symbol(String(param))
+        catch
+            continue
+        end
+        symbol in declared && _finite_dashboard_real(from) && _finite_dashboard_real(value) || continue
+        clean_until = if until === nothing || until === "" ||
+                (until isa AbstractString && isempty(strip(until)))
+            nothing
+        elseif _finite_dashboard_real(until)
+            until
+        else
+            continue
+        end
+        clean_until !== nothing && clean_until < from && continue
+        from > last(grid) && continue
+        clean_until !== nothing && clean_until < first(grid) && continue
+        key = (symbol, Float64(from), clean_until === nothing ? nothing : Float64(clean_until), Float64(value))
+        key in seen && continue
+        push!(seen, key)
+        push!(shocks, Dynamic.Shock(param = symbol, from = from, until = clean_until,
+            value = value, source = "dashboard shock row"))
+    end
+    return shocks
+end
+
 function dynamic_variable_options(parametrization::Dynamic.DynamicParametrization)
     return [
         (
@@ -74,6 +127,7 @@ function dynamic_parametrization_with_values(parametrization, names, values)
         parameters,
         parametrization.init,
         parametrization.u0,
+        deepcopy(parametrization.shocks),
     )
 end
 
@@ -100,6 +154,7 @@ function dynamic_parametrization_with_horizon(parametrization, horizon)
         parametrization.params,
         parametrization.init,
         parametrization.u0,
+        deepcopy(parametrization.shocks),
     )
 end
 
@@ -112,6 +167,7 @@ function solve_dynamic_cached(parametrization::Dynamic.DynamicParametrization)
         parametrization.params,
         parametrization.init,
         parametrization.u0,
+        parametrization.shocks,
     ))
     return lock(DYNAMIC_SOLVE_CACHE_LOCK) do
         if !haskey(DYNAMIC_SOLVE_CACHE, key) &&

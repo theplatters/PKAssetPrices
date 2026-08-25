@@ -1,7 +1,7 @@
 module ModelCore
 
 export AbstractModel, Equation, Lag, lag_key, BalanceSheet, BalanceSheetFilled,
-       parse_balance!, parse_balances!, check_accounting
+       parse_balance!, parse_balances!, check_accounting, parse_shock_entries
 
 """Describe a positive historical lag.
 

@@ -22,7 +22,7 @@ function run_dynq_case(; model=Dynamic.Dynamic.DynQconAPLevelChange2, overwrites
       error("Initial value $(k) not found in model initial values.")
     end
   end
-  scen = Dynamic.DynamicParametrization(model.model, params, init, model.u0)
+  scen = Dynamic.DynamicParametrization(model.model, params, init, model.u0, deepcopy(model.shocks))
 
   sol = solve_model(scen)
 

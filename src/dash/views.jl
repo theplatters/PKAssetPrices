@@ -113,7 +113,16 @@ function dynamic_explore(model_options)
                     html_span("Parameters"),
                     html_span("Value")
                 end,
-                html_div(id = "dynamic-param-container")
+                html_div(id = "dynamic-param-container"),
+                html_div(className = "dynamic-shock-heading") do
+                    html_span("Shocks", className = "control-label"),
+                    html_button("+ Add shock", id = "dynamic-shock-add", n_clicks = 0,
+                        className = "dynamic-shock-add")
+                end,
+                html_p("Parameter inputs set the value for all periods; shocks override it within their window",
+                    className = "dynamic-shock-caption"),
+                dcc_store(id = "dynamic-shock-rows-store", data = Int[]),
+                html_div(id = "dynamic-shock-rows-container", className = "dynamic-shock-rows")
             end,
             html_div(className = "dynamic-output-column") do
                 html_section(className = "series-selector-panel") do

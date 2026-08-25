@@ -46,6 +46,55 @@ end
     @test Dashboard.dynamic_path_component(first_solution, Symbol(first(selected)), 1) isa Dash.Component
     @test Dashboard.dynamic_endpoint_table(first_solution, Symbol.(selected)) isa Dash.Component
     @test Dashboard.dynamic_solution_component(first_solution, selected) isa Dash.Component
+
+    @test Dashboard.dynamic_shock_row(base, 1) isa Dash.Component
+    shock = Dashboard.dynamic_shocks_from_rows(
+        base, [first(names), :unknown, first(names)], [0.0, 0.0, 4.0],
+        [nothing, 2.0, 6.0], [new_value, 1.0, new_value + 0.1])
+    @test length(shock) == 2
+    @test shock[1].until === nothing
+    @test all(occursin("dashboard", item.source) for item in shock)
+    @test Dashboard.dynamic_shocks_from_rows(base, [first(names)], [NaN], [1.0], [1.0]) ==
+        PKAssetPrices.Dynamic.Shock[]
+
+    long_shock = Dashboard.dynamic_shocks_from_rows(
+        base, [first(names)], [last(base.model.time.grid) - 1], [nothing], [new_value])
+    shocked = PKAssetPrices.Dynamic.set_shocks(base, long_shock)
+    truncated_shocked = Dashboard.dynamic_parametrization_with_horizon(shocked, 6)
+    @test truncated_shocked.shocks == shocked.shocks
+    value_shocked = Dashboard.dynamic_parametrization_with_values(
+        shocked, [first(names)], [new_value + 0.2])
+    @test value_shocked.shocks == shocked.shocks
+    @test value_shocked.shocks !== shocked.shocks
+    @test all(isapprox(path[end], first_solution.paths[var][end]) for (var, path) in
+        Dashboard.solve_dynamic_cached(truncated_shocked).paths if haskey(first_solution.paths, var))
+
+    # Rows are filtered against the full base grid, not the selected horizon.
+    full_last = last(base.model.time.grid)
+    filtered = Dashboard.dynamic_shocks_from_rows(
+        base, [first(names), first(names), first(names), "unknown"],
+        [0.0, full_last + 1, 0.0, 0.0],
+        ["", nothing, "", nothing], [1.0, 2.0, 1.0, 3.0])
+    @test length(filtered) == 1
+    @test filtered[1].until === nothing
+    @test isempty(Dashboard.dynamic_shocks_from_rows(
+        base, [first(names)], [2.0], [1.0], [new_value]))
+    @test length(Dashboard.dynamic_shocks_from_rows(
+        base, [first(names), first(names)], [0.0], [nothing, nothing], [new_value, new_value])) == 1
+
+    # The shock set is part of the dynamic cache key, while equal reconstructed
+    # values still reuse the same entry.
+    empty!(Dashboard.DYNAMIC_SOLVE_CACHE)
+    s1 = PKAssetPrices.Dynamic.Shock(param=first_parameter, from=0, value=new_value,
+        source="cache")
+    s2 = PKAssetPrices.Dynamic.Shock(param=first_parameter, from=0, value=new_value + 0.1,
+        source="cache")
+    p1 = PKAssetPrices.Dynamic.set_shocks(base, [s1])
+    p2 = PKAssetPrices.Dynamic.set_shocks(base, [s2])
+    @test Dashboard.solve_dynamic_cached(p1) !== Dashboard.solve_dynamic_cached(p2)
+    @test length(Dashboard.DYNAMIC_SOLVE_CACHE) == 2
+    equivalent = PKAssetPrices.Dynamic.set_shocks(base, [deepcopy(s1)])
+    @test Dashboard.solve_dynamic_cached(equivalent) === Dashboard.solve_dynamic_cached(p1)
 end
 
 @testset "Dashboard solve cache" begin

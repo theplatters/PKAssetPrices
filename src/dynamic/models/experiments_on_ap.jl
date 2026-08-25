@@ -138,3 +138,7 @@ DynQodlAPLevelChange2 = @scenario DynQconAPLevelChange begin
         AD == γ0 + (1 / (1 - γ)) * SD
     end
 end
+
+DynαQCrRateHike = @shock DynαQCr begin
+    at(50, i0 = 0.05)
+end

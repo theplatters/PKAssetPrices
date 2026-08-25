@@ -267,6 +267,7 @@ end
 
 "Rebuild all derived dynamic machinery from an immutable scenario copy."
 function _rebuild_dynamic_model(base::DynamicModel, equations, init, source)
+    grid = validate_time_grid(base.time.grid; source=source)
     variables = deepcopy(base.variables); params = deepcopy(base.params)
     stocks = deepcopy(base.stocks); sheets = deepcopy(base.balance_sheets)
     variable_names = [v.name for v in variables]
@@ -297,13 +298,13 @@ function _rebuild_dynamic_model(base::DynamicModel, equations, init, source)
     stocks_eval = Core.eval(@__MODULE__, _generate_stocks_eval(variables, params, equations, stocks))
     sheet_eval = Core.eval(@__MODULE__, ModelCore.generate_sheet_eval(rewritten_sheets, variable_names,
         [p.name for p in params]; lag_symbols=_required_lag_symbols(discovered_lags), source=source))
-    return DynamicModel(time=DiscreteTime(copy(base.time.grid)), variables=variables, params=params,
+    return DynamicModel(time=DiscreteTime(grid), variables=variables, params=params,
         equations=deepcopy(equations), nulls=nulls, eval=eval_fun, stocks=stocks,
         stocks_eval=stocks_eval, balance_sheets=sheets, sheet_eval=sheet_eval)
 end
 
 function _dynamic_scenario(base::DynamicParametrization, param_overrides, equation_overrides,
-                           init_overrides, source)
+                           init_overrides, new_shocks, source)
     params = deepcopy(base.params)
     for (name, value, expression) in param_overrides
         haskey(params, name) || error("Dynamic @scenario parameter $name is not declared in the base model (source/offending expression: $expression); fix or remove it.")
@@ -328,7 +329,9 @@ function _dynamic_scenario(base::DynamicParametrization, param_overrides, equati
         init[name] = _normalize_init(value)
     end
     model = _rebuild_dynamic_model(base.model, equations, init, source)
-    return DynamicParametrization(model, params, init, deepcopy(base.u0))
+    effective_shocks = vcat(deepcopy(base.shocks), new_shocks)
+    validate_shocks(effective_shocks, base)
+    return DynamicParametrization(model, params, init, deepcopy(base.u0), deepcopy(effective_shocks))
 end
 
 
@@ -348,6 +351,13 @@ flows. Put current-flow relationships in the simultaneous equations instead.
 Balances are evaluated independently for every simulated period. `sheets(sol,
 t)` returns the filled sheets for period `t`; dynamic accounting returns
 `(consistent, periods)` for all periods and one result for a selected period.
+
+# Shocks
+Base models created with `@model` carry **no shocks**: the shock set starts
+empty. Shocks are added only by deriving scenarios with [`@scenario`](@ref)
+(its `@shocks` block) or the [`@shock`](@ref) sugar, or programmatically via
+[`set_shocks`](@ref)/[`shocks`](@ref). A scenario that declares no `@shocks`
+inherits the base shocks untouched.
 
 ```julia
 Example = @model begin
@@ -470,12 +480,14 @@ macro model(body)
     dynamic_parametrization = GlobalRef(@__MODULE__, :DynamicParametrization)
     dynamic_model = GlobalRef(@__MODULE__, :DynamicModel)
     discrete_time = GlobalRef(@__MODULE__, :DiscreteTime)
+    validate_grid = GlobalRef(@__MODULE__, :validate_time_grid)
 
     return esc(
         quote
+            let _dynamic_grid = $discrete_time($validate_grid(collect($time_expr); source=$(QuoteNode(source))))
             $dynamic_parametrization(
                 $dynamic_model(
-                    $discrete_time(collect($time_expr)),
+                    _dynamic_grid,
                     $variables,
                     $params,
                     $eqs,
@@ -490,10 +502,28 @@ macro model(body)
                 $init,
                 ones($n),
             )
+            end
         end
     )
 end
 
+
+function _materialize_shock_exprs(shock_block)
+    isnothing(shock_block) && return Expr[]
+    entries = ModelCore.parse_shock_entries(shock_block)
+    shock_ctor = GlobalRef(@__MODULE__, :Shock)
+    return [:($shock_ctor(param=$(QuoteNode(entry.param)), from=$(entry.from),
+                    until=$(isnothing(entry.until) ? :nothing : entry.until),
+                    value=$(entry.value), source=$(QuoteNode(entry.source)))) for entry in entries]
+end
+
+function _materialize_standalone_shock_exprs(body)
+    try
+        return _materialize_shock_exprs(body)
+    catch err
+        error("Invalid @shock body (offending expression/body: $body). @shock accepts only `at(...)` and `during(...)` shock calls; use @scenario for parameter, equation, or @init overrides. Details: $(sprint(showerror, err))")
+    end
+end
 
 """
     @scenario base begin
@@ -504,15 +534,59 @@ end
         @init begin
             variable = history
         end
+        @shocks begin
+            at(50, i0 = 0.05)
+            during(20:30, s0 = 1.0)
+        end
     end
 
 Create an independent dynamic scenario. Parameter assignments override declared
 parameters. Entries in `@equations` replace base equations by their left-hand
 side variable (`x[t]` and `x` both match `x`), while `@init` entries replace
-only the named histories. Unmentioned parameters, equations, and histories are
-deep-copied from the base. The derived residual, stock, evaluation, and balance
-sheet closures are rebuilt; the base model is not mutated.
+only the named histories. An optional `@shocks` block adds time-windowed
+overrides (see below). Unmentioned parameters, equations, histories, and shocks
+are deep-copied from the base. The derived residual, stock, evaluation, and
+balance sheet closures are rebuilt; the base model is not mutated.
 
+# Shocks
+Within `@shocks` (or via the [`@shock`](@ref) sugar) shocks are written as
+`at(...)` and `during(...)` calls, where the leading argument(s) are grid-time
+values, **not** 1-based path indices:
+
+```julia
+@shocks begin
+    at(50, i0 = 0.05)       # persistent from grid time 50 onward
+    during(20:30, s0 = 1.0) # from grid time 20 through 30
+end
+```
+
+- `at(50, i0 = 0.05)` is the persistent form: it is equivalent to a window whose
+  upper bound is `nothing` (see [`Shock`](@ref)).
+- `during(20:30, s0 = 1.0)` sets a closed window `[20, 30]`.
+
+**Timing is expressed in grid values, not 1-based path indices.** At period
+index `t` with `g = grid[t]`, a shock is active iff
+`from <= g <= (until === nothing ? Inf : until)`. Both bounds are inclusive:
+
+- For `at(period, ...)`, `until` is `nothing`, so the shock is active for every
+  grid value `g >= period`; i.e. it applies from the *first grid value `>=`
+  `period`* and persists to the end of the grid.
+- For `during(first:last, ...)`, the shock is active for grid values in
+  `[first, last]`: it starts at the *first grid value `>= first`* and ends at
+  the *last grid value `<= last`*.
+
+When two shocks target the same parameter and their windows overlap, the later
+declared shock wins for the overlapping grid values, because shock pairs are
+collected in declaration order and merged with later values taking precedence.
+A scenario that derives from another (a chained/derived scenario) appends its
+own `@shocks` *after* the inherited shocks (`effective_shocks = vcat(base.shocks,
+new_shocks)`); therefore a derived shock wins any overlap with an inherited one.
+A scenario that declares no `@shocks` inherits the base shocks untouched.
+
+**Dashboard interplay:** Parameter inputs set the value for all periods; shocks
+override it within their window.
+
+# Example
 ```julia
 HighGrowth = @scenario Baseline begin
     growth = 0.03
@@ -522,11 +596,14 @@ HighGrowth = @scenario Baseline begin
     @init begin
         K = [9.0, 10.0]
     end
+    @shocks begin
+        at(50, i0 = 0.05)
+        during(20:30, s0 = 1.0)
+    end
 end
-```
 """
 macro scenario(model, body)
-    parameters, equation_block, init_block = ModelCore.parse_dynamic_scenario_entries(body)
+    parameters, equation_block, init_block, shock_block = ModelCore.parse_dynamic_scenario_entries(body)
     equation_pairs = Expr[]
     if !isnothing(equation_block)
         override_names = Set{Symbol}()
@@ -555,6 +632,8 @@ macro scenario(model, body)
         end
     end
     param_pairs = [:(($(QuoteNode(name)), $(value), $(QuoteNode(Expr(:(=), name, value))))) for (name, value) in parameters]
+    shock_exprs = _materialize_shock_exprs(shock_block)
+    shock_type = GlobalRef(@__MODULE__, :Shock)
     source = "$(__source__.file):$(__source__.line)"
     scenario_builder = GlobalRef(@__MODULE__, :_dynamic_scenario)
     return esc(quote
@@ -562,6 +641,47 @@ macro scenario(model, body)
             [$(param_pairs...)],
             [$(equation_pairs...)],
             [$(init_pairs...)],
+            $shock_type[$(shock_exprs...)],
             $source)
+    end)
+end
+
+"""
+    Name = @shock Base begin at(period, parameter = value) end
+    Name = @shock Base begin during(first:last, parameter = value) end
+
+Create a scenario that adds **only** the literal `at(...)` / `during(...)`
+shock calls in the body to `Base`; it is sugar for [`@scenario`](@ref) with an
+`@shocks` block and no parameter, equation, or `@init` overrides. Parameter,
+equation, and initialization overrides must be expressed with `@scenario`
+instead.
+
+The leading argument(s) are grid-time values, **not** 1-based path indices:
+
+- `at(period, parameter = value)` (e.g. `at(50, i0 = 0.05)`) is persistent from
+  `period` onward (`until = nothing`; see [`Shock`](@ref)).
+- `during(first:last, parameter = value)` (e.g. `during(20:30, s0 = 1.0)`) sets
+  a closed window `[first, last]`.
+
+Timing uses the model time grid: at period index `t` with `g = grid[t]`, a
+shock is active iff `from <= g <= (until === nothing ? Inf : until)`, with both
+bounds inclusive (see [`@scenario`](@ref) for the full timing rules, override
+precedence, and dashboard interplay).
+
+# Example
+```julia
+Pulse = @shock Baseline begin
+    at(50, i0 = 0.05)
+    during(20:30, s0 = 1.0)
+end
+```
+"""
+macro shock(model, body)
+    shock_exprs = _materialize_standalone_shock_exprs(body)
+    shock_type = GlobalRef(@__MODULE__, :Shock)
+    source = "$(__source__.file):$(__source__.line)"
+    scenario_builder = GlobalRef(@__MODULE__, :_dynamic_scenario)
+    return esc(quote
+        $scenario_builder($model, [], [], [], $shock_type[$(shock_exprs...)], $source)
     end)
 end

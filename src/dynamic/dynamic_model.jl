@@ -7,7 +7,9 @@ import ..ModelCore: AbstractModel, Equation, lag_key, BalanceSheet, BalanceSheet
 import ..ModelCore
 import ..PKAssetPrices: solve_model
 
-export DynamicModel, DynamicParametrization, DynamicSolution, sheets, check_accounting, @model, @scenario
+export DynamicModel, DynamicParametrization, DynamicSolution, Shock, validate_shocks,
+       validate_time_grid, sheets, check_accounting, @model, @scenario, @shock,
+       set_shocks, shocks
 const check_accounting = ModelCore.check_accounting
 
 abstract type AbstractTimeDomain end
@@ -20,6 +22,96 @@ end
 struct DynVar
     name::Symbol
     desc::String
+end
+
+"""
+    Shock(param::Symbol, from::Float64, until::Union{Float64,Nothing}, value::Float64, source::String)
+
+A time-windowed override of a model parameter. `Shock` is the unit of a
+[`DynamicParametrization`](@ref) shock set; each entry forces `param` to
+`value` over a window of the model time grid and is applied by
+[`solve_model`](@ref) (and by [`shocks`](@ref)/[`set_shocks`](@ref) on the
+parametrization).
+
+# Fields
+- `param::Symbol`: the overridden parameter name (must be declared by the model).
+- `from::Float64`: lower bound of the window in grid time; inclusive.
+- `until::Union{Float64,Nothing}`: upper bound of the window in grid time;
+  `nothing` means the shock is *persistent* and applies from `from` to the end
+  of the grid (the effective upper bound is `Inf`).
+- `value::Float64`: the value assigned to `param` while the window is active.
+- `source::String`: provenance tag for diagnostics (e.g. a macro source line,
+  `"programmatic"`, or a dashboard identifier).
+
+# Constructor
+Prefer the keyword constructor, which validates inputs:
+
+```julia
+Shock(; param, from, until=nothing, value, source="programmatic")
+```
+
+- `until` defaults to `nothing`, i.e. a persistent shock.
+- `from`, `until`, and `value` must each be a finite `Real` value that is
+  **not** a `Bool` (`until` may instead be `nothing`). A non-finite `Real` or a
+  `Bool` raises an error.
+- `param` must be a `Symbol`.
+- Consistency is enforced: when `until` is set, it must satisfy `until >= from`.
+
+# Example
+```julia
+# Persistent shock: drift = 1.0 from grid time 2 onward.
+s = Shock(param=:drift, from=2, value=1.0)
+
+# Windowed shock: i0 = 0.05 exactly at grid time 50 (a point window).
+s2 = Shock(param=:i0, from=50, until=50, value=0.05)
+```
+"""
+struct Shock
+    param::Symbol
+    from::Float64
+    until::Union{Float64,Nothing}
+    value::Float64
+    source::String
+
+    # Keep the five-argument form available, but make it go through the same
+    # checks as the keyword form.  In particular, the generated typed
+    # constructor must not provide a positional validation escape hatch.
+    function Shock(param, from, until, value, source)
+        forms = "expected `Shock(param, from, until, value, source)` or `Shock(; param=..., from=..., until=..., value=..., source=...)`"
+        param isa Symbol || error("Invalid Shock parameter $(repr(param)); offending entry/source $(repr(source)); $forms.")
+        for (name, x) in (("from", from), ("until", until), ("value", value))
+            ((name == "until" && x === nothing) || (x isa Real && !(x isa Bool) && isfinite(x))) ||
+                error("Invalid Shock $(repr(param)) $name=$(repr(x)); offending source $(repr(source)); expected a finite Real (not Bool), with until=nothing allowed; $forms.")
+        end
+        until === nothing || until >= from ||
+            error("Invalid Shock $(repr(param)) window from=$(repr(from)), until=$(repr(until)); offending source $(repr(source)); expected until >= from; $forms.")
+        float_from, float_until, float_value = try
+            (Float64(from), until === nothing ? nothing : Float64(until), Float64(value))
+        catch
+            error("Invalid Shock $(repr(param)) numeric conversion; offending source $(repr(source)); expected values representable as finite Float64; $forms.")
+        end
+        isfinite(float_from) && (float_until === nothing || isfinite(float_until)) &&
+            isfinite(float_value) ||
+            error("Invalid Shock $(repr(param)) numeric conversion; offending source $(repr(source)); expected values representable as finite Float64; $forms.")
+        string_source = try
+            String(source)
+        catch
+            error("Invalid Shock $(repr(param)) source=$(repr(source)); expected a String or String-convertible source; $forms.")
+        end
+        new(param, float_from, float_until, float_value, string_source)
+    end
+end
+
+function Shock(; param, from, until=nothing, value, source="programmatic")
+    return Shock(param, from, until, value, source)
+end
+
+function validate_time_grid(grid; source="programmatic")
+    xs = Float64.(collect(grid))
+    isempty(xs) && error("Invalid @time grid source/expression `$source`: expected non-decreasing @time grid, got empty grid.")
+    all(isfinite, xs) && all(xs[i] <= xs[i+1] for i in 1:length(xs)-1) ||
+        error("Invalid @time grid source/expression `$source`: expected non-decreasing @time grid with finite values.")
+    return xs
 end
 
 struct DynamicModel{F, G, H} <: AbstractModel
@@ -49,6 +141,80 @@ struct DynamicParametrization{F, G, H, T <: Real, U}
     params::Dict{Symbol, T}
     init::Dict{Symbol, U}
     u0::Vector{Float64}
+    shocks::Vector{Shock}
+end
+
+DynamicParametrization(model, params, init, u0) = DynamicParametrization(model, params, init, u0, Shock[])
+function DynamicParametrization(; model, params, init, u0, shocks=Shock[])
+    return DynamicParametrization(model, params, init, u0, Shock[shocks...])
+end
+
+function validate_shocks(shocks::AbstractVector, base)
+    model = base isa DynamicParametrization ? base.model : base
+    declared = [p.name for p in model.params]
+    grid = model.time.grid
+    seen = Set{Tuple{Symbol,Float64,Union{Float64,Nothing},Float64}}()
+    for shock in shocks
+        shock isa Shock || error("Invalid shock entry $(repr(shock)); expected Shock with source.")
+        s = "Shock($(shock.param), $(shock.from), $(shock.until), $(shock.value)) source=$(repr(shock.source))"
+        shock.param isa Symbol || error("$s: invalid parameter entry; expected a Symbol in the Shock constructor.")
+        shock.from isa Real && !(shock.from isa Bool) && isfinite(shock.from) ||
+            error("$s: invalid from entry; expected a finite Real, not Bool.")
+        (shock.until === nothing || (shock.until isa Real && !(shock.until isa Bool) && isfinite(shock.until))) ||
+            error("$s: invalid until entry; expected nothing or a finite Real, not Bool.")
+        shock.value isa Real && !(shock.value isa Bool) && isfinite(shock.value) ||
+            error("$s: invalid value entry; expected a finite Real, not Bool.")
+        shock.source isa String || error("$s: invalid source; expected a String or String-convertible source.")
+        shock.until === nothing || shock.until >= shock.from ||
+            error("$s: reversed shock range; expected until >= from.")
+        shock.param in declared || error("$s: unknown parameter; declared parameters: $(join(string.(declared), ", ")). Fix the parameter name.")
+        shock.from <= last(grid) && (shock.until === nothing || shock.until >= first(grid)) ||
+            error("$s lies wholly outside grid $(first(grid)):$(last(grid)); expected a window intersecting the base grid.")
+        key = (shock.param, shock.from, shock.until, shock.value)
+        key in seen && error("Duplicate identical $s; remove the duplicate shock entry.")
+        push!(seen, key)
+    end
+    return shocks
+end
+
+"""Plain field accessor returning the shock vector of a parametrization.
+
+`shocks(dp)` returns the `Vector{Shock}` attached to `dp`. It does not copy or
+validate; to replace the shock set with validation, use [`set_shocks`](@ref).
+
+# Example
+```julia
+dp2 = set_shocks(dp, [Shock(param=:drift, from=2, value=1.0)])
+@assert shocks(dp2)[1].param === :drift
+```
+"""
+shocks(dp::DynamicParametrization) = dp.shocks
+
+"""Replace the shock vector of a `DynamicParametrization`, returning a new one.
+
+`set_shocks` validates `new_shocks` against `dp.model` via [`validate_shocks`]
+and returns a fresh `DynamicParametrization`. The `model` reference is shared
+(`result.model === dp.model`): shocks live on the parametrization, while the
+model closure is immutable by convention. `params`, `init`, `u0`, and the shock
+vector are deep-copied so the input is never mutated. The new shocks *replace*
+any existing ones rather than appending to them.
+
+# Example
+```julia
+dp2 = set_shocks(dp, [Shock(param=:drift, from=2, value=1.0)])
+@assert dp2.model === dp.model
+@assert shocks(dp2)[1].param === :drift
+```
+"""
+function set_shocks(dp::DynamicParametrization, new_shocks::Vector{Shock})
+    validated = validate_shocks(new_shocks, dp)
+    return DynamicParametrization(
+        dp.model,
+        deepcopy(dp.params),
+        deepcopy(dp.init),
+        deepcopy(dp.u0),
+        deepcopy(validated),
+    )
 end
 
 struct DynamicSolution{F, G, H, T, U}
@@ -83,7 +249,20 @@ function _build_context(dp::DynamicParametrization, t::Int, paths, depths)
     end
 
     lag_nt = (; lag_pairs...)
-    return merge(NamedTuple(dp.params), lag_nt)
+    isempty(dp.shocks) && return merge(NamedTuple(dp.params), lag_nt)
+
+    # Shock windows are expressed in model time, rather than in period
+    # indices.  Keeping the predicate here also makes this correct for
+    # truncated dashboard grids.  Pairs are deliberately collected in
+    # declaration order: merge then gives later active shocks precedence.
+    g = dp.model.time.grid[t]
+    shock_pairs = Pair{Symbol, Any}[]
+    for shock in dp.shocks
+        active = shock.from <= g <= (shock.until === nothing ? Inf : shock.until)
+        active && push!(shock_pairs, shock.param => shock.value)
+    end
+    shock_nt = (; shock_pairs...)
+    return merge(NamedTuple(dp.params), shock_nt, lag_nt)
 end
 
 function build_context(dp::DynamicParametrization, t::Int, paths)
@@ -103,6 +282,13 @@ function init_paths(m::DynamicModel, time_span::Int, ::Type{T}) where {T <: Real
     return paths
 end
 
+"""Evaluate the model equations at supplied values and base parameters.
+
+`eval_model` evaluates at base parameter values and shocks are not applied: the
+parametrization's shock set is ignored and the equations are solved at the base
+parameters only.  This helper is therefore intentionally independent of the
+period used by `solve_model`.
+"""
 function eval_model(dp::DynamicParametrization, values::Dict{Symbol, Float64}, lag::Dict{Symbol, Float64})
     par_nt = (; (k => v for (k, v) in dp.params)...)
     equations = vcat(dp.model.equations,
@@ -236,7 +422,8 @@ function update_params(dp::DynamicParametrization, x::Vector{T}) where {T <: Rea
         dp.model,
         new_params,
         dp.init,
-        dp.u0
+        dp.u0,
+        deepcopy(dp.shocks)
     )
 end
 
