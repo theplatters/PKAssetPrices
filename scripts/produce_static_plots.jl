@@ -14,7 +14,7 @@ end
 
 function save_figure(output_dir, stem, figure)
   pdf_path = joinpath(output_dir, "$(stem).pdf")
-  save(pdf_path, figure; pt_per_unit = 2)
+  save(pdf_path, figure; pt_per_unit=2)
   println("Saved static equilibrium panel to $pdf_path")
 
   png_path = joinpath(output_dir, "$(stem).png")
@@ -36,23 +36,24 @@ function (@main)(ARGS)
   baseline_figure = StaticPlotting.panel(
     baseline_solution,
     StaticPlotting.AssetMarketPanel();
-    reference_solution = nothing,
+    reference_solution=nothing,
   )
   save_figure(output_dir, "baseline_equilibrium_panel", baseline_figure)
   print_equilibrium("Baseline", baseline_solution)
 
   asset_market_models = (
-    ("pqc", PQC),
-    ("pqcr", PQCr),
-    ("pqcrdiff", PQCrDIFF),
-    ("firmsration", FirmsRation),
+    ("pqc", PQC, 0.0),
+    ("pqcr", PQCr, 0.0),
+    ("pqcrdiff", PQCrDIFF, 0.0),
+    ("firmsration", FirmsRation, 0.5),
   )
-  for (name, model) in asset_market_models
+  for (name, model, i₀) in asset_market_models
     solution = solve_model(model)
     figure = StaticPlotting.panel(
       solution,
       StaticPlotting.AssetMarketPanel();
-      reference_solution = baseline_solution,
+      reference_solution=baseline_solution,
+      lower_i0_factor=i₀
     )
     save_figure(output_dir, "$(name)_equilibrium_panel", figure)
     print_equilibrium(name, solution)

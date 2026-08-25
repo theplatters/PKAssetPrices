@@ -98,7 +98,7 @@ function plot_is_lm(
   sol::Static.Solution,
   ax::Makie.Axis;
   lower_i0_factor::Real=0.0,
-  reference_solution::Union{Nothing, Static.Solution}=nothing,
+  reference_solution::Union{Nothing,Static.Solution}=nothing,
 )
   output_range = range(IS_IR_X_LIMITS...; length=200)
   rate_range = range(IS_IR_Y_LIMITS...; length=200)
@@ -192,7 +192,7 @@ function plot_ad_as(
   sol::Static.Solution,
   ax::Makie.Axis;
   lower_i0_factor::Real=0.0,
-  reference_solution::Union{Nothing, Static.Solution}=nothing,
+  reference_solution::Union{Nothing,Static.Solution}=nothing,
 )
   equilibrium_curves = Static.eval_curve(sol)
   all(hasproperty(equilibrium_curves, curve) for curve in (:ADc, :ASc)) ||
@@ -322,7 +322,7 @@ function plot_asset_market(
   sol::Static.Solution,
   ax::Makie.Axis;
   lower_i0_factor::Real=0.0,
-  reference_solution::Union{Nothing, Static.Solution}=nothing,
+  reference_solution::Union{Nothing,Static.Solution}=nothing,
 )
   required_variables = (:AP, :AE, :AQ)
   all(haskey(sol.variables, variable) for variable in required_variables) ||
