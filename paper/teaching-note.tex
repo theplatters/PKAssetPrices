@@ -372,6 +372,7 @@ with loans creating deposits one-for-one ($dM=dL$), $\mu$ measures the flow of n
   \label{fig:baseline-equilibrium}
 \end{figure}
 
+%TODO mir ist nicht völlig klar, was die idee hier ist (wirkt ein bisschen nach AI slop auch mit den falschen references ;-)). text ist so zwischen caption und appendix text.
 Building on the baseline accounting structure as shown in tables \ref{tab:stockmatrix_simple} and \ref{tab:flowmatrix_simple}, we now show  how the introduction of an asset market impacts the stock-flow characteristics of th economy. Indicatively for the relevant changes are the introduction of real assets $A_t$ household's asset side and the new role of speculative loans given to households (both shown in Table \ref{tab:sfc-asset-stock}), where the flow matrix 
 To make the stock-flow consistency of the asset-market extension transparent we consolidate the two private-sector blocks --- households (the asset-expenditure side, $AE$) and firms (the investment side, $I$) --- into a single \emph{private sector} column, shown in Tables \ref{tab:stockmatrix_assets} and \ref{tab:assetpk-flow}. Summing the household and firm rows yields the following aggregated \emph{Saldonull} identities, which must hold sector-wide irrespective of the allocation of individual instruments between $AE$ and $I$.
 
@@ -391,7 +392,7 @@ On the flow side the private sector's net acquisition of financial assets in the
   \tag{Private flow identity}
   \label{eq:saldonull-flow}
 \end{align}
-so that the new deposits created to finance both productive and speculative positions are exactly matched by the corresponding new loans. The speculative trading block $+AE_t$ and $-AE_t$ cancels \emph{within} the private sector, confirming that gross asset expenditure is a purely internal reallocation of the existing stock $A_t$ and never appears as a net private-sector flow. These two identities constitute the consolidated Saldonull for $AE$ and $I$ and verify that the asset-market extension preserves stock-flow consistency.
+so that the new deposits created to finance both productive and speculative positions are exactly matched by the corresponding new loans. The speculative trading block $+AE_t$ and $-AE_t$ cancels \emph{within} the private sector, confirming that gross asset expenditure is a purely internal reallocation of the existing stock $A_t$ and never appears as a net private-sector flow. These two identities constitute the consolidated values for $AE$ and $I$ and verify that the asset-market extension preserves stock-flow consistency.
 
 %TODO: (2) in den captions genau ausweisen, was die underlying definitions für die closures sind. eventuell sollte man auch die fixe zuordnung der neuen deposits aufheben und das flexibel über households und firms schreiben. aber dann bricht die klare definition...
 
@@ -404,15 +405,13 @@ In particular, speculative debt $SD$ now enters bank lending alongside productiv
 
 \section{Real economic impacts of financial speculation} \label{sec:real_impact}
 
-%main TODO: Wir sollten mal überlegen ob der Vergleich so gescheit ist oder ob wir nicht besser mit baseline verglkeichen und ab hier auf die zinsen verzichten? bzw. könnte man es mit opacity vltl sogar hinkriegen vier linien verständlich zu zeigen... denke das wäre wesentlich instruktiver.
+In this section we suggest different formulations that will break the 'cordon sanitaire' betwen industrial and financial circulation and, hence, allow speculation to affect real economic activity. We thereby move from the position of the \treatise{} as captured in section \ref{subsec:asset_market} to a formulation that combines this setup with the idea from the \GT{} that financial transmarkets also have an impact on the real economy. As indicated by table \ref{tab:typology} we thereby move from a rational reconstruction \citep{Rorty.1984} of the \treatise{} to a model representing the core intuition found in post-Keynesian (and large parts of heterodox economics).
 
-In this section we suggest different formulations that will break the 'cordon sanitaire' betwen industrial and financial circulation and, hence, allow speculation to affect real economic activity. We thereby move from the position of the \treatise{} as captured in section \ref{subsec:asset_market} to a formulation that combines this setup with the idea from the \GT{} that financial transmarkets also have an impact on the real economy. As indicated by table \ref{tab:typology} we thereby move from a rational reconstruction (SOURCE: RORTY) of the \treatise{} to a model representing the core intuition found in post-Keynesian (and large parts of heterodox economics).
+However, the relevant literature suggests that such interaction between real and financial sphere can be driven by different actors and, hence, different causal channels. In what follows we focus three such channels driven by three different actors. In the first of these the propensity of banks to provide credit for real investment is negatively affected by speculative alternatives mimicing a crowding-out effect in credit provision (section \ref{subsec:banks_ration}). In the second scenario, the central bank is responsive to the development of asset prices $AP$ in addition to the (conventional) price level $P$, which affects the lending rate and, hence, has an indirect impact investment \ref{subsec:central_bank}. Finally, the third scenario captures the idea of a financialization of firms (SOURCE) \ref{subsec:financialization}. In this setup, firms themselves condition their planned productive investment on asset prices taking into account speculative activities as a viable alternative to real investment, which similarly affects real activity \citep{Stockhammer.2004,Stockhammer.2026}.
 
-%TODO: add rorty reference
+As we will see in what follows these scenarios build on imposing some unilateral impact of financial markets on the real economy; however, developments in the real economy then inevitable feed back on financial markets, which indicates that breaking the cordon sanitaire between both spheres will quickly create non-trivial interactions that depend on the specific modeling setup.
 
-However, the relevant literature suggests that such interaction between real and financial sphere can be driven by different actors and, hence, different causal channels. In what follows we focus three such channels driven by three different actors. In the first of these the propensity of banks to provide credit for real investment is negatively affected by speculative alternatives mimicing a crowding-out effect in credit provision (section \ref{subsec:banks_ration}). In the second scenario, the central bank is responsive to the development of asset prices $AP$ in addition to the (conventional) price level $P$, which affects the lending rate and, hence, has an indirect impact investment \ref{subsec:central_bank}. Finally, the third scenario captures the idea of a financialization of firms (SOURCE) \ref{subsec:financialization}. In this setup, firms themselves condition their planned productive investment on asset prices taking into account speculative activities as a viable alternative to real investment, which similarly affects real activity.
-
-%TODO: check text and if it works search two key references each (e.g. stockhammer on financialization)
+%TODO: check text and if it works search two key references each (e.g. stockhammer on financialization, epstein?)
 
 \subsection{The Credit Rationing Channel} \label{subsec:banks_ration}
 
@@ -451,7 +450,7 @@ Finally, the lower left panel gain shows balance sheet changes for the relevant 
   \label{fig:rationing-equilibrium}
 \end{figure}
 
-\subsection{The Asset-Price Channel (General Theory II)} \label{subsec:central_bank}
+\subsection{The Central Bank Channel} \label{subsec:central_bank}
 
 In this variant, we assume that the central bank is sensitive to asset price dynamics
 and, hence, considers asset prices analogously to prices for goods and services.
@@ -509,17 +508,14 @@ This feature also plays a role in real-world financial markets, where prices oft
 
 In terms of stock-flow relations we again note that the tables provided for describing the basic asset price model in section \ref{subsec:asset_market} are sufficient for capturing this model. We also note that -- in comparison to the baseline model -- the total amount of debt is again slightly lower due to the impact of higher interest rates.
 
-\subsection{The Firms' Investment-Rationing Channel} \label{subsec:financialization}
+\subsection{The Financialization of Firms} \label{subsec:financialization}
 
 The preceding variants locate the real effects of speculation in the banking
-sector or in the policy-rate rule. A further channel arises when firms condition
-planned productive investment directly on the valuation of speculative assets.
-Such a pattern typically can occur for diverese reasons, e.g., it can represent a better outside
+sector or in the policy-rate rule. A further channel arises when firms prioritize the acquisition of speculative assets relative to producive investment.
+Such a pattern typically can occur for diverese reasons, e.g., better outside
 options from financial investment, a rise in the opportunity cost of productive
 projects, or stakeholder demands for internal diversification to reduce perceived 
-risk-factors following a standard portfolio
-approach. These factors would lead firms to reduce effective investment to secure available 
-funds directing towards financial markets transactions.
+risk-factors following a standard portfolio approach. These factors would lead firms to reduce effective investment to secure available funds directing towards financial markets transactions.
 
 In the simplified variant captured below we retain the standard policy rule and the
 exogenous credit-rationing parameter $c$, but allow asset price to influence 
@@ -533,28 +529,23 @@ the investment-demand schedule via
 \label{eq:firms-ration}
 \end{equation}
 
-Thus a higher asset price lowers planned productive investment even if banks do
-not change the fraction of credit they grant and the central bank does not react
-directly to asset prices. The coefficient $d_2$ is a reduced-form measure of
-firms' sensitivity to financial valuations. 
+Thus a higher asset price lowers planned productive investment directly and, hence, does not require assuming any effect on the banking sector and the central bank. The coefficient $d_2$ is a reduced-form measure of firms' sensitivity to financial valuations, representing the idea that firms strive for highly valued assets to create a credible portfolio and that financialization seems more attractive in times of booms (which leads to a scenario inverse to the liquidity preference reasoning assigned to speculating households).
 
 This channel closes the real--financial loop directly. The interest rate affects
 speculative borrowing and therefore $AP$; the resulting asset price enters
 Eq.~\eqref{eq:firms-ration}, changes $D$, and feeds through to output and
-employment. Unlike PQC, the mechanism does not operate through endogenous bank
-credit rationing. Unlike PQCr, it does not require an asset-price term in the
-policy rule. 
+employment. In the outcome we observe a feedback effect similar to that in section \ref{subsec:banks_ration} -- lower output and prices lead to lower interest rates that boost speculation. However, but this time the mechanism does not operate through endogenous bank credit rationing. Rather, as the label ``financialization of firms'' suggest firms effectively replace the role of banks as drivers of financzialization as they themselves gain a stronger preferences for holding asssets.
 
-%TODO tendieren den satz darüber zu streichen; bin mir auch nicht ganz sicher ob der nächste absatz wirklich hilfreich ost
-Because $AP$ and speculative demand are jointly determined, the
-IS and aggregate-demand schedules shown in the figure use the unique solution
-of the asset-market equilibrium at each interest rate or goods price.
+%TODO (BRAUCHEN WR ALLES NICHT MEN) tendieren den satz darüber zu streichen; bin mir auch nicht ganz sicher ob der nächste absatz wirklich hilfreich ost
+%Because $AP$ and speculative demand are jointly determined, the
+%IS and aggregate-demand schedules shown in the figure use the unique solution
+%of the asset-market equilibrium at each interest rate or goods price.
 
-Figure~\ref{fig:firmsration-equilibrium} reports the calibrated equilibrium again
-showing the impact of a change in baseline interest rates. The
-IS--IR and AD--AS plots show the direct contractionary effect of asset-price
-rationing, while the asset-market plot and sector balance sheets display the
-financial position that generates it.
+%Figure~\ref{fig:firmsration-equilibrium} reports the calibrated equilibrium again
+%showing the impact of a change in baseline interest rates. The
+%IS--IR and AD--AS plots show the direct contractionary effect of asset-price
+%rationing, while the asset-market plot and sector balance sheets display the
+%financial position that generates it.
 
 \begin{figure}[htbp]
   \centering
@@ -565,12 +556,7 @@ financial position that generates it.
   \label{fig:firmsration-equilibrium}
 \end{figure}
 
-\section{Some extensions of the basic model}
-
-The turnover share \(\alpha\) and asset-creation rate \(g_a\) are fixed parameters
-in the teaching variants. Dynamic or experimental specifications that
-endogenize turnover are outside the model presented here and are not used for
-the equilibrium figures or comparative claims in this note.
+%TODO hier gibt es, denke ich, schon eine neue zeile oder so im flowchart weil die firmen jetzt auch was machen (speculative debt?) müsste das niht auch in den balance sheet rein? das müsste man sich nochmal anschauen...
 
 \section{Real world analysis: An Economic Policy Example with Dual Interest Rates}
 
@@ -615,6 +601,15 @@ The fact that the post-2020 correlation between crypto and equity markets rose s
 
 \paragraph{The two-way street.}
 Our model emphasizes the arrow from monetary conditions to asset prices, but recent experience also illustrates the reverse: the housing wealth effect from QE generated additional consumption, contributing to the post-2021 inflation that forced the Fed to tighten in the first place \citep{klein2025}. This creates a closed loop that our static model cannot fully capture but that the dynamic extensions of the \texttt{PKAssetPrices} framework are designed to explore: easy money \(\to\) rising asset prices \(\to\) rising consumption \(\to\) inflation \(\to\) tighter money \(\to\) falling asset prices. Keynes's insight that the speculative motive connects financial and industrial circulations in \emph{both} directions is borne out by the data.
+
+\section{Some extensions of the basic model}
+
+%NOTE: DAS HIER KÖNNTE MAN VLLT AUCH IN DIE CONCLUSION EINBAUEN, ODER HALT HIER VLLT 3-4 Punkte kursorisch andeuten (andere taylor rule, rolle von gamma, dynamisierung)
+
+The turnover share \(\alpha\) and asset-creation rate \(g_a\) are fixed parameters
+in the teaching variants. Dynamic or experimental specifications that
+endogenize turnover are outside the model presented here and are not used for
+the equilibrium figures or comparative claims in this note.
 
 \section{Conclusion}
 
