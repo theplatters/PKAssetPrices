@@ -53,7 +53,7 @@ end
                 parametrization.params[:s0] -
                 parametrization.params[:s1] * speculative_rate_multiplier * variables[:r] -
                 parametrization.params[:s2] * (variables[:AP] - 1)
-            @test variables[:AD] ≈
+            @test variables[:AE] ≈
                 parametrization.params[:γ0] + variables[:SD] / (1 - parametrization.params[:γ])
             @test variables[:dL] ≈ variables[:c] * variables[:D] + variables[:SD]
             @test curves.IS ≈ variables[:Y] atol = 1.0e-8
@@ -72,7 +72,7 @@ end
     @test (params[:s0], params[:s1], params[:s2]) ==
         (0.836089551258839, 4.0, 0.2)
     @test solution.variables[:SD] ≈ 0.38865823446839143
-    @test solution.variables[:AD] ≈ 0.7773164689367829
+    @test solution.variables[:AE] ≈ 0.7773164689367829
     @test solution.variables[:AP] ≈ 0.996559575559978
 end
 

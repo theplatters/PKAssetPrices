@@ -14,7 +14,7 @@ const DP = PKAssetPrices.DynamicPlotting
     solution = PKAssetPrices.solve_model(S.Baseline)
     figure = Figure()
     axis = Axis(figure[1, 1])
-    @test SP.plot_is_lm(solution, axis) === axis
+    @test SP.plot_is_ir(solution, axis) === axis
     @test length(axis.scene.plots) == 6
     @test axis.limits[] == ((4.0, 10.0), (0.06, 0.15))
     @test axis.yticks[][2] == ["6%", "8%", "10%", "12%", "14%"]
@@ -42,7 +42,7 @@ const DP = PKAssetPrices.DynamicPlotting
     @test SP.plot_asset_market(solution, asset_axis) === asset_axis
     @test length(asset_axis.scene.plots) == 6
     asset_lines = filter(plot -> plot isa Lines, asset_axis.scene.plots)
-    @test extrema(point[2] for point in asset_lines[1][1][]) == SP.ASSET_X_LIMITS
+    @test extrema(point[2] for point in asset_lines[1][1][]) == SP.ASSET_Y_LIMITS
     ad_as_axis = Axis(figure[2, 1])
     @test SP.plot_ad_as(solution, ad_as_axis) === ad_as_axis
     @test length(ad_as_axis.scene.plots) == 6
@@ -82,8 +82,8 @@ const DP = PKAssetPrices.DynamicPlotting
     @test all(segment_colors[data.sides .== :asset] .== SP.ASSET_COLOR)
     @test all(segment_colors[data.sides .== :liability] .== SP.LIABILITY_COLOR)
     @test "Central Bank · Central Bank Credit" in data.labels
-    @test extrema(SP.equilibrium_range(0.0)) == (-1.0, 1.0)
-    @test extrema(SP.equilibrium_range(-2.0)) == (-4.0, -1.0)
+    @test SP.equilibrium_lims(0.0) == (-1.0, 1.0)
+    @test SP.equilibrium_lims(-2.0) == (-4.0, -1.0)
 
     for model in (S.Baseline, S.PQC, S.PQCr, S.PQCrDIFF, S.FirmsRation)
         model_solution = PKAssetPrices.solve_model(model)
@@ -162,6 +162,29 @@ const DP = PKAssetPrices.DynamicPlotting
     @test count(content -> content isa Axis &&
         occursin("Sector Balance Sheets", string(content.title[])), asset_panel.content) == 1
 
+    custom_label_panel = SP.panel(
+        solution,
+        SP.AssetMarketPanel();
+        is_ir_label_positions = Dict("IS" => (0.20, 0.30)),
+        ad_as_label_positions = Dict("AD" => (0.30, 0.40)),
+        asset_market_label_positions = Dict("Asset Demand" => (0.40, 0.50)),
+    )
+    custom_text_position(axis_title, label) = begin
+        custom_axis = only(content for content in custom_label_panel.content if
+            content isa Axis && occursin(axis_title, string(content.title[])))
+        custom_text = only(plot for plot in custom_axis.scene.plots if
+            plot isa Makie.Text && plot.text[] == [label])
+        only(custom_text[1][])
+    end
+    @test custom_text_position("Goods Market Dynamics", "IS") ≈ Point2f(0.20, 0.30)
+    @test custom_text_position("Output and Inflation Dynamics", "AD") ≈ Point2f(0.30, 0.40)
+    @test custom_text_position("Financial Market Dynamics", "Asset Demand") ≈ Point2f(0.40, 0.50)
+    repositioned_ad_labels = SP.reposition_labels(
+        SP.STANDARD_AD_AS_LABELS,
+        Dict("AD" => (0.30, 0.40)),
+    )
+    @test repositioned_ad_labels["AD"].attributes == SP.STANDARD_AD_AS_LABELS["AD"].attributes
+
     titled_panel = SP.panel(
         PKAssetPrices.solve_model(S.Baseline),
         SP.AssetMarketPanel();
@@ -181,16 +204,16 @@ const DP = PKAssetPrices.DynamicPlotting
     sol = PKAssetPrices.solve_model(S.PQC)
     ref = PKAssetPrices.solve_model(S.Baseline)
 
-    # --- plot_is_lm reference overlay ---------------------------------------
-    is_lm_fig = Figure()
-    is_lm_ax = Axis(is_lm_fig[1, 1])
-    @test SP.plot_is_lm(sol, is_lm_ax; reference_solution = ref) === is_lm_ax
-    @test length(is_lm_ax.scene.plots) == 8
-    is_lm_lines = filter(plot -> plot isa Lines, is_lm_ax.scene.plots)
+    # --- plot_is_ir reference overlay ---------------------------------------
+    is_ir_fig = Figure()
+    is_ir_ax = Axis(is_ir_fig[1, 1])
+    @test SP.plot_is_ir(sol, is_ir_ax; reference_solution = ref) === is_ir_ax
+    @test length(is_ir_ax.scene.plots) == 8
+    is_ir_lines = filter(plot -> plot isa Lines, is_ir_ax.scene.plots)
     # line 4 is the grey reference IS curve: solid, linewidth 2.5
-    @test is_lm_lines[4].color[] == RGBAf(SP.REFERENCE_COLOR)
-    @test is_lm_lines[4].linewidth[] == 2.5
-    @test is_lm_lines[4].linestyle[] == nothing
+    @test is_ir_lines[4].color[] == RGBAf(SP.REFERENCE_COLOR)
+    @test is_ir_lines[4].linewidth[] == 2.5
+    @test is_ir_lines[4].linestyle[] == nothing
     # x-coordinates match ref.model .IS over the same rate coordinate range
     rate_range = range(SP.IS_IR_Y_LIMITS...; length = 200)
     ref_vars = copy(ref.variables)
@@ -198,9 +221,9 @@ const DP = PKAssetPrices.DynamicPlotting
         ref_vars[:r] = r
         return S.eval_curve(ref.model, ref_vars).IS
     end
-    @test [point[1] for point in is_lm_lines[4][1][]] ≈ expected_is_x
-    is_lm_texts = vcat([plot.text[] for plot in is_lm_ax.scene.plots if plot isa Makie.Text]...)
-    @test "IS (base)" in is_lm_texts
+    @test [point[1] for point in is_ir_lines[4][1][]] ≈ expected_is_x
+    is_ir_texts = vcat([plot.text[] for plot in is_ir_ax.scene.plots if plot isa Makie.Text]...)
+    @test "IS (base)" in is_ir_texts
 
     # --- plot_ad_as reference overlay ---------------------------------------
     ad_as_fig = Figure()
@@ -212,7 +235,7 @@ const DP = PKAssetPrices.DynamicPlotting
     @test ad_lines[4].color[] == RGBAf(SP.REFERENCE_COLOR)
     @test ad_lines[5].color[] == RGBAf(SP.REFERENCE_COLOR)
     @test ad_lines[4].linewidth[] == 2.5
-    @test ad_lines[5].linewidth[] == 2.5
+    @test ad_lines[5].linewidth[] == 2.0
     @test ad_lines[4].linestyle[] == nothing
     @test ad_lines[5].linestyle[] == Float32[0, 3, 6]
     # line 5 values match .ADc from the solved lowered reference model over P
@@ -238,16 +261,11 @@ const DP = PKAssetPrices.DynamicPlotting
     @test asset_lines[4].color[] == RGBAf(SP.REFERENCE_COLOR)
     @test asset_lines[5].color[] == RGBAf(SP.REFERENCE_COLOR)
     @test asset_lines[4].linewidth[] == 2.5
-    @test asset_lines[5].linewidth[] == 2.5
+    @test asset_lines[5].linewidth[] == 2.0
     @test asset_lines[4].linestyle[] == nothing
     @test asset_lines[5].linestyle[] == Float32[0, 3, 6]
     # line 4 values match ref.model .AMD over the plotted asset-price range
-    eq_curves = S.eval_curve(sol)
-    uses_reference_range = first(SP.ASSET_X_LIMITS) <= eq_curves.AMD <= last(SP.ASSET_X_LIMITS) &&
-                          first(SP.ASSET_Y_LIMITS) <= sol.variables[:AP] <= last(SP.ASSET_Y_LIMITS)
-    asset_price_range = uses_reference_range ?
-                        range(SP.ASSET_X_LIMITS...; length = 200) :
-                        range(SP.ASSET_Y_LIMITS...; length = 200)
+    asset_price_range = range(asset_ax.limits[][2]...; length = 200)
     ref_asset_vars = copy(ref.variables)
     expected_ref_demand = map(asset_price_range) do ap
         ref_asset_vars[:AP] = ap
@@ -255,7 +273,7 @@ const DP = PKAssetPrices.DynamicPlotting
     end
     @test [point[1] for point in asset_lines[4][1][]] ≈ expected_ref_demand
     asset_texts = vcat([plot.text[] for plot in asset_ax.scene.plots if plot isa Makie.Text]...)
-    @test "Asset Demand (base)" in asset_texts
+    @test "Demand (base)" in asset_texts
 
     # --- panel-level reference rendering ------------------------------------
     ref_panel = SP.panel(sol, SP.AssetMarketPanel(); reference_solution = ref, size = (900, 700))
@@ -267,9 +285,16 @@ const DP = PKAssetPrices.DynamicPlotting
         @test SP.panel(model_solution, SP.AssetMarketPanel(); reference_solution = ref, size = (900, 700)) isa Figure
     end
 
-    # StandardPanel signature remains unchanged: reference_solution is rejected
+    # The unified panel API also supports a reference curve on StandardPanel.
     baseline_solution = PKAssetPrices.solve_model(S.Baseline)
-    @test_throws MethodError SP.panel(baseline_solution, SP.StandardPanel(); reference_solution = ref)
+    standard_ref_panel = SP.panel(baseline_solution, SP.StandardPanel(); reference_solution = ref)
+    @test standard_ref_panel isa Figure
+    standard_ref_curve_axis = only(content for content in standard_ref_panel.content if
+        content isa Axis && occursin("Goods Market Dynamics", string(content.title[])))
+    standard_ref_texts = vcat([
+        plot.text[] for plot in standard_ref_curve_axis.scene.plots if plot isa Makie.Text
+    ]...)
+    @test "IS (base)" in standard_ref_texts
     @test SP.panel(baseline_solution; size = (900, 700)) isa Figure
     @test SP.panel(baseline_solution, SP.StandardPanel(); size = (900, 700)) isa Figure
 end

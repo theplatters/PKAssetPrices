@@ -344,8 +344,7 @@ end
 function ad_as_component(solution::Static.Solution)
 
     AP_eq = solution.variables[:AP]
-    AS_eq = solution.variables[:AS]
-    AD_eq = solution.variables[:AD]
+    equilibrium_quantity = Static.eval_curve(solution).AMD
 
     AP_min = AP_eq * 0.2
     AP_max = AP_eq * 3.0
@@ -373,7 +372,7 @@ function ad_as_component(solution::Static.Solution)
     lines!(ax, ad_values, collect(AP_range); color = :royalblue, linewidth = 3, label = "AmD")
     lines!(ax, as_values, collect(AP_range); color = :crimson, linewidth = 3, label = "AmS")
     scatter!(
-        ax, [AD_eq / AP_eq], [AP_eq];
+        ax, [equilibrium_quantity], [AP_eq];
         color = :black,
         markersize = 14,
         strokecolor = :white,
@@ -403,8 +402,7 @@ function ad_as_comparison_component(
 
     for (i, (solution, label)) in enumerate(zip(solutions, labels))
         AP_eq = solution.variables[:AP]
-        AS_eq = solution.variables[:AS]
-        AD_eq = solution.variables[:AD]
+        equilibrium_quantity = Static.eval_curve(solution).AMD
 
         AP_range = range(AP_eq * 0.2, AP_eq * 3.0; length = 200)
 
@@ -434,7 +432,7 @@ function ad_as_comparison_component(
             label = "AmS – $label",
         )
         scatter!(
-            ax, [AD_eq / AP_eq], [AP_eq];
+            ax, [equilibrium_quantity], [AP_eq];
             color = color,
             markersize = 14,
             strokecolor = :white,

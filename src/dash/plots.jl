@@ -154,8 +154,7 @@ end
 
 function ad_as_curve_component(solution::Static.Solution)
     asset_price = solution.variables[:AP]
-    asset_supply = solution.variables[:AS]
-    asset_demand = solution.variables[:AD]
+    equilibrium_quantity = Static.eval_curve(solution).AMD
     price_range = range(asset_price * 0.2, asset_price * 3.0; length = 200)
 
     demand_values = Float64[]
@@ -168,7 +167,6 @@ function ad_as_curve_component(solution::Static.Solution)
         push!(supply_values, curves.AMS)
     end
 
-    equilibrium_quantity = asset_demand / asset_price
     traces = [
         (
             x = demand_values,
@@ -209,7 +207,7 @@ function ad_as_curve_component(solution::Static.Solution)
         yaxis_title = Dict("text" => "Asset price, AP"),
         x_annotation = equilibrium_quantity,
         y_annotation = asset_price,
-        annotation_text = "Q* = $(format_value(asset_supply; digits = 4))<br>" *
+        annotation_text = "Q* = $(format_value(equilibrium_quantity; digits = 4))<br>" *
             "AP* = $(format_value(asset_price; digits = 2))",
     )
     return curve_component(traces, layout)
