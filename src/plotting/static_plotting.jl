@@ -28,6 +28,87 @@ const BALANCE_ACTOR_LABEL_SIZE = 20
 const BALANCE_ANNOTATION_SIZE = 18
 const BALANCE_TICK_LABEL_SIZE = 20
 
+struct LabelSpec{A}
+  position::Point2f
+  attributes::A
+end
+
+function LabelSpec(position; attributes...)
+  return LabelSpec(Point2f(position...), (; attributes...))
+end
+
+function reposition_labels(labels, positions)
+  return Dict(
+    label => LabelSpec(
+      get(positions, label, spec.position);
+      spec.attributes...,
+    )
+    for (label, spec) in labels
+  )
+end
+
+const STANDARD_IS_IR_LABELS = Dict(
+  "IS" => LabelSpec(
+    (0.08, 0.08); space=:relative, align=(:left, :bottom)
+  ),
+  "IR" => LabelSpec((0.88, 0.88); space=:relative, align=(:right, :top)),
+  "IR (lower i₀)" => LabelSpec((0.88, 0.72), space=:relative, align=(:right, :top)),
+  "IS (base)" => LabelSpec((0.42, 0.06), space=:relative, align=(:left, :bottom))
+)
+
+const STANDARD_AD_AS_LABELS = Dict(
+  "AD" => LabelSpec(
+    (0.08, 0.88);
+    space=:relative,
+    align=(:left, :top),
+  ),
+  "AD (lower i₀)" => LabelSpec(
+    (0.08, 0.72);
+    space=:relative,
+    fontsize=LEGEND_LABEL_SIZE - 2,
+    align=(:left, :top),
+  ),
+  "AS" => LabelSpec(
+    (0.88, 0.88);
+    space=:relative,
+    align=(:right, :top),
+  ),
+  "AD (base)" => LabelSpec(
+    (0.42, 0.3);
+    space=:relative,
+    fontsize=LEGEND_LABEL_SIZE - 2,
+    align=(:left, :bottom),
+  ),
+)
+
+const STANDARD_ASSET_MARKET_LABELS = Dict(
+  "Asset Demand" => LabelSpec(
+    (0.08, 0.88);
+    space=:relative,
+    fontsize=LEGEND_LABEL_SIZE - 1,
+    align=(:left, :top),
+  ),
+  "Demand (lower i₀)" => LabelSpec(
+    (0.08, 0.68);
+    space=:relative,
+    fontsize=LEGEND_LABEL_SIZE - 3,
+    align=(:left, :top),
+  ),
+  "Asset Supply" => LabelSpec(
+    (0.88, 0.88);
+    space=:relative,
+    fontsize=LEGEND_LABEL_SIZE - 1,
+    align=(:right, :top),
+  ),
+  "Demand (base)" => LabelSpec(
+    (0.42, 0.08);
+    space=:relative,
+    fontsize=LEGEND_LABEL_SIZE - 2,
+    align=(:left, :bottom),
+  ),
+)
+
+
 abstract type PanelVariant end
 
 """The default panel containing the macroeconomic curves and balance sheets."""
@@ -37,13 +118,12 @@ struct StandardPanel <: PanelVariant end
 struct AssetMarketPanel <: PanelVariant end
 
 """Return a plotting interval around an equilibrium value."""
-function equilibrium_range(value::Real; length::Integer=200)
+function equilibrium_lims(value::Real)
   if iszero(value)
-    return range(-1.0, 1.0; length=length)
+    return (-1.0, 1.0)
   end
 
-  endpoints = sort((0.5 * value, 2.0 * value))
-  return range(first(endpoints), last(endpoints); length=length)
+  return (0.5 * value, 2.0 * value)
 end
 
 """Format model identifiers for display in plot labels."""
@@ -88,32 +168,6 @@ function lower_autonomous_policy_rate(
   return Static.Parametrization(parametrization.model, params, copy(parametrization.u0))
 end
 
-struct CurveSpec{X,Y,S}
-  x::X
-  y::Y
-  label::String
-  attributes::S
-end
-
-function CurveSpec(
-  x,
-  y,
-  label;
-  color,
-  linewidth=3,
-  kwargs...,
-)
-  length(x) == length(y) ||
-    throw(DimensionMismatch("x and y must have equal lengths"))
-
-  style = (;
-    color,
-    linewidth,
-    kwargs...,
-  )
-
-  return CurveSpec(x, y, String(label), style)
-end
 
 function plot_curves!(ax, curves)
   for curve in curves
@@ -129,7 +183,7 @@ function plot_curves!(ax, curves)
   return nothing
 end
 
-calculate_curve_path(sol, curve, variable, variable_range) = calculate_curve_path(sol, sol.model, curve, variable, variable_r)
+calculate_curve_path(sol, curve, variable, variable_range) = calculate_curve_path(sol, sol.model, curve, variable, variable_range)
 
 function calculate_curve_path(sol, model, curve, variable, variable_range)
   vars = copy(sol.variables)
@@ -137,6 +191,207 @@ function calculate_curve_path(sol, model, curve, variable, variable_range)
     vars[variable] = var
     return getproperty(Static.eval_curve(model, vars), curve)
   end
+end
+
+abstract type AbstractOrientation end
+struct X <: AbstractOrientation end
+struct Y <: AbstractOrientation end
+
+struct Curve{S<:Static.Solution,A<:AbstractOrientation,AT}
+  label::String
+  curve_name::Symbol
+  variable::Symbol
+  sol::S
+  orientation::A
+  attributes::AT
+end
+
+
+struct PlotSpecs{C,L}
+  x_limits::NTuple{2,Float64}
+  y_limits::NTuple{2,Float64}
+  curves::C
+  labels::L
+end
+mutable struct PlotSpecsBuilder{AT,L}
+  x_limits::NTuple{2,Float64}
+  y_limits::NTuple{2,Float64}
+  curves::Vector{Curve}
+  labels::L
+  default_attributes::AT
+end
+
+function PlotSpecsBuilder(
+  x_limits,
+  y_limits;
+  labels,
+  default_attributes...,
+)
+  return PlotSpecsBuilder(
+    Float64.(x_limits),
+    Float64.(y_limits),
+    Curve[],
+    labels,
+    (; default_attributes...),
+  )
+end
+
+function add_curve!(
+  builder::PlotSpecsBuilder,
+  label,
+  curve_name,
+  variable,
+  sol,
+  orientation::AbstractOrientation;
+  attributes...,
+)
+  style = merge(
+    builder.default_attributes,
+    (; attributes...),
+  )
+
+  curve = Curve(
+    String(label),
+    curve_name,
+    variable,
+    sol,
+    orientation,
+    style,
+  )
+
+  push!(builder.curves, curve)
+  return builder
+end
+
+function x_curve!(
+  builder::PlotSpecsBuilder,
+  label,
+  curve_name,
+  variable,
+  sol;
+  attributes...,
+)
+  return add_curve!(
+    builder,
+    label,
+    curve_name,
+    variable,
+    sol,
+    X();
+    attributes...,
+  )
+end
+
+function y_curve!(
+  builder::PlotSpecsBuilder,
+  label,
+  curve_name,
+  variable,
+  sol;
+  attributes...,
+)
+  return add_curve!(
+    builder,
+    label,
+    curve_name,
+    variable,
+    sol,
+    Y();
+    attributes...,
+  )
+end
+
+function build(builder::PlotSpecsBuilder)
+  isempty(builder.curves) &&
+    throw(ArgumentError("a plot must contain at least one curve"))
+
+  return PlotSpecs(
+    builder.x_limits,
+    builder.y_limits,
+    Tuple(builder.curves),
+    builder.labels
+  )
+end
+
+function curve_coordinates(curve::Curve{<:Any,<:X}, x_range, y_range)
+  values = calculate_curve_path(
+    curve.sol,
+    curve.curve_name,
+    curve.variable,
+    y_range,
+  )
+
+  return values, y_range
+end
+
+function curve_coordinates(curve::Curve{<:Any,<:Y}, x_range, y_range)
+  values = calculate_curve_path(
+    curve.sol,
+    curve.curve_name,
+    curve.variable,
+    x_range,
+  )
+
+  return x_range, values
+end
+
+function plot_curve_label!(ax, curve, labels)
+  label_spec = get(labels, curve.label, nothing)
+  isnothing(label_spec) && return nothing
+
+  attributes = merge(
+    (
+      space=:relative,
+      color=get(curve.attributes, :color, :black),
+      fontsize=LEGEND_LABEL_SIZE,
+    ),
+    label_spec.attributes,
+  )
+
+  text!(
+    ax,
+    label_spec.position...;
+    text=curve.label,
+    attributes...,
+  )
+
+  return nothing
+end
+
+function plot_specs!(ax::Makie.Axis, specs::PlotSpecs)
+  x_range = range(specs.x_limits...; length=200)
+  y_range = range(specs.y_limits...; length=20)
+
+  for curve in specs.curves
+    x, y = curve_coordinates(curve, x_range, y_range)
+
+    lines!(
+      ax,
+      x,
+      y;
+      label=curve.label,
+      curve.attributes...,
+    )
+    plot_curve_label!(ax, curve, specs.labels)
+  end
+
+  xlims!(ax, specs.x_limits...)
+  ylims!(ax, specs.y_limits...)
+
+  return ax
+end
+
+function build_plot_specs(f, x_limits, y_limits; labels, attributes...)
+  builder = PlotSpecsBuilder(
+    x_limits,
+    y_limits
+    ;
+    labels,
+    attributes...,
+  )
+
+  f(builder)
+  return build(builder)
 end
 
 """
@@ -150,69 +405,39 @@ function plot_is_ir(
   ax::Makie.Axis;
   lower_i0_factor::Real=0.0,
   reference_solution::Union{Nothing,Static.Solution}=nothing,
+  labels
 )
 
-  output_range = range(IS_IR_X_LIMITS...; length=200)
-  rate_range = range(IS_IR_Y_LIMITS...; length=200)
+  lower_rate_solution = lower_autonomous_policy_rate(sol.model, factor=lower_i0_factor) |> Static.solve_model
 
-  is_values = calculate_curve_path(sol, :IS, :r, rate_range)
-  ir_values = calculate_curve_path(sol, :IR, :Y, output_range)
 
-  lower_rate_model = lower_autonomous_policy_rate(sol.model; factor=lower_i0_factor)
-  lower_rate_solution = Static.solve_model(lower_rate_model)
-  lower_ir_values = calculate_curve_path(lower_rate_solution, :IR, :Y, output_range)
+  specs = build_plot_specs(
+    IS_IR_X_LIMITS,
+    IS_IR_Y_LIMITS;
+    labels,
+    linewidth=3,
+    linestyle=:solid,
+  ) do builder
+    x_curve!(builder, "IS", :IS, :r, sol; color=IS_COLOR)
+    y_curve!(builder, "IR", :IR, :Y, sol; color=IR_COLOR)
 
-  curves = [
-    CurveSpec(
-      is_values,
-      rate_range,
-      "IS";
-      color=IS_COLOR,
-    ),
-    CurveSpec(
-      output_range,
-      ir_values,
-      "IR";
-      color=IR_COLOR,
-    ),
-    CurveSpec(
-      output_range,
-      lower_ir_values,
-      "IR (lower i₀)";
+    y_curve!(
+      builder,
+      "IR (lower i₀)",
+      :IR,
+      :Y,
+      lower_rate_solution;
       color=COUNTERFACTUAL,
       linewidth=2,
       linestyle=:dash,
-    ),
-  ]
-
-  if !isnothing(reference_solution)
-    reference_is_values = calculate_curve_path(reference_solution, :IS, :r, rate_range)
-    push!(curves, CurveSpec(reference_is_values, rate_range, "IS (base)", color=REFERENCE_COLOR, linewidth=2.5))
-  end
-
-  plot_curves!(ax, curves)
-  xlims!(ax, IS_IR_X_LIMITS...)
-  ylims!(ax, IS_IR_Y_LIMITS...)
-  ax.xticks = LinearTicks(4)
-  ax.yticks = percentage_ticks()
-  text!(
-    ax, 0.08, 0.08; text="IS", space=:relative, color=IS_COLOR,
-    fontsize=LEGEND_LABEL_SIZE, align=(:left, :bottom)
-  )
-  text!(
-    ax, 0.88, 0.88; text="IR", space=:relative, color=IR_COLOR,
-    fontsize=LEGEND_LABEL_SIZE, align=(:right, :top)
-  )
-  text!(
-    ax, 0.88, 0.72; text="IR (lower i₀)", space=:relative, color=COUNTERFACTUAL,
-    fontsize=LEGEND_LABEL_SIZE - 2, align=(:right, :top)
-  )
-  if !isnothing(reference_solution)
-    text!(
-      ax, 0.42, 0.06; text="IS (base)", space=:relative, color=REFERENCE_COLOR,
-      fontsize=LEGEND_LABEL_SIZE - 2, align=(:left, :bottom)
     )
+
+    if (!isnothing(reference_solution))
+      x_curve!(builder, "IS (base)", :IS, :r, reference_solution, color=REFERENCE_COLOR, linewidth=2.5)
+    end
   end
+  plot_specs!(ax, specs)
+
   return ax
 end
 
@@ -220,6 +445,7 @@ end
 function plot_ad_as(
   sol::Static.Solution,
   ax::Makie.Axis;
+  labels,
   lower_i0_factor::Real=0.0,
   reference_solution::Union{Nothing,Static.Solution}=nothing,
 )
@@ -227,7 +453,6 @@ function plot_ad_as(
   all(hasproperty(equilibrium_curves, curve) for curve in (:ADc, :ASc)) ||
     throw(ArgumentError("the model does not define aggregate ADc and ASc curves"))
 
-  price_range = range(AD_AS_Y_LIMITS...; length=200)
   ad_as_x_limits = AD_AS_X_LIMITS
   equilibrium_output = sol.variables[:Y]
   if !(first(ad_as_x_limits) <= equilibrium_output <= last(ad_as_x_limits))
@@ -237,57 +462,41 @@ function plot_ad_as(
       max(last(AD_AS_X_LIMITS), equilibrium_output + padding),
     )
   end
-  output_range = range(ad_as_x_limits...; length=200)
 
-  demand_values = calculate_curve_path(sol, :ADc, :P, price_range)
-  supply_values = calculate_curve_path(sol, :ASc, :Y, output_range)
 
   lower_rate_model = lower_autonomous_policy_rate(sol.model; factor=lower_i0_factor)
-
   lower_rate_solution = Static.solve_model(lower_rate_model)
-  lower_ir_values = calculate_curve_path(lower_rate_solution, :ADc, :P, price_range)
 
-  curves = [
-    CurveSpec(demand_values, price_range, "AD", color=IS_COLOR),
-    CurveSpec(output_range, supply_values, "AS", color=IR_COLOR),
-    CurveSpec(lower_ir_values, price_range, "AD (lowered i₀)", color=COUNTERFACTUAL, linewidth=2.0, linestyle=:dash),
-  ]
+  specs = build_plot_specs(
+    ad_as_x_limits,
+    AD_AS_Y_LIMITS;
+    labels,
+    linewidth=3,
+    linestyle=:solid,
+  ) do builder
+    x_curve!(builder, "AD", :ADc, :P, sol; color=IS_COLOR)
+    y_curve!(builder, "AS", :ASc, :Y, sol; color=IR_COLOR)
 
-
-  if !isnothing(reference_solution)
-    reference_demand_values = calculate_curve_path(reference_solution, :ADc, :P, price_range)
-    lowered_reference_model = lower_autonomous_policy_rate(
-      reference_solution.model;
-      factor=lower_i0_factor,
+    x_curve!(
+      builder,
+      "AD (lower i₀)",
+      :ADc,
+      :P,
+      lower_rate_solution;
+      color=COUNTERFACTUAL,
+      linewidth=2,
+      linestyle=:dash,
     )
-    lowered_reference_solution = Static.solve_model(lowered_reference_model)
-    lowered_reference_demand_values = calculate_curve_path(lowered_reference_solution, :ADc, :P, price_range)
 
-    push!(curves, CurveSpec(reference_demand_values, price_range, "AD (base)", color=REFERENCE_COLOR, linewidth=2.5))
-    push!(curves, CurveSpec(lowered_reference_demand_values, price_range, "AD (base lowered i₀)", color=REFERENCE_COLOR, linewidth=2.0, linestyle=:dash))
+    if (!isnothing(reference_solution))
+      lowered_reference_model = lower_autonomous_policy_rate(reference_solution.model, factor=lower_i0_factor)
+      lowered_reference_solution = Static.solve_model(lowered_reference_model)
+      x_curve!(builder, "AD (base)", :ADc, :P, reference_solution, color=REFERENCE_COLOR, linewidth=2.5)
+      x_curve!(builder, "AD (base lower i₀)", :ADc, :P, lowered_reference_solution, color=REFERENCE_COLOR, linewidth=2.0, linestyle=:dash)
+    end
   end
+  plot_specs!(ax, specs)
 
-  plot_curves!(ax, curves)
-  xlims!(ax, ad_as_x_limits...)
-  ylims!(ax, AD_AS_Y_LIMITS...)
-  text!(
-    ax, 0.08, 0.88; text="AD", space=:relative, color=IS_COLOR,
-    fontsize=LEGEND_LABEL_SIZE, align=(:left, :top)
-  )
-  text!(
-    ax, 0.08, 0.72; text="AD (lower i₀)", space=:relative, color=COUNTERFACTUAL,
-    fontsize=LEGEND_LABEL_SIZE - 2, align=(:left, :top)
-  )
-  text!(
-    ax, 0.88, 0.88; text="AS", space=:relative, color=IR_COLOR,
-    fontsize=LEGEND_LABEL_SIZE, align=(:right, :top)
-  )
-  if !isnothing(reference_solution)
-    text!(
-      ax, 0.42, 0.3; text="AD (base)", space=:relative, color=REFERENCE_COLOR,
-      fontsize=LEGEND_LABEL_SIZE - 2, align=(:left, :bottom)
-    )
-  end
   return ax
 end
 
@@ -301,6 +510,7 @@ the model variable `AE` itself.
 function plot_asset_market(
   sol::Static.Solution,
   ax::Makie.Axis;
+  labels,
   lower_i0_factor::Real=0.0,
   reference_solution::Union{Nothing,Static.Solution}=nothing,
 )
@@ -319,66 +529,45 @@ function plot_asset_market(
     first(ASSET_X_LIMITS) <= equilibrium_quantity <= last(ASSET_X_LIMITS) &&
     first(ASSET_Y_LIMITS) <= sol.variables[:AP] <= last(ASSET_Y_LIMITS)
   if !uses_reference_range
-    asset_x_range = equilibrium_range(equilibrium_quantity)
-    asset_y_range = equilibrium_range(sol.variables[:AP])
-    asset_x_limits = (first(asset_x_range), last(asset_x_range))
-    asset_y_limits = (first(asset_y_range), last(asset_y_range))
+    asset_x_limits = equilibrium_lims(equilibrium_quantity)
+    asset_y_limits = equilibrium_lims(sol.variables[:AP])
   end
-
-  asset_price_range = uses_reference_range ?
-                      range(ASSET_X_LIMITS...; length=200) :
-                      range(asset_y_limits...; length=200)
-
-
-  demand_values = calculate_curve_path(sol, :AMD, :AP, asset_price_range)
-  supply_values = calculate_curve_path(sol, :AMS, :AP, asset_price_range)
 
   lower_rate_model = lower_autonomous_policy_rate(sol.model; factor=lower_i0_factor)
   lower_rate_solution = Static.solve_model(lower_rate_model)
-  lower_demand_values = calculate_curve_path(lower_rate_solution, :AMD, :AP, asset_price_range)
 
-  curves = [
-    CurveSpec(demand_values, asset_price_range, "Asset Demand", color=IS_COLOR),
-    CurveSpec(lower_demand_values, asset_price_range, "Demand (lower i₀)", color=COUNTERFACTUAL, linewidth=2.0, linestyle=:dash),
-    CurveSpec(supply_values, asset_price_range, "Asset Supply", color=IR_COLOR),
-  ]
+  specs = build_plot_specs(
+    asset_x_limits,
+    asset_y_limits;
+    labels,
+    linewidth=3,
+    linestyle=:solid,
+  ) do builder
+    x_curve!(builder, "Asset Demand", :AMD, :AP, sol; color=IS_COLOR)
+    x_curve!(builder, "Asset Supply", :AMS, :AP, sol; color=IR_COLOR)
 
-
-  if !isnothing(reference_solution)
-    reference_demand_values = calculate_curve_path(reference_solution, :AMD, :AP, asset_price_range)
-    lowered_reference_model = lower_autonomous_policy_rate(
-      reference_solution.model;
-      factor=lower_i0_factor,
+    x_curve!(
+      builder,
+      "Demand (lower i₀)",
+      :AMD,
+      :AP,
+      lower_rate_solution;
+      color=COUNTERFACTUAL,
+      linewidth=2,
+      linestyle=:dash,
     )
-    lowered_reference_solution = Static.solve_model(lowered_reference_model)
-    lowered_reference_demand_values = calculate_curve_path(lowered_reference_solution, :AMD, :AP, asset_price_range)
-    push!(curves, CurveSpec(reference_demand_values, asset_price_range, "Asset Demand (base)", color=REFERENCE_COLOR, linewidth=2.5))
-    push!(curves, CurveSpec(lowered_reference_demand_values, asset_price_range, "Asset Demand (base lowere i₀)", color=REFERENCE_COLOR, linewidth=2.5, linestyle=:dash))
+
+    if (!isnothing(reference_solution))
+      lowered_reference_model = lower_autonomous_policy_rate(reference_solution.model, factor=lower_i0_factor)
+      lowered_reference_solution = Static.solve_model(lowered_reference_model)
+      x_curve!(builder, "Demand (base)", :AMD, :AP, reference_solution, color=REFERENCE_COLOR, linewidth=2.5)
+      x_curve!(builder, "Demand (base lower i₀)", :AMD, :AP, lowered_reference_solution, color=REFERENCE_COLOR, linewidth=2.0, linestyle=:dash)
+    end
   end
 
-  plot_curves!(ax, curves)
 
-  xlims!(ax, asset_x_limits...)
-  ylims!(ax, asset_y_limits...)
-  text!(
-    ax, 0.08, 0.88; text="Asset Demand", space=:relative, color=IS_COLOR,
-    fontsize=LEGEND_LABEL_SIZE - 1, align=(:left, :top)
-  )
-  text!(
-    ax, 0.08, 0.68; text="Demand (lower i₀)", space=:relative, color=COUNTERFACTUAL,
-    fontsize=LEGEND_LABEL_SIZE - 3, align=(:left, :top)
-  )
-  text!(
-    ax, 0.88, 0.88; text="Asset Supply", space=:relative, color=IR_COLOR,
-    fontsize=LEGEND_LABEL_SIZE - 1, align=(:right, :top)
-  )
-  if !isnothing(reference_solution)
-    text!(
-      ax, 0.42, 0.08; text="Asset Demand (base)", space=:relative,
-      color=REFERENCE_COLOR, fontsize=LEGEND_LABEL_SIZE - 2,
-      align=(:left, :bottom)
-    )
-  end
+  plot_specs!(ax, specs)
+
 
   return ax
 end
@@ -620,14 +809,19 @@ end
 function _fill_axis(
   sol,
   axis;
+  is_ir_label_positions,
+  ad_as_label_positions,
+  asset_market_label_positions,
   lower_i0_factor=nothing,
   reference_solution=nothing,
 )
   kwargs = (; reference_solution, lower_i0_factor)
 
-  plot_is_ir(sol, axis.curve_axis; kwargs...)
-  plot_ad_as(sol, axis.ad_as_axis; kwargs...)
-  _plot_asset_market(sol, axis; kwargs...)
+
+  is_ir_labels = reposition_labels(STANDARD_IS_IR_LABELS, is_ir_label_positions)
+  plot_is_ir(sol, axis.curve_axis; labels=is_ir_labels, kwargs...)
+  plot_ad_as(sol, axis.ad_as_axis; labels=STANDARD_AD_AS_LABELS, kwargs...)
+  _plot_asset_market(sol, axis; labels=STANDARD_ASSET_MARKET_LABELS, kwargs...)
   plot_balance_sheets(sol, axis.balance_axis)
 
   return nothing
@@ -656,6 +850,7 @@ applicable). The existing, unused `title` keyword remains accepted unchanged.
 function panel(
   sol::Static.Solution,
   panel_type;
+  label_positions,
   size=nothing,
   reference_solution=nothing,
   lower_i0_factor=0.0,
