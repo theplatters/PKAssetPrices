@@ -88,80 +88,109 @@ function lower_autonomous_policy_rate(
   return Static.Parametrization(parametrization.model, params, copy(parametrization.u0))
 end
 
+struct CurveSpec{X,Y,S}
+  x::X
+  y::Y
+  label::String
+  attributes::S
+end
+
+function CurveSpec(
+  x,
+  y,
+  label;
+  color,
+  linewidth=3,
+  kwargs...,
+)
+  length(x) == length(y) ||
+    throw(DimensionMismatch("x and y must have equal lengths"))
+
+  style = (;
+    color,
+    linewidth,
+    kwargs...,
+  )
+
+  return CurveSpec(x, y, String(label), style)
+end
+
+function plot_curves!(ax, curves)
+  for curve in curves
+    lines!(
+      ax,
+      curve.x,
+      curve.y;
+      label=curve.label,
+      curve.attributes...,
+    )
+  end
+
+  return nothing
+end
+
+calculate_curve_path(sol, curve, variable, variable_range) = calculate_curve_path(sol, sol.model, curve, variable, variable_r)
+
+function calculate_curve_path(sol, model, curve, variable, variable_range)
+  vars = copy(sol.variables)
+  return map(variable_range) do var
+    vars[variable] = var
+    return getproperty(Static.eval_curve(model, vars), curve)
+  end
+end
+
 """
 Plot the IS and interest-rate-rule curves on the presentation range.
 
 A subdued counterfactual IR curve shows the effect of multiplying the
 autonomous policy rate by `lower_i0_factor`.
 """
-function plot_is_lm(
+function plot_is_ir(
   sol::Static.Solution,
   ax::Makie.Axis;
   lower_i0_factor::Real=0.0,
   reference_solution::Union{Nothing,Static.Solution}=nothing,
 )
+
   output_range = range(IS_IR_X_LIMITS...; length=200)
   rate_range = range(IS_IR_Y_LIMITS...; length=200)
 
-  vars = copy(sol.variables)
-  is_values = map(rate_range) do r
-    vars[:r] = r
-    return Static.eval_curve(sol.model, vars).IS
-  end
-
-  vars = copy(sol.variables)
-  ir_values = map(output_range) do y
-    vars[:Y] = y
-    return Static.eval_curve(sol.model, vars).IR
-  end
+  is_values = calculate_curve_path(sol, :IS, :r, rate_range)
+  ir_values = calculate_curve_path(sol, :IR, :Y, output_range)
 
   lower_rate_model = lower_autonomous_policy_rate(sol.model; factor=lower_i0_factor)
-  vars = copy(sol.variables)
-  lower_ir_values = map(output_range) do y
-    vars[:Y] = y
-    return Static.eval_curve(lower_rate_model, vars).IR
+  lower_rate_solution = Static.solve_model(lower_rate_model)
+  lower_ir_values = calculate_curve_path(lower_rate_solution, :IR, :Y, output_range)
+
+  curves = [
+    CurveSpec(
+      is_values,
+      rate_range,
+      "IS";
+      color=IS_COLOR,
+    ),
+    CurveSpec(
+      output_range,
+      ir_values,
+      "IR";
+      color=IR_COLOR,
+    ),
+    CurveSpec(
+      output_range,
+      lower_ir_values,
+      "IR (lower i₀)";
+      color=COUNTERFACTUAL,
+      linewidth=2,
+      linestyle=:dash,
+    ),
+  ]
+
+  if !isnothing(reference_solution)
+    reference_is_values = calculate_curve_path(reference_solution, :IS, :r, rate_range)
+    push!(curves, CurveSpec(reference_is_values, rate_range, "IS (base)", color=REFERENCE_COLOR, linewidth=2.5))
   end
 
-  lines!(
-    ax,
-    is_values,
-    rate_range;
-    color=IS_COLOR,
-    linewidth=3,
-    label="IS",
-  )
-  lines!(
-    ax,
-    output_range,
-    ir_values;
-    color=IR_COLOR,
-    linewidth=3,
-    label="IR",
-  )
-  lines!(
-    ax,
-    output_range,
-    lower_ir_values;
-    color=COUNTERFACTUAL,
-    linewidth=2,
-    linestyle=:dash,
-    label="IR (lower i₀)",
-  )
-  if !isnothing(reference_solution)
-    reference_vars = copy(reference_solution.variables)
-    reference_is_values = map(rate_range) do r
-      reference_vars[:r] = r
-      return Static.eval_curve(reference_solution.model, reference_vars).IS
-    end
-    lines!(
-      ax,
-      reference_is_values,
-      rate_range;
-      color=REFERENCE_COLOR,
-      linewidth=2.5,
-      label="IS (base)",
-    )
-  end
+  plot_curves!(ax, curves)
   xlims!(ax, IS_IR_X_LIMITS...)
   ylims!(ax, IS_IR_Y_LIMITS...)
   ax.xticks = LinearTicks(4)
@@ -210,84 +239,35 @@ function plot_ad_as(
   end
   output_range = range(ad_as_x_limits...; length=200)
 
-  vars = copy(sol.variables)
-  demand_values = map(price_range) do price
-    vars[:P] = price
-    return Static.eval_curve(sol.model, vars).ADc
-  end
-
-  vars = copy(sol.variables)
-  supply_values = map(output_range) do output
-    vars[:Y] = output
-    return Static.eval_curve(sol.model, vars).ASc
-  end
+  demand_values = calculate_curve_path(sol, :ADc, :P, price_range)
+  supply_values = calculate_curve_path(sol, :ASc, :Y, output_range)
 
   lower_rate_model = lower_autonomous_policy_rate(sol.model; factor=lower_i0_factor)
-  vars = copy(sol.variables)
-  lower_ir_values = map(price_range) do price
-    vars[:P] = price
-    return Static.eval_curve(lower_rate_model, vars).ADc
-  end
 
-  lines!(
-    ax,
-    demand_values,
-    price_range;
-    color=IS_COLOR,
-    linewidth=3,
-    label="AD",
-  )
-  lines!(
-    ax,
-    output_range,
-    supply_values;
-    color=IR_COLOR,
-    linewidth=3,
-    label="AS",
-  )
+  lower_rate_solution = Static.solve_model(lower_rate_model)
+  lower_ir_values = calculate_curve_path(lower_rate_solution, :ADc, :P, price_range)
 
-  lines!(
-    ax,
-    lower_ir_values,
-    price_range;
-    color=COUNTERFACTUAL,
-    linewidth=2,
-    linestyle=:dash,
-    label="AD (lower i₀)",
-  )
+  curves = [
+    CurveSpec(demand_values, price_range, "AD", color=IS_COLOR),
+    CurveSpec(output_range, supply_values, "AS", color=IR_COLOR),
+    CurveSpec(lower_ir_values, price_range, "AD (lowered i₀)", color=COUNTERFACTUAL, linewidth=2.0, linestyle=:dash),
+  ]
+
+
   if !isnothing(reference_solution)
-    reference_vars = copy(reference_solution.variables)
-    reference_demand_values = map(price_range) do price
-      reference_vars[:P] = price
-      return Static.eval_curve(reference_solution.model, reference_vars).ADc
-    end
+    reference_demand_values = calculate_curve_path(reference_solution, :ADc, :P, price_range)
     lowered_reference_model = lower_autonomous_policy_rate(
       reference_solution.model;
       factor=lower_i0_factor,
     )
     lowered_reference_solution = Static.solve_model(lowered_reference_model)
-    lowered_reference_vars = copy(lowered_reference_solution.variables)
-    lowered_reference_demand_values = map(price_range) do price
-      lowered_reference_vars[:P] = price
-      return Static.eval_curve(lowered_reference_solution.model, lowered_reference_vars).ADc
-    end
-    lines!(
-      ax,
-      reference_demand_values,
-      price_range;
-      color=REFERENCE_COLOR,
-      linewidth=2.5,
-      label="AD (base)",
-    )
-    lines!(
-      ax,
-      lowered_reference_demand_values,
-      price_range;
-      color=REFERENCE_COLOR,
-      linewidth=2.5,
-      linestyle=:dash,
-    )
+    lowered_reference_demand_values = calculate_curve_path(lowered_reference_solution, :ADc, :P, price_range)
+
+    push!(curves, CurveSpec(reference_demand_values, price_range, "AD (base)", color=REFERENCE_COLOR, linewidth=2.5))
+    push!(curves, CurveSpec(lowered_reference_demand_values, price_range, "AD (base lowered i₀)", color=REFERENCE_COLOR, linewidth=2.0, linestyle=:dash))
   end
+
+  plot_curves!(ax, curves)
   xlims!(ax, ad_as_x_limits...)
   ylims!(ax, AD_AS_Y_LIMITS...)
   text!(
@@ -304,7 +284,7 @@ function plot_ad_as(
   )
   if !isnothing(reference_solution)
     text!(
-      ax, 0.42, 0.30; text="AD (base)", space=:relative, color=REFERENCE_COLOR,
+      ax, 0.42, 0.3; text="AD (base)", space=:relative, color=REFERENCE_COLOR,
       fontsize=LEGEND_LABEL_SIZE - 2, align=(:left, :bottom)
     )
   end
@@ -344,88 +324,40 @@ function plot_asset_market(
     asset_x_limits = (first(asset_x_range), last(asset_x_range))
     asset_y_limits = (first(asset_y_range), last(asset_y_range))
   end
+
   asset_price_range = uses_reference_range ?
                       range(ASSET_X_LIMITS...; length=200) :
                       range(asset_y_limits...; length=200)
 
-  vars = copy(sol.variables)
-  demand_values = map(asset_price_range) do asset_price
-    vars[:AP] = asset_price
-    return Static.eval_curve(sol.model, vars).AMD
-  end
+
+  demand_values = calculate_curve_path(sol, :AMD, :AP, asset_price_range)
+  supply_values = calculate_curve_path(sol, :AMS, :AP, asset_price_range)
 
   lower_rate_model = lower_autonomous_policy_rate(sol.model; factor=lower_i0_factor)
   lower_rate_solution = Static.solve_model(lower_rate_model)
-  vars = copy(lower_rate_solution.variables)
-  lower_demand_values = map(asset_price_range) do asset_price
-    vars[:AP] = asset_price
-    return Static.eval_curve(lower_rate_solution.model, vars).AMD
-  end
+  lower_demand_values = calculate_curve_path(lower_rate_solution, :AMD, :AP, asset_price_range)
 
-  vars = copy(sol.variables)
-  supply_values = map(asset_price_range) do asset_price
-    vars[:AP] = asset_price
-    return Static.eval_curve(sol.model, vars).AMS
-  end
+  curves = [
+    CurveSpec(demand_values, asset_price_range, "Asset Demand", color=IS_COLOR),
+    CurveSpec(lower_demand_values, asset_price_range, "Demand (lower i₀)", color=COUNTERFACTUAL, linewidth=2.0, linestyle=:dash),
+    CurveSpec(supply_values, asset_price_range, "Asset Supply", color=IR_COLOR),
+  ]
 
-  lines!(
-    ax,
-    demand_values,
-    asset_price_range;
-    color=IS_COLOR,
-    linewidth=3,
-    label="Asset Demand",
-  )
-  lines!(
-    ax,
-    supply_values,
-    asset_price_range;
-    color=IR_COLOR,
-    linewidth=3,
-    label="Asset Supply",
-  )
-  lines!(
-    ax,
-    lower_demand_values,
-    asset_price_range;
-    color=COUNTERFACTUAL,
-    linewidth=2,
-    linestyle=:dash,
-    label="Demand (lower i₀)",
-  )
+
   if !isnothing(reference_solution)
-    reference_vars = copy(reference_solution.variables)
-    reference_demand_values = map(asset_price_range) do asset_price
-      reference_vars[:AP] = asset_price
-      return Static.eval_curve(reference_solution.model, reference_vars).AMD
-    end
+    reference_demand_values = calculate_curve_path(reference_solution, :AMD, :AP, asset_price_range)
     lowered_reference_model = lower_autonomous_policy_rate(
       reference_solution.model;
       factor=lower_i0_factor,
     )
     lowered_reference_solution = Static.solve_model(lowered_reference_model)
-    lowered_reference_vars = copy(lowered_reference_solution.variables)
-    lowered_reference_demand_values = map(asset_price_range) do asset_price
-      lowered_reference_vars[:AP] = asset_price
-      return Static.eval_curve(lowered_reference_solution.model, lowered_reference_vars).AMD
-    end
-    lines!(
-      ax,
-      reference_demand_values,
-      asset_price_range;
-      color=REFERENCE_COLOR,
-      linewidth=2.5,
-      label="Asset Demand (base)",
-    )
-    lines!(
-      ax,
-      lowered_reference_demand_values,
-      asset_price_range;
-      color=REFERENCE_COLOR,
-      linewidth=2.5,
-      linestyle=:dash,
-    )
+    lowered_reference_demand_values = calculate_curve_path(lowered_reference_solution, :AMD, :AP, asset_price_range)
+    push!(curves, CurveSpec(reference_demand_values, asset_price_range, "Asset Demand (base)", color=REFERENCE_COLOR, linewidth=2.5))
+    push!(curves, CurveSpec(lowered_reference_demand_values, asset_price_range, "Asset Demand (base lowere i₀)", color=REFERENCE_COLOR, linewidth=2.5, linestyle=:dash))
   end
+
+  plot_curves!(ax, curves)
+
   xlims!(ax, asset_x_limits...)
   ylims!(ax, asset_y_limits...)
   text!(
@@ -447,6 +379,7 @@ function plot_asset_market(
       align=(:left, :bottom)
     )
   end
+
   return ax
 end
 
@@ -584,9 +517,132 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
   return ax
 end
 
+
+_panel_figure(figure_size) = Figure(
+  size=figure_size,
+  fontsize=FIGURE_FONT_SIZE,
+  figure_padding=(28, 38, 28, 28),
+  backgroundcolor=:white,
+)
+
+_curve_axis(figure_pos) = Axis(
+  figure_pos;
+  title=rich("(A) ", "Goods Market Dynamics"; font=:bold),
+  xlabel="Output Y", ylabel="interest rate r",
+  xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
+  titlesize=AXIS_TITLE_SIZE,
+  xlabelsize=AXIS_LABEL_SIZE,
+  ylabelsize=AXIS_LABEL_SIZE,
+  bottomspinecolor=:black, topspinecolor=:black,
+  leftspinecolor=:black, rightspinecolor=:black,
+)
+
+_ad_as_axis(figure_pos) = Axis(
+  figure_pos;
+  title=rich("(B) ", "Output and Inflation Dynamics"; font=:bold),
+  xlabel="Output Y", ylabel="Price Level P",
+  xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
+  titlesize=AXIS_TITLE_SIZE,
+  xlabelsize=AXIS_LABEL_SIZE,
+  ylabelsize=AXIS_LABEL_SIZE,
+  bottomspinecolor=:black, topspinecolor=:black,
+  leftspinecolor=:black, rightspinecolor=:black,
+)
+
+_asset_market_axis(figure_pos) = Axis(
+  figure_pos;
+  title=rich("(C) ", "Financial Market Dynamics"; font=:bold),
+  xlabel="Base-price-equivalent quantity",
+  ylabel="Asset Price AP",
+  xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
+  titlesize=AXIS_TITLE_SIZE,
+  xlabelsize=AXIS_LABEL_SIZE,
+  ylabelsize=AXIS_LABEL_SIZE,
+  bottomspinecolor=:black, topspinecolor=:black,
+  leftspinecolor=:black, rightspinecolor=:black,
+)
+
+_balance_axis(figure_pos) = Axis(
+  figure_pos;
+  title=rich("(D) ", "Sector Balance Sheets"; font=:bold),
+  ylabel="Amount",
+  xgridvisible=false,
+  ygridcolor=(:black, 0.08),
+  titlesize=AXIS_TITLE_SIZE,
+  xlabelsize=AXIS_LABEL_SIZE,
+  ylabelsize=AXIS_LABEL_SIZE,
+  bottomspinecolor=:black, topspinecolor=:black,
+  leftspinecolor=:black, rightspinecolor=:black,
+  xticklabelsize=BALANCE_TICK_LABEL_SIZE,
+)
+
+
+function _set_gaps!(figure)
+  colgap!(figure.layout, 42)
+  rowgap!(figure.layout, 22)
+  rowsize!(figure.layout, 1, Relative(0.5))
+  return rowsize!(figure.layout, 2, Relative(0.5))
+end
+
+struct StandardPanelAxis{C,A,B}
+  curve_axis::C
+  ad_as_axis::A
+  balance_axis::B
+end
+
+struct AssetPanelAxis{C,A,AS,B}
+  curve_axis::C
+  ad_as_axis::A
+  asset_market_axis::AS
+  balance_axis::B
+end
+
+function _get_axis(figure, ::StandardPanel)
+  curve_axis = _curve_axis(figure[1, 1])
+  ad_as_axis = _ad_as_axis(figure[1, 2])
+  balance_axis = _balance_axis(figure[2, 1:2])
+
+
+  return StandardPanelAxis(curve_axis, ad_as_axis, balance_axis)
+end
+
+function _get_axis(figure, ::AssetMarketPanel)
+  curve_axis = _curve_axis(figure[1, 1])
+  ad_as_axis = _ad_as_axis(figure[1, 2])
+
+  asset_market_axis = _asset_market_axis(figure[2, 1])
+  balance_axis = _balance_axis(figure[2, 2])
+
+  return AssetPanelAxis(curve_axis, ad_as_axis, asset_market_axis, balance_axis)
+end
+
+
+function _fill_axis(
+  sol,
+  axis;
+  lower_i0_factor=nothing,
+  reference_solution=nothing,
+)
+  kwargs = (; reference_solution, lower_i0_factor)
+
+  plot_is_ir(sol, axis.curve_axis; kwargs...)
+  plot_ad_as(sol, axis.ad_as_axis; kwargs...)
+  _plot_asset_market(sol, axis; kwargs...)
+  plot_balance_sheets(sol, axis.balance_axis)
+
+  return nothing
+end
+
+_plot_asset_market(sol, ::StandardPanelAxis; kwargs...) = nothing
+
+function _plot_asset_market(sol, axis::AssetPanelAxis; kwargs...)
+  plot_asset_market(sol, axis.asset_market_axis; kwargs...)
+  return nothing
+end
+
 """
-    panel(sol; size = nothing, title = "Static equilibrium overview")
-    panel(sol, AssetMarketPanel(); size = nothing, title = "Static equilibrium overview",
+    panel(sol; size = nothing)
+    panel(sol, AssetMarketPanel(); size = nothing,
           reference_solution = nothing, lower_i0_factor = 0.0)
 
 Create a presentation-ready equilibrium and balance-sheet overview. The default
@@ -597,164 +653,26 @@ when a reference solution is supplied, the three curve plots show grey base
 reference curves (and dashed lower-policy-rate reference curves where
 applicable). The existing, unused `title` keyword remains accepted unchanged.
 """
-panel(
-  sol::Static.Solution;
-  size=nothing,
-  title="Static equilibrium overview",
-) = panel(sol, StandardPanel(); size, title)
-
 function panel(
   sol::Static.Solution,
-  ::StandardPanel;
+  panel_type;
   size=nothing,
-  title="Static equilibrium overview",
-)
-  figure_size = isnothing(size) ? (1400, 1000) : size
-
-  figure = Figure(
-    size=figure_size,
-    fontsize=FIGURE_FONT_SIZE,
-    figure_padding=(28, 38, 28, 28),
-    backgroundcolor=:white,
-  )
-
-  curve_axis = Axis(
-    figure[1, 1];
-    title=rich("(A) ", "Goods Market Dynamics"; font=:bold),
-    xlabel="Output Y", ylabel="interest rate r",
-    xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
-    titlesize=AXIS_TITLE_SIZE,
-    xlabelsize=AXIS_LABEL_SIZE,
-    ylabelsize=AXIS_LABEL_SIZE,
-    bottomspinecolor=:black, topspinecolor=:black,
-    leftspinecolor=:black, rightspinecolor=:black,
-  )
-  ad_as_axis = Axis(
-    figure[1, 2];
-    title=rich("(B) ", "Output and Inflation Dynamics"; font=:bold),
-    xlabel="Output Y", ylabel="Price Level P",
-    xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
-    titlesize=AXIS_TITLE_SIZE,
-    xlabelsize=AXIS_LABEL_SIZE,
-    ylabelsize=AXIS_LABEL_SIZE,
-    bottomspinecolor=:black, topspinecolor=:black,
-    leftspinecolor=:black, rightspinecolor=:black,
-  )
-  balance_axis = Axis(
-    figure[2, 1:2];
-    title=rich("(C) ", "Sector Balance Sheets"; font=:bold),
-    ylabel="Amount",
-    xgridvisible=false,
-    ygridcolor=(:black, 0.08),
-    titlesize=AXIS_TITLE_SIZE,
-    xlabelsize=AXIS_LABEL_SIZE,
-    ylabelsize=AXIS_LABEL_SIZE,
-    bottomspinecolor=:black, topspinecolor=:black,
-    leftspinecolor=:black, rightspinecolor=:black,
-    xticklabelsize=BALANCE_TICK_LABEL_SIZE,
-  )
-
-  plot_is_lm(sol, curve_axis)
-  plot_ad_as(sol, ad_as_axis)
-  plot_balance_sheets(sol, balance_axis)
-
-  colgap!(figure.layout, 42)
-  rowgap!(figure.layout, 22)
-  rowsize!(figure.layout, 1, Relative(0.5))
-  rowsize!(figure.layout, 2, Relative(0.5))
-  return figure
-end
-
-function panel(
-  sol::Static.Solution,
-  ::AssetMarketPanel;
-  size=nothing,
-  title="Static equilibrium overview",
   reference_solution=nothing,
   lower_i0_factor=0.0,
 )
   figure_size = isnothing(size) ? (1400, 1000) : size
 
-  figure = Figure(
-    size=figure_size,
-    fontsize=FIGURE_FONT_SIZE,
-    figure_padding=(28, 38, 28, 28),
-    backgroundcolor=:white,
-  )
+  figure = _panel_figure(figure_size)
 
-  curve_axis = Axis(
-    figure[1, 1];
-    title=rich("(A) ", "Goods Market Dynamics"; font=:bold),
-    xlabel="Output Y", ylabel="interest rate r",
-    xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
-    titlesize=AXIS_TITLE_SIZE,
-    xlabelsize=AXIS_LABEL_SIZE,
-    ylabelsize=AXIS_LABEL_SIZE,
-    bottomspinecolor=:black, topspinecolor=:black,
-    leftspinecolor=:black, rightspinecolor=:black,
-  )
-  ad_as_axis = Axis(
-    figure[1, 2];
-    title=rich("(B) ", "Output and Inflation Dynamics"; font=:bold),
-    xlabel="Output Y", ylabel="Price Level P",
-    xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
-    titlesize=AXIS_TITLE_SIZE,
-    xlabelsize=AXIS_LABEL_SIZE,
-    ylabelsize=AXIS_LABEL_SIZE,
-    bottomspinecolor=:black, topspinecolor=:black,
-    leftspinecolor=:black, rightspinecolor=:black,
-  )
-  asset_market_axis = Axis(
-    figure[2, 1];
-    title=rich("(C) ", "Financial Market Dynamics"; font=:bold),
-    xlabel="Base-price-equivalent quantity",
-    ylabel="Asset Price AP",
-    xgridcolor=(:black, 0.12), ygridcolor=(:black, 0.12),
-    titlesize=AXIS_TITLE_SIZE,
-    xlabelsize=AXIS_LABEL_SIZE,
-    ylabelsize=AXIS_LABEL_SIZE,
-    bottomspinecolor=:black, topspinecolor=:black,
-    leftspinecolor=:black, rightspinecolor=:black,
-  )
-  balance_axis = Axis(
-    figure[2, 2];
-    title=rich("(D) ", "Sector Balance Sheets"; font=:bold),
-    ylabel="Amount",
-    xgridvisible=false,
-    ygridcolor=(:black, 0.08),
-    titlesize=AXIS_TITLE_SIZE,
-    xlabelsize=AXIS_LABEL_SIZE,
-    ylabelsize=AXIS_LABEL_SIZE,
-    bottomspinecolor=:black, topspinecolor=:black,
-    leftspinecolor=:black, rightspinecolor=:black,
-    xticklabelsize=BALANCE_TICK_LABEL_SIZE,
-  )
-
-  plot_is_lm(
-    sol,
-    curve_axis;
-    reference_solution,
+  axis = _get_axis(figure, panel_type)
+  _fill_axis(
+    sol, axis; reference_solution,
     lower_i0_factor,
   )
-  plot_ad_as(
-    sol,
-    ad_as_axis;
-    reference_solution,
-    lower_i0_factor,
-  )
-  plot_asset_market(
-    sol,
-    asset_market_axis;
-    reference_solution,
-    lower_i0_factor,
-  )
-  plot_balance_sheets(sol, balance_axis)
 
-  colgap!(figure.layout, 42)
-  rowgap!(figure.layout, 22)
-  rowsize!(figure.layout, 1, Relative(0.5))
-  rowsize!(figure.layout, 2, Relative(0.5))
+  _set_gaps!(figure)
   return figure
 end
+
 
 end

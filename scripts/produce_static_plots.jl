@@ -10,6 +10,7 @@ function print_equilibrium(name, solution)
   for (k, v) in sort(collect(solution.variables))
     @printf("  %12s = %.6f\n", k, v)
   end
+  return
 end
 
 function save_figure(output_dir, stem, figure)
@@ -19,7 +20,7 @@ function save_figure(output_dir, stem, figure)
 
   png_path = joinpath(output_dir, "$(stem).png")
   save(png_path, figure)
-  println("Saved static equilibrium panel to $png_path")
+  return println("Saved static equilibrium panel to $png_path")
 end
 
 function (@main)(ARGS)
@@ -28,7 +29,7 @@ function (@main)(ARGS)
   mkpath(output_dir)
 
   simplepk_solution = solve_model(SimplePK)
-  simplepk_figure = StaticPlotting.panel(simplepk_solution)
+  simplepk_figure = StaticPlotting.panel(simplepk_solution, StaticPlotting.StandardPanel())
   save_figure(output_dir, "simplepk_equilibrium_panel", simplepk_figure)
   print_equilibrium("SimplePK", simplepk_solution)
 
