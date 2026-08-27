@@ -372,27 +372,6 @@ with loans creating deposits one-for-one ($dM=dL$), $\mu$ measures the flow of n
   \label{fig:baseline-equilibrium}
 \end{figure}
 
-%TODO mir ist nicht völlig klar, was die idee hier ist (wirkt ein bisschen nach AI slop auch mit den falschen references ;-)). text ist so zwischen caption und appendix text.
-Building on the baseline accounting structure as shown in tables \ref{tab:stockmatrix_simple} and \ref{tab:flowmatrix_simple}, we now show  how the introduction of an asset market impacts the stock-flow characteristics of th economy. Indicatively for the relevant changes are the introduction of real assets $A_t$ household's asset side and the new role of speculative loans given to households (both shown in Table \ref{tab:sfc-asset-stock}), where the flow matrix 
-To make the stock-flow consistency of the asset-market extension transparent we consolidate the two private-sector blocks --- households (the asset-expenditure side, $AE$) and firms (the investment side, $I$) --- into a single \emph{private sector} column, shown in Tables \ref{tab:stockmatrix_assets} and \ref{tab:assetpk-flow}. Summing the household and firm rows yields the following aggregated \emph{Saldonull} identities, which must hold sector-wide irrespective of the allocation of individual instruments between $AE$ and $I$.
-
-On the stock side the private sector's net worth equals its real and speculative assets minus its borrowing from banks:
-\begin{equation}
-  V^H_t + V^F_t
-  = \underbrace{K_t + A_t}_{\text{private assets}}
-    - \underbrace{L^P_t + L^S_t}_{\text{loans from banks}} .
-  \tag{Private stock identity}
-  \label{eq:saldonull-stock}
-\end{equation}
-
-On the flow side the private sector's net acquisition of financial assets in the period equals its net borrowing from the banking sector. Using the closing-balance rows of Table \ref{tab:assetpk-flow},
-\begin{align}
-  \Delta M_t + \Delta L^S_t + \Delta L^P_t \Big|_{H+F}
-  &= -(cD_t + SD_t) + SD_t + cD_t = 0 ,
-  \tag{Private flow identity}
-  \label{eq:saldonull-flow}
-\end{align}
-so that the new deposits created to finance both productive and speculative positions are exactly matched by the corresponding new loans. The speculative trading block $+AE_t$ and $-AE_t$ cancels \emph{within} the private sector, confirming that gross asset expenditure is a purely internal reallocation of the existing stock $A_t$ and never appears as a net private-sector flow. These two identities constitute the consolidated values for $AE$ and $I$ and verify that the asset-market extension preserves stock-flow consistency.
 
 %TODO: (2) in den captions genau ausweisen, was die underlying definitions für die closures sind. eventuell sollte man auch die fixe zuordnung der neuen deposits aufheben und das flexibel über households und firms schreiben. aber dann bricht die klare definition...
 
@@ -436,8 +415,7 @@ depress real activity. The financial circulation is no longer subject to a cordo
 sanitaire---rather, it draws resources away from the industrial circulation.
 
 Figure~\ref{fig:rationing-equilibrium} shows the resulting equilibrium before and after
-a change of the baseline interest rate by %TODO howmuch
-. Compared with the Baseline case, speculative demand now lowers available productive credit and therefore shifts the goods-market outcome (panel A in figure \ref{fig:rationing-equilibrium}) downwards, which reduces output and prices as shown in panel B. Asset Dynamics remain close to stable but are subject to a small feedback effect: as decreasing output also comes with lower prices, central banks react via lower interest rates, which slightly amplifies specultive dynamic.\footnote{WHile small in scale, the emerging feedback effect represents a plausible variant of self-reinforcing economy dynamics: reduced investment leads to lower real economic dynamism, which creates strengthens incentives for speculative activity.}
+a change of the baseline interest rate by setting the autonomous interest rate $i_0$ from $1\% $ to $0 \%$. Compared with the Baseline case, speculative demand now lowers available productive credit and therefore shifts the goods-market outcome (panel A in figure \ref{fig:rationing-equilibrium}) downwards, which reduces output and prices as shown in panel B. Asset Dynamics remain close to stable but are subject to a small feedback effect: as decreasing output also comes with lower prices, central banks react via lower interest rates, which slightly amplifies specultive dynamic.\footnote{WHile small in scale, the emerging feedback effect represents a plausible variant of self-reinforcing economy dynamics: reduced investment leads to lower real economic dynamism, which creates strengthens incentives for speculative activity.}
 
 Finally, the lower left panel gain shows balance sheet changes for the relevant variables. While the general stock-flow relationships as mapped by tables \ref{tab:sfc-asset-stock} and \ref{tab:sfc-asset-flow} do not change, we observe a slight reduction in the total credit volume as compared by the baseline scenario. This reduction corresponds exactly to the reduction of credit provided for productive investments; correspondingly the share of speculative debt increases slightly.
 
@@ -475,21 +453,8 @@ because in the \GT{} framework interest rates determine the attractiveness of as
 where as in an endogenous money frame they impact on their affordability. Hence, such a version would be suitable to embed Keynes' key mechanism in the mechanics of modern
 financial systems. However, it should be admitted that modern central banks do only rarely effectively consider asset prices in a systemic, non-discretionary way as suggested by equation \ref{eq:i-ap}.
 
-%TODO Ich glaube das brauchen wir nicht mehr?
-%  In the simultaneous equilibrium, the credit-rationing
-% channel remains active as well, so the net effect on output depends on the shock.
-% With the reported calibration, an increase in autonomous speculative borrowing
-% $s_0$ raises $AP$ and $r$ and lowers $Y$.
-% This is a closer analogue to the \GT{}'s liquidity preference
-% channel: the link runs from the asset market to the rate of interest,
-% and from there to real activity.
-% The model is static and therefore does not establish dynamic stability or
-% instability. The contemporaneous policy feedback is stabilizing in its immediate
-% direction: a higher asset price raises the lending rate, which reduces
-% speculative borrowing and asset demand.
 
-Figure~\ref{fig:centralbank-equilibrium} summarizes the respective model solution, again using the example of a change in the baseline interest rate by 
-%TODO HOW MUCH AGAIN? 
+Figure~\ref{fig:centralbank-equilibrium} summarizes the respective model solution, again using the example of a change in the autonomous interest rate from $1\%$ to $0\%$ 
 and compares the outcome to the baseline scenario as shown in figure \ref{fig:simplepk-equilibrium} and \ref{fig:baseline-equilibrium}. 
 
 % HIER WAS NEUES? The asset-market price now enters the policy rule, linking the financial equilibrium to the interest rate and output shown in the upper-left panel.
@@ -536,16 +501,6 @@ speculative borrowing and therefore $AP$; the resulting asset price enters
 Eq.~\eqref{eq:firms-ration}, changes $D$, and feeds through to output and
 employment. In the outcome we observe a feedback effect similar to that in section \ref{subsec:banks_ration} -- lower output and prices lead to lower interest rates that boost speculation. However, but this time the mechanism does not operate through endogenous bank credit rationing. Rather, as the label ``financialization of firms'' suggest firms effectively replace the role of banks as drivers of financzialization as they themselves gain a stronger preferences for holding asssets.
 
-%TODO (BRAUCHEN WR ALLES NICHT MEN) tendieren den satz darüber zu streichen; bin mir auch nicht ganz sicher ob der nächste absatz wirklich hilfreich ost
-%Because $AP$ and speculative demand are jointly determined, the
-%IS and aggregate-demand schedules shown in the figure use the unique solution
-%of the asset-market equilibrium at each interest rate or goods price.
-
-%Figure~\ref{fig:firmsration-equilibrium} reports the calibrated equilibrium again
-%showing the impact of a change in baseline interest rates. The
-%IS--IR and AD--AS plots show the direct contractionary effect of asset-price
-%rationing, while the asset-market plot and sector balance sheets display the
-%financial position that generates it.
 
 \begin{figure}[htbp]
   \centering
