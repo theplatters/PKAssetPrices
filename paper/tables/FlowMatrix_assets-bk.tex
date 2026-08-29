@@ -1,4 +1,4 @@
-\begin{table}[htbp]
+\begin{sidewaystable}[htbp]
   \centering
   \caption{Transactions-flow matrix with asset-market extension}
   \label{tab:assetpk-flow}
@@ -35,7 +35,7 @@
         & $+I_t$
         & $0$
         & $0$
-        & \multirow{2}{*}{$0$}
+        & $+I_t$
       \\
 
       Investment expenditure $I_t$
@@ -43,7 +43,7 @@
         & $-I_t$
         & $0$
         & $0$
-        & 
+        & $-I_t$
       \\
 
       Wages $W_tN_t$
@@ -77,7 +77,7 @@
         & $0$
         & $0$
         & $0$
-        & \multirow{2}{*}{\newterm{$0$}}
+        & \newterm{$+AE_t$}
       \\
 
       \newterm{Speculative asset sales $AE_t$}
@@ -85,7 +85,7 @@
         & $0$
         & $0$
         & $0$
-        & 
+        & \newterm{$-AE_t$}
       \\
 
       % ---------------------------------------------------------------
@@ -152,70 +152,49 @@
       % ---------------------------------------------------------------
 
       \midrule
-      \multicolumn{6}{l}{\newterm{\textit{Credit-taking emerging from behavioral assumptions}}}
-      \\
-      \midrule
-
-      \newterm{New productive loans $\Delta L^P_t$}
-        & $0$
-        & \newterm{$+cD_t$}
-        & \newterm{$-cD_t$}
-        & $0$
-        & $0$
-      \\
-
-      \newterm{New speculative loans $\Delta L^S_t$}
-        & \newterm{$+SD_t$}
-        & $0$
-        & \newterm{$-SD_t$}
-        & $0$
-        & $0$
-      \\
-
-      \newterm{Related deposit-creation}
-        & \newterm{$-SD_t$}
-        & \newterm{$-cD$}
-        & \newterm{$(cD_t+\newterm{SD_t})$}
-        & $0$
-        & $0$
-      \\
-
-      \midrule
       \multicolumn{6}{l}{\textit{Closing balances: correcting stocks for changes in the current period}}
       \\
       \midrule
 
-     New loans $\Delta L_t$
-      & $0$
-      & $+\Delta L_t$
-      & $-\Delta L_t$
-      & $0$
-      & $0$
-    \\
+      New productive loans $\Delta L^P_t$
+        & $0$
+        & $+cD_t$
+        & $-cD_t$
+        & $0$
+        & $0$
+      \\
 
-    New deposits $\Delta M_t$
-      & $-\Delta M_t$
-      & $0$
-      & $+\Delta M_t$
-      & $0$
-      & $0$
-    \\
+      New speculative loans $\Delta L^S_t$
+        & \newterm{$SD_t$}
+        & $0$
+        & \newterm{$-SD_t$}
+        & $0$
+        & $0$
+      \\
 
-    Central-bank credit $\Delta F^{CB}_t$
-      & $0$
-      & $0$
-      & $+\Delta F^{CB}_t$
-      & $-\Delta F^{CB}_t$
-      & $0$
-    \\
+      New deposits $\Delta M_t$
+        & $-(cD_t+\newterm{SD_t})$
+        & $0$
+        & $+(cD_t+\newterm{SD_t})$
+        & $0$
+        & $0$
+      \\
 
-    Change in reserves $\Delta R_t$
-      & $0$
-      & $0$
-      & $-\Delta R_t$
-      & $+\Delta R_t$
-      & $0$
-    \\
+      Central-bank credit $\Delta F^{CB}_t$
+        & $0$
+        & $0$
+        & $0$
+        & $-\Delta F^{CB}_t$
+        & $0$
+      \\
+
+      New reserves $\Delta R_t$
+        & $0$
+        & $0$
+        & $-\Delta R_t$
+        & $+\Delta R_t$
+        & $0$
+      \\
 
       \midrule
 
@@ -229,8 +208,10 @@
       \bottomrule
     \end{tabular}
     \caption*{\footnotesize
-    \textit{Note:} Gray entries denote implicit relations required for intertemporal consistency, purple entries show additions relative to Table \ref{tab:sfc-simple-flows}. Closing-balances entries update the relevant sectoral stocks. In particular, deposit dynamics follow from the household budget constraint as$\Delta M_t = W_tN_t + r_t^D M_{t-1} + d\Pi^B_t - C_t$,since the speculative asset purchase and sale rows cancel within the column. Likewise, bank profits are $\Pi^B_t = r_t L^P_{t-1} + r_t L^S_{t-1} - r_t^D M_{t-1}$,
-    and bank equity evolves as $E^B_t = E^B_{t-1} + \Pi^B_t - d\Pi^B_t$.}
+\textit{Note:} Gray entries denote implicit relations required for intertemporal consistency, purple entries show additions relative to Table \ref{tab:sfc-simple-flows}. Closing-balances entries update the relevant sectoral stocks. In particular, deposit dynamics follow from the household budget constraint as
+$\Delta M_t = W_t N_t + r_t^D M_{t-1} + d\Pi^B_t - C_t - AE_t$ if speculative asset purchases are financed out of deposits. Likewise, bank equity evolves as the residual of bank profits after dividend
+payments and interest flows, i.e.
+$E^B_t = E^B_{t-1} + r_t L^P_{t-1} + r_t L^S_{t-1} - r_t^D M_{t-1} - d\Pi^B_t$.
+}
 
-
-\end{table}
+\end{sidewaystable}

@@ -21,6 +21,7 @@
 \usepackage{makecell}
 \usepackage{multirow}
 \usepackage{array}
+\usepackage{caption}
 \usepackage[table]{xcolor}
 
 \definecolor{NewTermPurple}{RGB}{128,0,128}
@@ -73,7 +74,7 @@ NOTE: Wir sollten vllt einmal überlegen ob wir die notion der "speculative mark
 
 \section{Keynes on money and speculation} \label{sec:historyofthought}
 
-It is a quite well-known fact  that the \GT and the \treatise do rest on fundamentally different conceptions of \emph{money itself} \parencite[e.g.][]{smithinKeynessTheoriesMoney2013, patinkinKeynesMonetaryThought1976}.
+It is a quite well-known fact  that the \GT and the \treatise do rest on fundamentally different conceptions of \emph{money itself} \parencite[e.g.][]{smithinKeynessTheoriesMoney2013, patinkinKeynesMonetaryThought1976, Roncaglia.2017}.
 
 The \treatise is more preoccupied with the mechanics of credit creation and provides a detailed classification of how bank credit eventually creates bank deposits so that the \treatise is effectively driven by a view of money as \emph{endogenous}: the banking system creates purchasing power through lending, and the money supply expands with bank credit. This is a credit-based rather than a horizontalist form of endogeneity: banks ration credit in line with their own liquidity and risk concerns, and the central bank continues to steer the quantity of money through the bank rate \parencite{carvalhoKeynesEndogeneityMoney2013}. The \GT, in contrast, shelves this institutional apparatus. Money enters the analysis as a simple stock of base money $M=\bar{M}$, determined by the monetary authority, and the analytical effort shifts entirely to the demand side---the liquidity preference schedule. The banking system fades into the background; what matters is the portfolio choice between holding money and holding assets \parencite{chickMacroeconomicsKeynesReconsideration1983}.
 
@@ -82,8 +83,7 @@ Speculation is, thereby, distinct from investment as it channels liquidity into 
 
 However, which exact relationship exists between financial speculation and real economic activity is one of the oldest questions in monetary theory.
 Again, within Keynes's own oeuvre, two different answers can be found.
-In the \treatise{} (1930), speculative activity is largely cordoned off from the real economy: money used for financial transactions circulates in a different ``sphere'' from money used for production and consumption.
-In the \GT{} (1936), however, this cordon is removed: speculative motives are captured by the notion of a liquidity preference. As a consequence, asset price movements originating in financial markets affect the demand for money, which in turn can affect the rate of interest, and thereby investment, output, and employment.
+In the \treatise{}, originally published in 1930, speculative activity is largely cordoned off from the real economy: money used for financial transactions circulates in a different ``sphere'' from money used for production and consumption. In the \GT{} from 1936, however, this cordon is removed: speculative motives are captured by the notion of a liquidity preference. As a consequence, asset price movements originating in financial markets affect the demand for money, which in turn can affect the rate of interest, and thereby investment, output, and employment.
 
 The shift from the \treatise{} to the \GT{} is therefore not a single change but a \emph{double shift}: one along the speculation--real-economy dimension, another along the endogenous--exogenous money dimension.
 These two shifts can be represented by the simple typology, shown in Table~\ref{tab:typology}.
@@ -252,7 +252,7 @@ Against this backdrop we would suggest to rewrite equations \ref{eq:simple_y} in
 
 to better align the presentation with conventional notation and assumptions typically employed in Keynesian-style models.
 This applies especially to the idea that consumption is governed by comparatively constant behavioral patterns (see equation \ref{eq:teaching_nd}), while investment is guided by animal spirits and financial markets conditions.
-In the above setup, the latter enter via $r$ as a general constraint and $c$, which depends on the portfolio choices of the banking sector as well as the solvency of potential borrowers.\footnote{In Minskyan terms, $c$ can be interpreted as a reduced-form representation of borrower's and lender's risk, which constrain the volume of debt-financed investment \parencite[Ch.~8]{minskyStabilizingUnstableEconomy1986}. While $c$ is taken as given in the baseline model, Section~\ref{sec:banks_ration} subsequently endogenizes it with respect to asset demand. The model nevertheless remains static and therefore does not capture the intertemporal transition from hedge to speculative and Ponzi finance central to Minsky's financial instability hypothesis \parencite{minskyFinancialInstabilityHypothesis1992}.}
+In the above setup, the latter enter via $r$ as a general constraint and $c$, which depends on the portfolio choices of the banking sector as well as the solvency of potential borrowers.\footnote{In Minskyan terms, $c$ can be interpreted as a reduced-form representation of borrower's and lender's risk, which constrain the volume of debt-financed investment \parencite[Ch.~8]{minskyStabilizingUnstableEconomy1986}. While $c$ is taken as given in the baseline model, Section~\ref{subsec:banks_ration} subsequently endogenizes it with respect to asset demand. The model nevertheless remains static and therefore does not capture the intertemporal transition from hedge to speculative and Ponzi finance central to Minsky's financial instability hypothesis \parencite{minskyFinancialInstabilityHypothesis1992}.}
 
 As already indicated the monetary sector is mainly governed by interest rates $r$, which are jointly determined by the central bank's policy rate $i$ as well as bank markup $m$. The remaining equations do collect relevant transactions for accounting purposes.
 
@@ -265,7 +265,7 @@ As already indicated the monetary sector is mainly governed by interest rates $r
   dR &= k dM \label{eq:simple_dr}
 \end{align}
 
-This model features a minimal version of a Taylor-rule that neglects the output/employment term and focuses on price stability only. Similar to the rationale of the original exposition of \citet{fontanaSimpleTeachableMacroeconomic2009},this setup aims to implement a minimal, but plausible representation of the inner workings of contemporary monetary systems \citep[e.g.][]{McLeay.2014}; appropriate extensions covering this aspect can be easily added in later stages of the exposition.
+This model features a minimal version of a Taylor-rule that neglects the output/employment term and focuses on price stability only. Similar to the rationale of the original exposition of \citet{fontanaSimpleTeachableMacroeconomic2009},this setup aims to implement a minimal, but plausible representation of the inner workings of contemporary monetary systems \citep[e.g.][]{mcleayMoneyCreationModern}; appropriate extensions covering this aspect can be easily added in later stages of the exposition.
 
 %expand?{eventuell sollten wir uns mal anschauen was eine echte taylorrule bewirken würde -> aber vielleicht geht das im statischen modell gar nicht wg. rekursivität}
 
@@ -300,7 +300,7 @@ Given our static model setup focused on flows we do not model stocks directly; r
 
 This aspect and related notions of stock-flow consistency can be captured even more precisely by Tables \ref{tab:sfc-simple-stocks} and \ref{tab:sfc-simple-flows} below. These tables not only make the conventional assumption about private sector deposits and loands transparent, but also allows for spotlighing other aspects that are implied by the model but do not directly enter the apparatus of a static model: the existence of a capital stock (in Table \ref{tab:sfc-simple-stocks}), the impact of intertemporal consistency requirements or the role of bank sector profits (which can assumed to be zero, in which case the three respective rows drop out.)
 
-While such matrices are typically not often employed for simple static models -- exactly because such models only represent flows and corresponding closures -- they are a useful pedagogical device to create an intuition for the underlying balance sheet dynamics, which carry greater weight when explicitly introducing asset markets into the model.
+While such matrices are typically not often employed for simple static models -- exactly because such models only represent flows and corresponding closures -- they are a useful pedagogical device to create an intuition for the underlying balance sheet dynamics, which begin to carry greater weight when as soon as asset markets are introduced into the model.
 
 \input{tables/StockMatrix_simple.tex} \label{tab:sfc-simple-stocks}
 
@@ -351,10 +351,10 @@ This variant of the model corresponds precisely to the \treatise{} position when
 
 Figure~\ref{fig:baseline-equilibrium} displays this separation graphically. In this simple model setup, the real interest rate $r$ is the key variable that has an impact on both, real and financial, markets as lower interest not only drive up real investment, but also make speculative endeavors less risky. This increases the net demand for assets when interest rates are reduced as depicted in the far right panel in Figure~\ref{fig:baseline-equilibrium}. The balance sheet  in the lower panel of the same figure indicates how the introduction of an asset-market inflates sector balance sheets due to the presence of speculative borrowing. However, this balance sheet inflation does not carry any real economic consequences as Keynes wrote, speculative expansion of bank money can be contained within the financial circulation: ``there will be no effect on the purchasing power of money'' \citep[Vol.~1, Ch.~17, pp.~270--271]{johnmaynardkeynesTreatiseMoneyTwo2011}.
 
-To assess the proportion of newly created bank money that is absorbed by the asset market we introduce the risk indicator $\psi := \frac{SD}{dL} = \frac{SD}{cD + SD}$, with $1-\psi$ giving the productive share of new lending. Because loans create deposits one-for-one in this framework ($dM=dL$), $\psi$ measures the share of new money creation that enters the financial rather than the industrial circulation; it thereby provides a quantitative counterpart to the deposit classification of the \treatise{} reproduced in Table~\ref{tab:treatise-balance}. The indicator is reported in Figures \ref{fig:baseline-equilibrium}, \ref{fig:pqc-equilibrium}, \ref{fig:pqcr-equilibrium}, \ref{fig:firmsration-equilibrium}
+To assess the proportion of newly created bank money that is absorbed by the asset market we introduce the risk indicator $\psi := \frac{SD}{dL} = \frac{SD}{cD + SD}$, with $1-\psi$ giving the productive share of new lending. Because loans create deposits one-for-one in this framework ($dM=dL$), $\psi$ measures the share of new money creation that enters the financial rather than the industrial circulation; it thereby provides a quantitative counterpart to the deposit classification of the \treatise{} reproduced in Table~\ref{tab:treatise-balance}. The indicator is reported in Figures \ref{fig:baseline-equilibrium}, \ref{fig:rationing-equilibrium}, \ref{fig:centralbank-equilibrium}, \ref{fig:firmsration-equilibrium}
 and \ref{fig:pqcrdiff-equilibrium} for the corresponding scenarios.
 
-Two lessons follow. First, since $\partial SD/\partial r<0$, monetary easing mechanically raises $\psi$ even when real outcomes remain unchanged. Cheap credit tilts the composition of new lending toward speculation, mirroring the risk-taking channel documented for the post-2020 period in Section~\ref{sec:uncertainty}. Second, $\psi$ is a ratio of flows and captures the orientation of new credit within a period, but not the accumulated leverage that governs financial fragility in the Minskyan sense. It should therefore be read as an indicator of where new money creation is directed, rather than as a sufficient statistic for systemic risk.
+Two lessons follow. First, since $\partial SD/\partial r<0$, monetary easing mechanically raises $\psi$ even when real outcomes remain unchanged. Cheap credit tilts the composition of new lending toward speculation, mirroring the risk-taking channel documented for the post-2020 period in Section~\ref{subsec:uncertainty}. Second, $\psi$ is a ratio of flows and captures the orientation of new credit within a period, but not the accumulated leverage that governs financial fragility in the Minskyan sense. It should therefore be read as an indicator of where new money creation is directed, rather than as a sufficient statistic for systemic risk.
 
 To complement the composition indicator $\psi$, we can also gauge the scale of money creation relative to real activity. Defining the money creation ratio
 \begin{equation}
@@ -371,7 +371,7 @@ with loans creating deposits one-for-one ($dM=dL$), $\mu$ measures the flow of n
 \end{figure}
 
 
-%TODO: (2) in den captions genau ausweisen, was die underlying definitions für die closures sind. eventuell sollte man auch die fixe zuordnung der neuen deposits aufheben und das flexibel über households und firms schreiben. aber dann bricht die klare definition... (eventuell dazu mal in den gelöschten slop-text schauen)
+%TODO: (2) in den captions genau ausweisen, was die underlying definitions für die closures sind. eventuell sollte man auch die fixe zuordnung der neuen deposits aufheben und das flexibel über households und firms schreiben. aber dann bricht die klare definition... (eventuell dazu mal in den gelöschten slop-text schauen) --> UPDATE: DAZU HABE ICH EIGENTLICH WAS GEMACHT; EVENTUELL IS ES ERLEDIGT...
 
 \input{tables/StockMatrix_assets.tex} \label{tab:sfc-asset-stock}
 %expand? -- (1) das ist traditionell geschrieben, aber man könnte auch die rentiers auskoppeln und als eigene Klasse darstellen. (machen wir mal eher nicht...?) – FS: Find ich würd dann einen zu großen anderen Punkt auchmachen mm lieber nicht. --> DANN LASSEN WIR ES MAL SO!
@@ -467,7 +467,7 @@ and compares the outcome to the baseline scenario as shown in figure \ref{fig:si
 
 Similar to the scenario shown in section \ref{subsec:banks_ration} we find a decrease in output that is due to an increase in interest rates that reflects the central bank's sensitivity for asset price dnyamics. However, this increase in interest rates also leads to a reduction in real investment. The major difference in comparison to the pure crowding-out scenario is thereby that higher interest rates  also have a permanent depressing effect on asset markets as they make speculative endeavors effectively more expensive. Thereby the effect of higher interest rates complete dominates the (still present) feedback effect observed in the first scenario, where lower output and price-level led to more speculation via lower interest rates. 
 
-This feature also plays a role in real-world financial markets, where prices often depend on leverage and the degree of leverage is governed by the lending rate. In this context, section \ref{sec:uncertainty} below gives some examples of how this plays out in practice.
+This feature also plays a role in real-world financial markets, where prices often depend on leverage and the degree of leverage is governed by the lending rate. In this context, section \ref{subsec:uncertainty} below gives some examples of how this plays out in practice.
 
 In terms of stock-flow relations we again note that the tables provided for describing the basic asset price model in section \ref{subsec:asset_market} are sufficient for capturing this model. We also note that -- in comparison to the baseline model -- the total amount of debt is again slightly lower due to the impact of higher interest rates.
 

@@ -155,7 +155,7 @@ function (@main)(ARGS)
   model_panel_specs = (
     ("pqc", PQC, 0.0, pqc_label_positions),
     ("pqcr", PQCr, 0.0, pqcr_label_positions),
-    ("firmsration", FirmsRation, 0.5, firmsration_label_positions),
+    ("firmsration", FirmsRation, 0.8, firmsration_label_positions),
     ("pqcrdiff", PQCrDIFF, 0.0, pqcrdiff_label_positions),
   )
   for (name, model, i₀, positions) in model_panel_specs

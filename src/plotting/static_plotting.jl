@@ -12,7 +12,7 @@ const REFERENCE_COLOR = RGBf(0.45, 0.45, 0.45)
 const COUNTERFACTUAL = (IS_COLOR, 0.38)
 const IS_IR_X_LIMITS = (4.0, 10.0)
 const IS_IR_Y_LIMITS = (0.06, 0.15)
-const AD_AS_X_LIMITS = (5.0, 9.0)
+const AD_AS_X_LIMITS = (5.5, 8.5)
 const AD_AS_Y_LIMITS = (1.2, 2.2)
 const ASSET_X_LIMITS = (0.6, 1.3)
 const ASSET_Y_LIMITS = (0.7, 1.3)
@@ -55,13 +55,13 @@ const STANDARD_IS_IR_LABELS = Dict(
     "IR (lower i₀)" => LabelSpec(
         (0.88, 0.72);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE - 2,
+        fontsize = LEGEND_LABEL_SIZE,
         align = (:right, :top),
     ),
     "IS (base)" => LabelSpec(
         (0.42, 0.06);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE - 2,
+        fontsize = LEGEND_LABEL_SIZE,
         align = (:left, :bottom),
     ),
 )
@@ -75,7 +75,7 @@ const STANDARD_AD_AS_LABELS = Dict(
     "AD (lower i₀)" => LabelSpec(
         (0.08, 0.72);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE - 2,
+        fontsize = LEGEND_LABEL_SIZE,
         align = (:left, :top),
     ),
     "AS" => LabelSpec(
@@ -86,7 +86,7 @@ const STANDARD_AD_AS_LABELS = Dict(
     "AD (base)" => LabelSpec(
         (0.42, 0.3);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE - 2,
+        fontsize = LEGEND_LABEL_SIZE,
         align = (:left, :bottom),
     ),
 )
@@ -765,7 +765,7 @@ _asset_market_axis(figure_pos) = Axis(
 
 _balance_axis(figure_pos; panel_label = "D") = Axis(
     figure_pos;
-    title = rich("($panel_label) ", "Sector Balance Sheets"; font = :bold),
+    title = rich("($panel_label) ", "Changes in Balance Sheets"; font = :bold),
     ylabel = "Amount",
     xgridvisible = false,
     ygridcolor = (:black, 0.08),
