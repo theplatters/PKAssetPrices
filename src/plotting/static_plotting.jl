@@ -9,7 +9,7 @@ const IR_COLOR = RGBf(1.0, 0.5, 0.0)
 const ASSET_COLOR = IS_COLOR
 const LIABILITY_COLOR = IR_COLOR
 const REFERENCE_COLOR = RGBf(0.45, 0.45, 0.45)
-const COUNTERFACTUAL = (IS_COLOR, 0.38)
+const COUNTERFACTUAL = IS_COLOR
 const IS_IR_X_LIMITS = (4.0, 10.0)
 const IS_IR_Y_LIMITS = (0.06, 0.15)
 const AD_AS_X_LIMITS = (5.5, 8.5)
@@ -89,6 +89,12 @@ const STANDARD_AD_AS_LABELS = Dict(
         fontsize = LEGEND_LABEL_SIZE,
         align = (:left, :bottom),
     ),
+    "AMD (base, lower i₀)" => LabelSpec(
+        (0.5, 0.4);
+        space = :relative,
+        fontsize = LEGEND_LABEL_SIZE,
+        align = (:left, :bottom),
+    ),
 )
 
 const STANDARD_ASSET_MARKET_LABELS = Dict(
@@ -110,8 +116,14 @@ const STANDARD_ASSET_MARKET_LABELS = Dict(
         fontsize = LEGEND_LABEL_SIZE - 1,
         align = (:right, :top),
     ),
-    "Demand (base)" => LabelSpec(
+    "Asset Demand (base)" => LabelSpec(
         (0.42, 0.08);
+        space = :relative,
+        fontsize = LEGEND_LABEL_SIZE - 2,
+        align = (:left, :bottom),
+    ),
+    "AMD (base, lower i₀)" => LabelSpec(
+        (0.6, 0.5);
         space = :relative,
         fontsize = LEGEND_LABEL_SIZE - 2,
         align = (:left, :bottom),
@@ -428,8 +440,8 @@ function plot_is_ir(
         linewidth = 3,
         linestyle = :solid,
     ) do builder
-        x_curve!(builder, "IS", :IS, :r, sol; color = IS_COLOR)
-        y_curve!(builder, "IR", :IR, :Y, sol; color = IR_COLOR)
+        x_curve!(builder, "IS", :IS, :r, sol; color = IR_COLOR)
+        y_curve!(builder, "IR", :IR, :Y, sol; color = IS_COLOR)
 
         y_curve!(
             builder,
@@ -438,7 +450,7 @@ function plot_is_ir(
             :Y,
             lower_rate_solution;
             color = COUNTERFACTUAL,
-            linewidth = 2,
+            linewidth = 3,
             linestyle = :dash,
         )
 
@@ -447,8 +459,6 @@ function plot_is_ir(
         end
     end
     plot_specs!(ax, specs)
-    ax.xticks = LinearTicks(4)
-    ax.yticks = percentage_ticks()
 
     return ax
 end
@@ -496,7 +506,7 @@ function plot_ad_as(
             :P,
             lower_rate_solution;
             color = COUNTERFACTUAL,
-            linewidth = 2,
+            linewidth = 3,
             linestyle = :dash,
         )
 
@@ -504,7 +514,20 @@ function plot_ad_as(
             lowered_reference_model = lower_autonomous_policy_rate(reference_solution.model, factor = lower_i0_factor)
             lowered_reference_solution = Static.solve_model(lowered_reference_model)
             x_curve!(builder, "AD (base)", :ADc, :P, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
-            x_curve!(builder, "AD (base lower i₀)", :ADc, :P, lowered_reference_solution, color = REFERENCE_COLOR, linewidth = 2.0, linestyle = :dash)
+            x_curve!(builder, "AMD (base, lower i₀)", :ADc, :P, lowered_reference_solution, color = REFERENCE_COLOR, linewidth = 2.0, linestyle = :dash)
+
+            textlabel!(
+                ax,
+                Point2f(0.35, 0.45);
+                text = "AD (lower i₀)",
+                space = :relative,
+                text_color = IS_COLOR,
+                fontsize = LEGEND_LABEL_SIZE,
+                text_align = (:left, :top),
+                background_color = (:white, 0.8),
+                strokecolor = (:white, 0.8),
+                padding = 8,
+            )
         end
     end
     plot_specs!(ax, specs)
@@ -565,15 +588,15 @@ function plot_asset_market(
             :AP,
             lower_rate_solution;
             color = COUNTERFACTUAL,
-            linewidth = 2,
+            linewidth = 3,
             linestyle = :dash,
         )
 
         if (!isnothing(reference_solution))
             lowered_reference_model = lower_autonomous_policy_rate(reference_solution.model, factor = lower_i0_factor)
             lowered_reference_solution = Static.solve_model(lowered_reference_model)
-            x_curve!(builder, "Demand (base)", :AMD, :AP, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
-            x_curve!(builder, "Demand (base lower i₀)", :AMD, :AP, lowered_reference_solution, color = REFERENCE_COLOR, linewidth = 2.0, linestyle = :dash)
+            x_curve!(builder, "Asset Demand (base)", :AMD, :AP, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
+            x_curve!(builder, "AMD (base, lower i₀)", :AMD, :AP, lowered_reference_solution, color = REFERENCE_COLOR, linewidth = 2.0, linestyle = :dash)
         end
     end
 
@@ -659,62 +682,71 @@ end
 
 """Plot sector balance sheets as grouped vertical asset and liability bars."""
 function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
-    data = balance_sheet_plot_data(sol)
-    isempty(data.positions) && return ax
+    dM = sol.variables[:dM]
+    dL = sol.variables[:dL]
+    dR = sol.variables[:dR]
 
-    segment_colors = balance_sheet_segment_colors(data.instruments, data.sides)
-    abbreviation(name) = begin
-        occursin("Deposit", name) ? "D" : occursin("Loan", name) ? "L" :
-            occursin("Reserve", name) ? "R" : occursin("Credit", name) ? "CB" : name
-    end
+    inner_gap = 1.2
+    group_gap = 1.6
+    start_x   = 1.1
+    positions = [
+        start_x,
+        start_x + inner_gap,
+        start_x + inner_gap + group_gap,
+        start_x + inner_gap + group_gap,
+        start_x + inner_gap + group_gap + inner_gap,
+        start_x + inner_gap + group_gap + inner_gap,
+        start_x + 2 * inner_gap + 2 * group_gap,
+        start_x + 2 * inner_gap + 2 * group_gap + inner_gap,
+    ]
+    bar_vals = [dM, dL, dL, dR, dM, dR, dR, dR]
+    bar_clrs = [IS_COLOR, IR_COLOR, IS_COLOR, IS_COLOR,
+                IR_COLOR, IR_COLOR, IS_COLOR, IR_COLOR]
+    bar_stck = Int[1, 2, 3, 3, 4, 4, 5, 6]
+    bar_lbls = [
+        @sprintf("D: %.1f", dM),
+        @sprintf("L: %.1f", dL),
+        @sprintf("L: %.1f", dL),
+        @sprintf("R: %.1f", dR),
+        @sprintf("D: %.1f", dM),
+        @sprintf("CB: %.1f", dR),
+        @sprintf("CB: %.1f", dR),
+        @sprintf("R: %.1f", dR),
+    ]
+
     barplot!(
-        ax, data.positions, data.values;
-        stack = data.stacks, width = 0.8, color = segment_colors,
-        strokecolor = (:black, 0.65),
-        strokewidth = 1.5,
-        bar_labels = [
-            @sprintf(
-                    "%s: %.1f", abbreviation(data.instruments[index]),
-                    data.raw_values[index]
-                ) for index in eachindex(data.positions)
-        ],
-        gap = 2,
-        label_position = :center,
-        label_color = :black,
-        label_size = BALANCE_BAR_LABEL_SIZE,
+        ax, positions, bar_vals;
+        stack = bar_stck, width = 1.2, color = bar_clrs,
+        strokecolor = (:black, 0.65), strokewidth = 1.5,
+        bar_labels = bar_lbls,
+        label_position = :center, label_color = :black, label_size = BALANCE_BAR_LABEL_SIZE,
     )
+
     hlines!(ax, [0.0]; color = (:black, 0.55), linewidth = 1.5)
-    vlines!(ax, [3.0, 6.0]; color = (:black, 0.35), linewidth = 1.0, linestyle = :dash, ymax = 6.0 / 8.0)
+    vlines!(ax, [3.1, 5.9]; ymin = 0.0, ymax = 0.75,
+           color = (:black, 0.35), linewidth = 1.0, linestyle = :dash)
 
-    text!(
-        ax,
-        data.actor_positions,
-        fill(5.5, length(data.actor_positions));
-        text = data.actor_labels,
-        align = (:center, :bottom),
-        font = :bold,
-        fontsize = BALANCE_ACTOR_LABEL_SIZE,
-        color = :black,
-    )
+    risk = get(sol.variables, :SD, 0.0) / dL
+    annotation = join([
+        @sprintf("Total Debt / GDP: %.2f", dL / sol.variables[:Y]),
+        @sprintf("Speculative debt / Total Debt: %.2f", risk),
+    ], '\n')
+    text!(ax, 0.97, 0.97; text = annotation, space = :relative,
+          align = (:right, :top), fontsize = BALANCE_ANNOTATION_SIZE, color = (:black, 0.75))
+    text!(ax, [1.7, 4.5, 7.3], fill(5.2, 3);
+          text = ["Private Sector", "Banks", "Central Bank"],
+          align = (:center, :bottom), font = :bold, fontsize = BALANCE_ACTOR_LABEL_SIZE,
+          color = :black)
 
-    ax.xticks = (data.tick_positions, data.tick_labels)
+    xs = [start_x, start_x + inner_gap,
+          start_x + inner_gap + group_gap,
+          start_x + inner_gap + group_gap + inner_gap,
+          start_x + 2 * inner_gap + 2 * group_gap,
+          start_x + 2 * inner_gap + 2 * group_gap + inner_gap]
+    ax.xticks = (xs, ["Assets", "Liabilities", "Assets",
+                      "Liabilities", "Assets", "Liabilities"])
     xlims!(ax, 0.3, 8.7)
     ylims!(ax, 0.0, 8.0)
-    text!(
-        ax,
-        0.97, 0.97;
-        text = join(
-            [
-                @sprintf("Total Debt / GDP: %.2f", total_loans(sol) / sol.variables[:Y]),
-                @sprintf("Speculative debt / Total Debt: %.2f", risk_indicator(sol)),
-            ],
-            '\n',
-        ),
-        space = :relative,
-        align = (:right, :top),
-        fontsize = BALANCE_ANNOTATION_SIZE,
-        color = (:black, 0.75),
-    )
     return ax
 end
 
@@ -753,7 +785,7 @@ _ad_as_axis(figure_pos) = Axis(
 _asset_market_axis(figure_pos) = Axis(
     figure_pos;
     title = rich("(C) ", "Financial Market Dynamics"; font = :bold),
-    xlabel = "Base-price-equivalent quantity",
+    xlabel = "Quantity of assets traded",
     ylabel = "Asset Price AP",
     xgridcolor = (:black, 0.12), ygridcolor = (:black, 0.12),
     titlesize = AXIS_TITLE_SIZE,
@@ -765,7 +797,7 @@ _asset_market_axis(figure_pos) = Axis(
 
 _balance_axis(figure_pos; panel_label = "D") = Axis(
     figure_pos;
-    title = rich("($panel_label) ", "Changes in Balance Sheets"; font = :bold),
+    title = rich("($panel_label) ", "Balance Sheet Analysis"; font = :bold),
     ylabel = "Amount",
     xgridvisible = false,
     ygridcolor = (:black, 0.08),
@@ -781,8 +813,8 @@ _balance_axis(figure_pos; panel_label = "D") = Axis(
 function _set_gaps!(figure)
     colgap!(figure.layout, 42)
     rowgap!(figure.layout, 22)
-    rowsize!(figure.layout, 1, Relative(0.5))
-    return rowsize!(figure.layout, 2, Relative(0.5))
+    rowsize!(figure.layout, 1, Relative(0.48))
+    return rowsize!(figure.layout, 2, Relative(0.52))
 end
 
 struct StandardPanelAxis{C, A, B}

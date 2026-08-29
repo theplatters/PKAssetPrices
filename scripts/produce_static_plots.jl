@@ -66,7 +66,7 @@ function (@main)(ARGS)
     ad_as_label_positions=baseline_label_positions.ad_as,
     asset_market_label_positions=baseline_label_positions.asset_market,
   )
-  save_figure(output_dir, "baseline_equilibrium_panel", baseline_figure)
+  save_figure(output_dir, "baseline_mathematica_style", baseline_figure)
   print_equilibrium("Baseline", baseline_solution)
 
   pqc_label_positions = (
@@ -86,7 +86,7 @@ function (@main)(ARGS)
       "Asset Demand" => (0.5, 0.1),
       "Asset Supply" => (0.22, 0.08),
       "Demand (lower i₀)" => (0.74, 0.32),
-      "Demand (base)" => (1 / 70, 0.42),
+      "Asset Demand (base)" => (1 / 70, 0.42),
     ),
   )
   pqcr_label_positions = (
@@ -106,7 +106,7 @@ function (@main)(ARGS)
       "Asset Demand" => (0.5, 0.1),
       "Asset Supply" => (0.22, 0.08),
       "Demand (lower i₀)" => (0.72, 0.32),
-      "Demand (base)" => (1 / 70, 0.82),
+      "Asset Demand (base)" => (1 / 70, 0.82),
     ),
   )
   firmsration_label_positions = (
@@ -126,7 +126,7 @@ function (@main)(ARGS)
       "Asset Demand" => (0.5, 0.1),
       "Asset Supply" => (0.22, 0.1),
       "Demand (lower i₀)" => (0.72, 0.35),
-      "Demand (base)" => (1 / 70, 0.42),
+      "Asset Demand (base)" => (1 / 70, 0.42),
     ),
   )
 
@@ -147,7 +147,7 @@ function (@main)(ARGS)
       "Asset Demand" => (0.45, 0.12),
       "Asset Supply" => (0.27, 0.1),
       "Demand (lower i₀)" => (0.72, 0.35),
-      "Demand (base)" => (-100, 0.42),
+      "Asset Demand (base)" => (-100, 0.42),
     ),
   )
 
@@ -155,7 +155,7 @@ function (@main)(ARGS)
   model_panel_specs = (
     ("pqc", PQC, 0.0, pqc_label_positions),
     ("pqcr", PQCr, 0.0, pqcr_label_positions),
-    ("firmsration", FirmsRation, 0.8, firmsration_label_positions),
+    ("firmsration", FirmsRation, 0.0, firmsration_label_positions),
     ("pqcrdiff", PQCrDIFF, 0.0, pqcrdiff_label_positions),
   )
   for (name, model, i₀, positions) in model_panel_specs
