@@ -494,7 +494,7 @@ function plot_ad_as(
             lowered_reference_model = lower_autonomous_policy_rate(reference_solution.model, factor = lower_i0_factor)
             lowered_reference_solution = Static.solve_model(lowered_reference_model)
             x_curve!(builder, "AD (base)", :ADc, :P, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
-            x_curve!(builder, "AMD (base, lower i₀)", :ADc, :P, lowered_reference_solution, color = REFERENCE_COLOR, linewidth = 2.0, linestyle = :dash)
+            x_curve!(builder, "AD (base, lower i₀)", :ADc, :P, lowered_reference_solution, color = REFERENCE_COLOR, linewidth = 2.0, linestyle = :dash)
 
 
         end
@@ -552,7 +552,7 @@ function plot_asset_market(
 
         x_curve!(
             builder,
-            "Demand (lower i₀)",
+            "Asset Demand\n(lower i₀)",
             :AMD,
             :AP,
             lower_rate_solution;

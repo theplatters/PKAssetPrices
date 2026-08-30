@@ -32,7 +32,7 @@ function (@main)(ARGS)
   # Notebook data-space positions are converted to relative-axis coordinates.
   baseline_label_positions = (
     is_ir=Dict(
-      "IS" => (9 / 30, 8 / 9),
+      "IS" => (9.8 / 30, 7 / 9),
       "IR" => (10 / 12, 75 / 90),
       "IR (lower i₀)" => (53 / 60, 4.5 / 9),
     ),
@@ -43,8 +43,8 @@ function (@main)(ARGS)
     ),
     asset_market=Dict(
       "Asset Demand" => (0.5, 0.1),
-      "Asset Supply" => (0.22, 0.08),
-      "Demand (lower i₀)" => (0.74, 0.32),
+      "Asset Supply" => (0.23, 0.1),
+      "Asset Demand\n(lower i₀)" => (0.85, 0.34),
     ),
   )
 
@@ -71,42 +71,42 @@ function (@main)(ARGS)
 
   pqc_label_positions = (
     is_ir=Dict(
-      "IS" => (8 / 30, 8 / 9),
-      "IR" => (10 / 12, 79 / 90),
-      "IR (lower i₀)" => (53 / 60, 5 / 9),
-      "IS (base)" => (0.55, 1 / 6),
+      "IS" => (8.5 / 30, 7 / 9),
+      "IR" => (10 / 12, 75 / 90),
+      "IR (lower i₀)" => (53 / 60, 4.7 / 9),
+      "IS (base)" => (0.52, 1 / 6),
     ),
     ad_as=Dict(
-      "AD" => (0.2, 0.88),
-      "AD (lower i₀)" => (0.42, 0.76),
-      "AS" => (0.92, 0.70),
-      "AD (base)" => (17 / 30, 1 / 10),
+      "AD" => (0.12, 0.88),
+      "AD (lower i₀)" => (0.3, 0.76),
+      "AS" => (0.92, 0.66),
+      "AD (base)" => (16 / 30, 1 / 10),
     ),
     asset_market=Dict(
       "Asset Demand" => (0.5, 0.1),
-      "Asset Supply" => (0.22, 0.08),
-      "Demand (lower i₀)" => (0.74, 0.32),
-      "Demand (base)" => (1 / 70, 0.42),
+      "Asset Supply" => (0.23, 0.1),
+      "Asset Demand\n(lower i₀)" => (0.87, 0.36),
+      "Asset Demand\n(base)" => (9 / 70, 0.38),
     ),
   )
   pqcr_label_positions = (
     is_ir=Dict(
-      "IS" => (8 / 30, 8 / 9),
-      "IR" => (20 / 24, 82 / 90),
-      "IR (lower i₀)" => (53 / 60, 54 / 90),
+      "IS" => (8.5 / 30, 7 / 9),
+      "IR" => (20 / 24, 85 / 90),
+      "IR (lower i₀)" => (53 / 60, 58 / 90),
       "IS (base)" => (0.54, 1 / 6),
     ),
     ad_as=Dict(
-      "AD" => (0.18, 0.88),
-      "AD (lower i₀)" => (0.42, 0.76),
-      "AS" => (0.92, 0.70),
-      "AD (base)" => (17 / 30, 1 / 10),
+      "AD" => (0.1, 0.88),
+      "AD (lower i₀)" => (0.3, 0.76),
+      "AS" => (0.88, 0.65),
+      "AD (base)" => (16 / 30, 1 / 10),
     ),
     asset_market=Dict(
-      "Asset Demand" => (0.5, 0.1),
-      "Asset Supply" => (0.25, 0.08),
-      "Demand (lower i₀)" => (0.72, 0.32),
-      "Demand (base)" => (1 / 70, 0.82),
+      "Asset Demand" => (0.4, 0.1),
+      "Asset Supply" => (0.23, 0.1),
+      "Asset Demand\n(lower i₀)" => (0.3, 0.5),
+      "Asset Demand\n(base)" => (60 / 70, 0.4),
     ),
   )
   firmsration_label_positions = (
@@ -125,8 +125,8 @@ function (@main)(ARGS)
     asset_market=Dict(
       "Asset Demand" => (0.5, 0.1),
       "Asset Supply" => (0.22, 0.1),
-      "Demand (lower i₀)" => (0.72, 0.35),
-      "Demand (base)" => (1 / 70, 0.42),
+      "Asset Demand\n(lower i₀)" => (0.72, 0.35),
+      "Asset Demand\n(base)" => (1 / 70, 0.42),
     ),
   )
 
@@ -146,8 +146,8 @@ function (@main)(ARGS)
     asset_market=Dict(
       "Asset Demand" => (0.45, 0.12),
       "Asset Supply" => (0.27, 0.1),
-      "Demand (lower i₀)" => (0.72, 0.35),
-      "Demand (base)" => (-100, 0.42),
+      "Asset Demand\n(lower i₀)" => (0.72, 0.35),
+      "Asset Demand\n(base)" => (-100, 0.42),
     ),
   )
 
