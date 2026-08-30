@@ -33,7 +33,7 @@ function (@main)(ARGS)
   baseline_label_positions = (
     is_ir=Dict(
       "IS" => (9.8 / 30, 7 / 9),
-      "IR" => (10 / 12, 75 / 90),
+      "IR" => (9 / 12, 72 / 90),
       "IR (lower i₀)" => (53 / 60, 4.5 / 9),
     ),
     ad_as=Dict(
@@ -72,13 +72,13 @@ function (@main)(ARGS)
   pqc_label_positions = (
     is_ir=Dict(
       "IS" => (8.5 / 30, 7 / 9),
-      "IR" => (10 / 12, 75 / 90),
+      "IR" => (9 / 12, 72 / 90),
       "IR (lower i₀)" => (53 / 60, 4.7 / 9),
       "IS (base)" => (0.52, 1 / 6),
     ),
     ad_as=Dict(
       "AD" => (0.12, 0.88),
-      "AD (lower i₀)" => (0.3, 0.76),
+      "AD (lower i₀)" => (0.29, 0.76),
       "AS" => (0.92, 0.66),
       "AD (base)" => (16 / 30, 1 / 10),
     ),
@@ -92,32 +92,32 @@ function (@main)(ARGS)
   pqcr_label_positions = (
     is_ir=Dict(
       "IS" => (8.5 / 30, 7 / 9),
-      "IR" => (20 / 24, 85 / 90),
+      "IR" => (18 / 24, 72 / 90),
       "IR (lower i₀)" => (53 / 60, 58 / 90),
       "IS (base)" => (0.54, 1 / 6),
     ),
     ad_as=Dict(
-      "AD" => (0.1, 0.88),
-      "AD (lower i₀)" => (0.3, 0.76),
+      "AD" => (0.08, 0.88),
+      "AD (lower i₀)" => (0.24, 0.76),
       "AS" => (0.88, 0.65),
       "AD (base)" => (16 / 30, 1 / 10),
     ),
     asset_market=Dict(
       "Asset Demand" => (0.4, 0.1),
       "Asset Supply" => (0.23, 0.1),
-      "Asset Demand\n(lower i₀)" => (0.3, 0.5),
-      "Asset Demand\n(base)" => (60 / 70, 0.4),
+      "Asset Demand\n(lower i₀)" => (0.5, 0.55),
+      "Asset Demand\n(base)" => (60 / 70, 0.3),
     ),
   )
   firmsration_label_positions = (
     is_ir=Dict(
       "IS" => (0.22, 8 / 9),
-      "IR" => (10 / 12, 85 / 100),
+      "IR" => (9 / 12, 80 / 100),
       "IR (lower i₀)" => (53 / 60, 60 / 100),
       "IS (base)" => (0.55, 1 / 6),
     ),
     ad_as=Dict(
-      "AD" => (0.12, 0.88),
+      "AD" => (0.1, 0.88),
       "AD (lower i₀)" => (0.1, 0.7),
       "AS" => (0.9, 0.85),
       "AD (base)" => (17 / 30, 1 / 10),
@@ -159,6 +159,7 @@ function (@main)(ARGS)
     ("pqcrdiff", PQCrDIFF, 0.0, pqcrdiff_label_positions),
   )
   for (name, model, i₀, positions) in model_panel_specs
+    use_textlabel = name in ("pqcr", "firmsration")
     solution = solve_model(model)
     figure = StaticPlotting.panel(
       solution,
@@ -168,6 +169,7 @@ function (@main)(ARGS)
       is_ir_label_positions=positions.is_ir,
       ad_as_label_positions=positions.ad_as,
       asset_market_label_positions=positions.asset_market,
+      asset_market_textlabel=use_textlabel,
     )
     save_figure(output_dir, "$(name)_equilibrium_panel", figure)
     print_equilibrium(name, solution)

@@ -31,10 +31,11 @@ const BALANCE_TICK_LABEL_SIZE = 20
 struct LabelSpec{A}
     position::Point2f
     attributes::A
+    textlabel::Bool
 end
 
-function LabelSpec(position; attributes...)
-    return LabelSpec(Point2f(position...), (; attributes...))
+function LabelSpec(position; textlabel=false, attributes...)
+    return LabelSpec(Point2f(position...), (; attributes...), textlabel)
 end
 
 function reposition_labels(labels, positions)
@@ -42,6 +43,7 @@ function reposition_labels(labels, positions)
         label => LabelSpec(
                 get(positions, label, spec.position);
                 spec.attributes...,
+                textlabel = spec.textlabel,
             )
             for (label, spec) in labels
     )
@@ -74,6 +76,7 @@ const STANDARD_AD_AS_LABELS = Dict(
         (0.08, 0.72);
         space = :relative,
         align = (:left, :top),
+        textlabel = true,
     ),
     "AS" => LabelSpec(
         (0.88, 0.88);
@@ -97,6 +100,30 @@ const STANDARD_ASSET_MARKET_LABELS = Dict(
         (0.08, 0.68);
         space = :relative,
         align = (:center, :top),
+    ),
+    "Asset Supply" => LabelSpec(
+        (0.88, 0.88);
+        space = :relative,
+        align = (:right, :top),
+    ),
+    "Asset Demand\n(base)" => LabelSpec(
+        (0.42, 0.08);
+        space = :relative,
+        align = (:center, :bottom),
+    ),
+)
+
+const ASSET_MARKET_LABELS_WITH_TEXTLABEL = Dict(
+    "Asset Demand" => LabelSpec(
+        (0.08, 0.88);
+        space = :relative,
+        align = (:left, :top),
+    ),
+    "Asset Demand\n(lower i₀)" => LabelSpec(
+        (0.08, 0.68);
+        space = :relative,
+        align = (:center, :top),
+        textlabel = true,
     ),
     "Asset Supply" => LabelSpec(
         (0.88, 0.88);
@@ -350,12 +377,27 @@ function plot_curve_label!(ax, curve, labels)
         label_spec.attributes,
     )
 
-    text!(
-        ax,
-        label_spec.position...;
-        text = curve.label,
-        attributes...,
-    )
+    if label_spec.textlabel
+        textlabel!(
+            ax,
+            label_spec.position...;
+            text = curve.label,
+            space = get(attributes, :space, :relative),
+            fontsize = get(attributes, :fontsize, LEGEND_LABEL_SIZE),
+            text_color = get(attributes, :color, :black),
+            text_align = get(attributes, :align, (:center, :center)),
+            background_color = (:white, 0.8),
+            strokecolor = (:white, 0.8),
+            padding = 8,
+        )
+    else
+        text!(
+            ax,
+            label_spec.position...;
+            text = curve.label,
+            attributes...,
+        )
+    end
 
     return nothing
 end
@@ -827,13 +869,15 @@ function _fill_axis(
         asset_market_label_positions,
         lower_i0_factor = 0.0,
         reference_solution = nothing,
+        asset_market_textlabel = false,
     )
     kwargs = (; reference_solution, lower_i0_factor)
 
 
+    asset_market_base = asset_market_textlabel ? ASSET_MARKET_LABELS_WITH_TEXTLABEL : STANDARD_ASSET_MARKET_LABELS
     is_ir_labels = reposition_labels(STANDARD_IS_IR_LABELS, is_ir_label_positions)
     ad_as_labels = reposition_labels(STANDARD_AD_AS_LABELS, ad_as_label_positions)
-    asset_market_labels = reposition_labels(STANDARD_ASSET_MARKET_LABELS, asset_market_label_positions)
+    asset_market_labels = reposition_labels(asset_market_base, asset_market_label_positions)
 
     plot_is_ir(sol, axis.curve_axis; labels = is_ir_labels, kwargs...)
     plot_ad_as(sol, axis.ad_as_axis; labels = ad_as_labels, kwargs...)
@@ -875,6 +919,7 @@ function panel(
         title = "Static equilibrium overview",
         reference_solution = nothing,
         lower_i0_factor = 0.0,
+        asset_market_textlabel = false,
     )
     figure_size = isnothing(size) ? (1400, 1000) : size
 
@@ -888,6 +933,7 @@ function panel(
         asset_market_label_positions,
         reference_solution,
         lower_i0_factor,
+        asset_market_textlabel,
     )
 
     _set_gaps!(figure)
