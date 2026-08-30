@@ -226,7 +226,7 @@ AssetModel = @model begin
           i0 + i1 * price_level + policy_ap_channel * i2 * AP
         )
         speculative_rate_multiplier =
-          1 + differential_rate_channel * (AP - 1)
+          1 + differential_rate_channel * (iAP - 1)
         speculative_debt =
           s0 - s1 * speculative_rate_multiplier * rate - s2 * (AP - 1)
         nominal_asset_demand = γ0 + speculative_debt / (1 - γ)
