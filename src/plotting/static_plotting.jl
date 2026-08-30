@@ -64,6 +64,34 @@ const STANDARD_IS_IR_LABELS = Dict(
         space = :relative,
         align = (:left, :bottom),
     ),
+    "IR (base)" => LabelSpec(
+        (0.88, 0.55);
+        space = :relative,
+        align = (:right, :top),
+    ),
+)
+
+const IS_IR_LABELS_WITH_TEXTLABEL = Dict(
+    "IS" => LabelSpec(
+        (0.08, 0.08); space = :relative, align = (:left, :bottom)
+    ),
+    "IR" => LabelSpec((0.88, 0.88); space = :relative, align = (:right, :top)),
+    "IR (lower i₀)" => LabelSpec(
+        (0.88, 0.72);
+        space = :relative,
+        align = (:right, :top),
+        textlabel = true,
+    ),
+    "IS (base)" => LabelSpec(
+        (0.42, 0.06);
+        space = :relative,
+        align = (:left, :bottom),
+    ),
+    "IR (base)" => LabelSpec(
+        (0.88, 0.55);
+        space = :relative,
+        align = (:right, :top),
+    ),
 )
 
 const STANDARD_AD_AS_LABELS = Dict(
@@ -450,6 +478,7 @@ function plot_is_ir(
         lower_i0_factor::Real = 0.0,
         reference_solution::Union{Nothing, Static.Solution} = nothing,
         labels = STANDARD_IS_IR_LABELS,
+        show_ir_base::Bool = false,
     )
 
     lower_rate_solution = lower_autonomous_policy_rate(sol.model, factor = lower_i0_factor) |> Static.solve_model
@@ -478,6 +507,11 @@ function plot_is_ir(
 
         if (!isnothing(reference_solution))
             x_curve!(builder, "IS (base)", :IS, :r, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
+            if show_ir_base
+                lowered_reference = lower_autonomous_policy_rate(reference_solution.model, factor = lower_i0_factor) |> Static.solve_model
+                y_curve!(builder, "IR (base)", :IR, :Y, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
+                y_curve!(builder, "IR (base, lower i₀)", :IR, :Y, lowered_reference, color = REFERENCE_COLOR, linewidth = 2.0, linestyle = :dash)
+            end
         end
     end
     plot_specs!(ax, specs)
@@ -870,16 +904,19 @@ function _fill_axis(
         lower_i0_factor = 0.0,
         reference_solution = nothing,
         asset_market_textlabel = false,
+        show_ir_base = false,
+        is_ir_textlabel = false,
     )
     kwargs = (; reference_solution, lower_i0_factor)
 
 
     asset_market_base = asset_market_textlabel ? ASSET_MARKET_LABELS_WITH_TEXTLABEL : STANDARD_ASSET_MARKET_LABELS
-    is_ir_labels = reposition_labels(STANDARD_IS_IR_LABELS, is_ir_label_positions)
+    is_ir_base_labels = is_ir_textlabel ? IS_IR_LABELS_WITH_TEXTLABEL : STANDARD_IS_IR_LABELS
+    is_ir_labels = reposition_labels(is_ir_base_labels, is_ir_label_positions)
     ad_as_labels = reposition_labels(STANDARD_AD_AS_LABELS, ad_as_label_positions)
     asset_market_labels = reposition_labels(asset_market_base, asset_market_label_positions)
 
-    plot_is_ir(sol, axis.curve_axis; labels = is_ir_labels, kwargs...)
+    plot_is_ir(sol, axis.curve_axis; labels = is_ir_labels, kwargs..., show_ir_base)
     plot_ad_as(sol, axis.ad_as_axis; labels = ad_as_labels, kwargs...)
     _plot_asset_market(sol, axis; labels = asset_market_labels, kwargs...)
     plot_balance_sheets(sol, axis.balance_axis)
@@ -920,6 +957,8 @@ function panel(
         reference_solution = nothing,
         lower_i0_factor = 0.0,
         asset_market_textlabel = false,
+        show_ir_base = false,
+        is_ir_textlabel = false,
     )
     figure_size = isnothing(size) ? (1400, 1000) : size
 
@@ -934,6 +973,8 @@ function panel(
         reference_solution,
         lower_i0_factor,
         asset_market_textlabel,
+        show_ir_base,
+        is_ir_textlabel,
     )
 
     _set_gaps!(figure)

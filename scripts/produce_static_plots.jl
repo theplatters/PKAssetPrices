@@ -91,10 +91,11 @@ function (@main)(ARGS)
   )
   pqcr_label_positions = (
     is_ir=Dict(
-      "IS" => (8.5 / 30, 7 / 9),
-      "IR" => (18 / 24, 72 / 90),
-      "IR (lower i₀)" => (53 / 60, 58 / 90),
+      "IS" => (8 / 30, 8 / 9),
+      "IR" => (20 / 24, 82 / 90),
+      "IR (lower i₀)" => (53 / 60, 54 / 90),
       "IS (base)" => (0.54, 1 / 6),
+      "IR (base)" => (0.25, 0.3),
     ),
     ad_as=Dict(
       "AD" => (0.08, 0.88),
@@ -105,8 +106,8 @@ function (@main)(ARGS)
     asset_market=Dict(
       "Asset Demand" => (0.4, 0.1),
       "Asset Supply" => (0.23, 0.1),
-      "Asset Demand\n(lower i₀)" => (0.5, 0.55),
-      "Asset Demand\n(base)" => (60 / 70, 0.3),
+      "Asset Demand\n(lower i₀)" => (0.51, 0.55),
+      "Asset Demand\n(base)" => (60 / 70, 0.26),
     ),
   )
   firmsration_label_positions = (
@@ -160,6 +161,8 @@ function (@main)(ARGS)
   )
   for (name, model, i₀, positions) in model_panel_specs
     use_textlabel = name in ("pqcr", "firmsration")
+    use_ir_base = name == "pqcr"
+    use_ir_textlabel = name == "pqcr"
     solution = solve_model(model)
     figure = StaticPlotting.panel(
       solution,
@@ -170,6 +173,8 @@ function (@main)(ARGS)
       ad_as_label_positions=positions.ad_as,
       asset_market_label_positions=positions.asset_market,
       asset_market_textlabel=use_textlabel,
+      show_ir_base=use_ir_base,
+      is_ir_textlabel=use_ir_textlabel,
     )
     save_figure(output_dir, "$(name)_equilibrium_panel", figure)
     print_equilibrium(name, solution)
