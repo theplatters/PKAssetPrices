@@ -33,13 +33,13 @@ function (@main)(ARGS)
   baseline_label_positions = (
     is_ir=Dict(
       "IS" => (9 / 30, 8 / 9),
-      "IR" => (10 / 12, 79 / 90),
-      "IR (lower i₀)" => (53 / 60, 5 / 9),
+      "IR" => (10 / 12, 75 / 90),
+      "IR (lower i₀)" => (53 / 60, 4.5 / 9),
     ),
     ad_as=Dict(
       "AD" => (0.2, 0.88),
-      "AD (lower i₀)" => (0.42, 0.76),
-      "AS" => (0.92, 0.70),
+      "AD (lower i₀)" => (0.39, 0.76),
+      "AS" => (0.92, 0.67),
     ),
     asset_market=Dict(
       "Asset Demand" => (0.5, 0.1),
@@ -66,7 +66,7 @@ function (@main)(ARGS)
     ad_as_label_positions=baseline_label_positions.ad_as,
     asset_market_label_positions=baseline_label_positions.asset_market,
   )
-  save_figure(output_dir, "baseline_mathematica_style", baseline_figure)
+  save_figure(output_dir, "baseline_equilibrium_panel", baseline_figure)
   print_equilibrium("Baseline", baseline_solution)
 
   pqc_label_positions = (
@@ -86,7 +86,7 @@ function (@main)(ARGS)
       "Asset Demand" => (0.5, 0.1),
       "Asset Supply" => (0.22, 0.08),
       "Demand (lower i₀)" => (0.74, 0.32),
-      "Asset Demand (base)" => (1 / 70, 0.42),
+      "Demand (base)" => (1 / 70, 0.42),
     ),
   )
   pqcr_label_positions = (
@@ -104,9 +104,9 @@ function (@main)(ARGS)
     ),
     asset_market=Dict(
       "Asset Demand" => (0.5, 0.1),
-      "Asset Supply" => (0.22, 0.08),
+      "Asset Supply" => (0.25, 0.08),
       "Demand (lower i₀)" => (0.72, 0.32),
-      "Asset Demand (base)" => (1 / 70, 0.82),
+      "Demand (base)" => (1 / 70, 0.82),
     ),
   )
   firmsration_label_positions = (
@@ -126,7 +126,7 @@ function (@main)(ARGS)
       "Asset Demand" => (0.5, 0.1),
       "Asset Supply" => (0.22, 0.1),
       "Demand (lower i₀)" => (0.72, 0.35),
-      "Asset Demand (base)" => (1 / 70, 0.42),
+      "Demand (base)" => (1 / 70, 0.42),
     ),
   )
 
@@ -147,7 +147,7 @@ function (@main)(ARGS)
       "Asset Demand" => (0.45, 0.12),
       "Asset Supply" => (0.27, 0.1),
       "Demand (lower i₀)" => (0.72, 0.35),
-      "Asset Demand (base)" => (-100, 0.42),
+      "Demand (base)" => (-100, 0.42),
     ),
   )
 

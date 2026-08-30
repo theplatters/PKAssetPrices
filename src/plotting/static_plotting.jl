@@ -55,13 +55,11 @@ const STANDARD_IS_IR_LABELS = Dict(
     "IR (lower i₀)" => LabelSpec(
         (0.88, 0.72);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE,
         align = (:right, :top),
     ),
     "IS (base)" => LabelSpec(
         (0.42, 0.06);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE,
         align = (:left, :bottom),
     ),
 )
@@ -75,7 +73,6 @@ const STANDARD_AD_AS_LABELS = Dict(
     "AD (lower i₀)" => LabelSpec(
         (0.08, 0.72);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE,
         align = (:left, :top),
     ),
     "AS" => LabelSpec(
@@ -86,13 +83,6 @@ const STANDARD_AD_AS_LABELS = Dict(
     "AD (base)" => LabelSpec(
         (0.42, 0.3);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE,
-        align = (:left, :bottom),
-    ),
-    "AMD (base, lower i₀)" => LabelSpec(
-        (0.5, 0.4);
-        space = :relative,
-        fontsize = LEGEND_LABEL_SIZE,
         align = (:left, :bottom),
     ),
 )
@@ -101,32 +91,22 @@ const STANDARD_ASSET_MARKET_LABELS = Dict(
     "Asset Demand" => LabelSpec(
         (0.08, 0.88);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE - 1,
         align = (:left, :top),
     ),
-    "Demand (lower i₀)" => LabelSpec(
+    "Asset Demand\n(lower i₀)" => LabelSpec(
         (0.08, 0.68);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE - 3,
-        align = (:left, :top),
+        align = (:center, :top),
     ),
     "Asset Supply" => LabelSpec(
         (0.88, 0.88);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE - 1,
         align = (:right, :top),
     ),
-    "Asset Demand (base)" => LabelSpec(
+    "Asset Demand\n(base)" => LabelSpec(
         (0.42, 0.08);
         space = :relative,
-        fontsize = LEGEND_LABEL_SIZE - 2,
-        align = (:left, :bottom),
-    ),
-    "AMD (base, lower i₀)" => LabelSpec(
-        (0.6, 0.5);
-        space = :relative,
-        fontsize = LEGEND_LABEL_SIZE - 2,
-        align = (:left, :bottom),
+        align = (:center, :bottom),
     ),
 )
 
@@ -516,18 +496,7 @@ function plot_ad_as(
             x_curve!(builder, "AD (base)", :ADc, :P, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
             x_curve!(builder, "AMD (base, lower i₀)", :ADc, :P, lowered_reference_solution, color = REFERENCE_COLOR, linewidth = 2.0, linestyle = :dash)
 
-            textlabel!(
-                ax,
-                Point2f(0.35, 0.45);
-                text = "AD (lower i₀)",
-                space = :relative,
-                text_color = IS_COLOR,
-                fontsize = LEGEND_LABEL_SIZE,
-                text_align = (:left, :top),
-                background_color = (:white, 0.8),
-                strokecolor = (:white, 0.8),
-                padding = 8,
-            )
+
         end
     end
     plot_specs!(ax, specs)
@@ -595,7 +564,7 @@ function plot_asset_market(
         if (!isnothing(reference_solution))
             lowered_reference_model = lower_autonomous_policy_rate(reference_solution.model, factor = lower_i0_factor)
             lowered_reference_solution = Static.solve_model(lowered_reference_model)
-            x_curve!(builder, "Asset Demand (base)", :AMD, :AP, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
+            x_curve!(builder, "Asset Demand\n(base)", :AMD, :AP, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
             x_curve!(builder, "AMD (base, lower i₀)", :AMD, :AP, lowered_reference_solution, color = REFERENCE_COLOR, linewidth = 2.0, linestyle = :dash)
         end
     end
@@ -797,7 +766,7 @@ _asset_market_axis(figure_pos) = Axis(
 
 _balance_axis(figure_pos; panel_label = "D") = Axis(
     figure_pos;
-    title = rich("($panel_label) ", "Balance Sheet Analysis"; font = :bold),
+    title = rich("($panel_label) ", "Changes in Balance Sheets"; font = :bold),
     ylabel = "Amount",
     xgridvisible = false,
     ygridcolor = (:black, 0.08),
