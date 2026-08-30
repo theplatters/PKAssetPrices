@@ -593,6 +593,7 @@ function plot_asset_market(
         labels = STANDARD_ASSET_MARKET_LABELS,
         lower_i0_factor::Real = 0.0,
         reference_solution::Union{Nothing, Static.Solution} = nothing,
+        force_standard_asset_range::Bool = false,
     )
     required_variables = (:AP, :AE, :AQ)
     all(haskey(sol.variables, variable) for variable in required_variables) ||
@@ -608,7 +609,7 @@ function plot_asset_market(
     uses_reference_range =
         first(ASSET_X_LIMITS) <= equilibrium_quantity <= last(ASSET_X_LIMITS) &&
         first(ASSET_Y_LIMITS) <= sol.variables[:AP] <= last(ASSET_Y_LIMITS)
-    if !uses_reference_range
+    if !uses_reference_range && !force_standard_asset_range
         asset_x_limits = equilibrium_lims(equilibrium_quantity)
         asset_y_limits = equilibrium_lims(sol.variables[:AP])
     end
@@ -906,8 +907,11 @@ function _fill_axis(
         asset_market_textlabel = false,
         show_ir_base = false,
         is_ir_textlabel = false,
+        force_standard_asset_range = false,
     )
-    kwargs = (; reference_solution, lower_i0_factor)
+    kwargs_is_ir = (; reference_solution, lower_i0_factor)
+    kwargs_ad_as = (; reference_solution, lower_i0_factor)
+    kwargs_asset = (; reference_solution, lower_i0_factor, force_standard_asset_range)
 
 
     asset_market_base = asset_market_textlabel ? ASSET_MARKET_LABELS_WITH_TEXTLABEL : STANDARD_ASSET_MARKET_LABELS
@@ -916,9 +920,9 @@ function _fill_axis(
     ad_as_labels = reposition_labels(STANDARD_AD_AS_LABELS, ad_as_label_positions)
     asset_market_labels = reposition_labels(asset_market_base, asset_market_label_positions)
 
-    plot_is_ir(sol, axis.curve_axis; labels = is_ir_labels, kwargs..., show_ir_base)
-    plot_ad_as(sol, axis.ad_as_axis; labels = ad_as_labels, kwargs...)
-    _plot_asset_market(sol, axis; labels = asset_market_labels, kwargs...)
+    plot_is_ir(sol, axis.curve_axis; labels = is_ir_labels, kwargs_is_ir..., show_ir_base)
+    plot_ad_as(sol, axis.ad_as_axis; labels = ad_as_labels, kwargs_ad_as...)
+    _plot_asset_market(sol, axis; labels = asset_market_labels, kwargs_asset...)
     plot_balance_sheets(sol, axis.balance_axis)
 
     return nothing
@@ -959,6 +963,7 @@ function panel(
         asset_market_textlabel = false,
         show_ir_base = false,
         is_ir_textlabel = false,
+        force_standard_asset_range = false,
     )
     figure_size = isnothing(size) ? (1400, 1000) : size
 
@@ -975,6 +980,7 @@ function panel(
         asset_market_textlabel,
         show_ir_base,
         is_ir_textlabel,
+        force_standard_asset_range,
     )
 
     _set_gaps!(figure)

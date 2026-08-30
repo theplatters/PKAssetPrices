@@ -105,10 +105,10 @@ AssetModel = @model begin
     c1 = 0.1, "financial-activity induced credit rationing"
     d0 = 5.0, "autonomous credit financed demand"
     d1 = 8.0, "interest sensitivity of productive credit demand"
-    d2 = 1.0, "asset-price sensitivity of planned investment"
+    d2 = 0.5, "asset-price sensitivity of planned investment"
     i0 = 0.01, "autonomous policy rate"
     i1 = 0.05, "goods-price induced policy rate"
-    i2 = 0.01, "asset-price induced policy rate"
+    i2 = 0.02, "asset-price induced policy rate"
     iAP = 2.0, "penalty for financing speculative assets"
     m = 0.15, "bank markup"
     k = 0.3, "reserve share"
@@ -226,7 +226,7 @@ AssetModel = @model begin
           i0 + i1 * price_level + policy_ap_channel * i2 * AP
         )
         speculative_rate_multiplier =
-          1 + differential_rate_channel * (iAP - 1)
+          1 + differential_rate_channel * (AP - 1)
         speculative_debt =
           s0 - s1 * speculative_rate_multiplier * rate - s2 * (AP - 1)
         nominal_asset_demand = γ0 + speculative_debt / (1 - γ)
