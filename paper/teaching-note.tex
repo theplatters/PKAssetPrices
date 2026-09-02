@@ -394,7 +394,9 @@ As we will see in what follows these scenarios build on imposing some unilateral
 
 \subsection{The Credit Rationing Channel} \label{subsec:banks_ration}
 
-This channel builds on the intuition that credit provided for financial speculation might crowd out credit provided for real investment, e.g. when the former provides higher expected returns or when the related collaterals are perceived as more secure and preferable (e.g. in real-estate). A simple approach to model this potential impact is to partly endogenize the credit rationing parameter $c$ with an endogenous function of asset demand:
+This channel builds on the intuition that credit provided for financial speculation might crowd out credit provided for real investment, e.g. when the former provides higher expected returns or when the related collaterals are perceived as more secure and preferable (e.g. in real-estate). The probably most pronounced example for such an effect is the case of a credit crunch, where a sudden drop in confidence creates a tightening of lending conditions \citep[as in][]{Kapeller.2014}. However, we can also assume a more secular trend, where increased attractivity of speculation requires real investment to provide greater ``margins of safety'' \citep[][Ch. 8]{minskyStabilizingUnstableEconomy1986} and therey constrain access to external funding.
+
+A simple approach to model auch an impact is to partly endogenize the credit rationing parameter $c$ with an endogenous function of asset demand:
 
 \begin{equation}
   c = c_0 - c_1 SD \label{eq:c-sd}
@@ -417,7 +419,8 @@ sanitaire---rather, it draws resources away from the industrial circulation.
 Figure~\ref{fig:rationing-equilibrium} shows the resulting equilibrium before and after
 a change of the baseline interest rate by setting the autonomous interest rate $i_0$ from $1\% $ to $0 \%$. Compared with the Baseline case, speculative demand now lowers available productive credit and therefore shifts the goods-market outcome (panel A in figure \ref{fig:rationing-equilibrium}) downwards, which reduces output and prices as shown in panel B. Asset Dynamics remain close to stable but are subject to a small feedback effect: as decreasing output also comes with lower prices, central banks react via lower interest rates, which slightly amplifies specultive dynamic.\footnote{While small in scale, the emerging feedback effect represents a plausible variant of self-reinforcing economy dynamics: reduced investment leads to lower real economic dynamism, which creates strengthens incentives for speculative activity.}
 
-Finally, the lower left panel gain shows balance sheet changes for the relevant variables. While the general stock-flow relationships as mapped by tables \ref{tab:sfc-asset-stock} and \ref{tab:sfc-asset-flow} do not change, we observe a slight reduction in the total credit volume as compared by the baseline scenario. This reduction corresponds exactly to the reduction of credit provided for productive investments; correspondingly the share of speculative debt increases slightly.
+Finally, the lower left panel summarizes balance sheet changes for the relevant sectors. While the general stock-flow relationships as mapped by tables \ref{tab:sfc-asset-stock} and \ref{tab:sfc-asset-flow} do not change, we observe a slight reduction in the total credit volume as compared by the baseline scenario. This reduction corresponds exactly to the reduction of credit provided for productive investments; correspondingly the share of speculative debt increases slightly.
+%todo: der "increase" ist zwar vorhanden, aber leider so klein, dass man ihn in unserer gerundeten auswertung nicht sieht...
 
 \begin{figure}[htbp]
   \centering
@@ -432,30 +435,34 @@ Finally, the lower left panel gain shows balance sheet changes for the relevant 
 
 In this variant, we assume that the central bank is sensitive to asset price dynamics
 and, hence, considers asset prices analogously to prices for goods and services.
-Such a setup  resonates more directly with Keynes's claim that ``it is by playing
+Such a setup resonates more directly with Keynes's claim that ``it is by playing
 on the speculative-motive that monetary management is brought to bear
 on the economic system'': the speculative motive determines asset prices,
-which then feed into the policy rate which governs investment. Eventually, such a reaction of the central bank can be captured by
+which then feed into the policy rate which governs investment. 
+Eventually, such a reaction of the central bank can be captured by
 
 \begin{equation}
   i = i_0 + i_1 P + i_2 AP. \label{eq:i-ap}
 \end{equation}
 
 Holding the other arguments of the policy rule fixed, a rise in $AP$ raises
-the policy rate $i$ and, correspondingly, the lending rate $r$. It therefore reduces
-debt-financed (investment) demand $D$ as indicated by equation \ref{eq:teaching_d}.
+the policy rate $i$ and, correspondingly, the lending rate $r$. It therefore reduces both, 
+speculative credit $SD$ as well as debt-financed (investment) demand $D$ (as indicated above
+by equations \ref{eq:sd} and \ref{eq:teaching_d}).
 
-By couching mechanism in a modern Taylor-rule-like framework, the chain of
-causality runs different: while in the \GT{} higher asset prices \textit{decrease}
+By couching the mechanism in a modern Taylor-rule-like framework, the chain of
+causality now runs different: while in the \GT{} higher asset prices \textit{decrease}
 the rate of interest directly (leading people to hold money instead of assets), 
-here we assume central banks to \textit{increase} interest rates. This change occurs
-because in the \GT{} framework interest rates determine the attractiveness of assets,
-where as in an endogenous money frame they impact on their affordability. Hence, such a version would be suitable to embed Keynes' key mechanism in the mechanics of modern
-financial systems. However, it should be admitted that modern central banks do only rarely effectively consider asset prices in a systemic, non-discretionary way as suggested by equation \ref{eq:i-ap}.
+here we assume central banks show sensitivity to asset prive developments and, hecne,
+\textit{increase} interest rates. This change occurs because in the \GT{} framework interest 
+rates determine the attractiveness of assets, where as in an endogenous money framework
+ they impact on their affordability. Hence, such a version would be suitable to embed Keynes this would require that modern central banks would indeed consider asset prices in a systemic, non-discretionary way as suggested by equation \ref{eq:i-ap}. in contrast, much of current central
+ bank practice is focused on the consumer price index and largely abstracts from asset price
+ developments.
 
 
 Figure~\ref{fig:centralbank-equilibrium} summarizes the respective model solution, again using the example of a change in the autonomous interest rate from $1\%$ to $0\%$ 
-and compares the outcome to the baseline scenario as shown in figure \ref{fig:simplepk-equilibrium} and \ref{fig:baseline-equilibrium}. 
+and compares the outcome to the baseline scenario as shown in figure \ref{fig:simplepk-equilibrium} and \ref{fig:baseline-equilibrium}. We immediately find, that the shift in interest rates has a double impact on the goods market as it lowers investment (shift in IS) and increases the baseline interest rate at every price level $P$, which shifts the IR-curve upwards. So, while this policy successfully manages to dampen speculative dynamics and enforce decreasing asset prices, it also leads to a strong drop economic tightening suggesting that such a sensitivity of central banks towards speculation can come with significant real economic costs. 
 
 % HIER WAS NEUES? The asset-market price now enters the policy rule, linking the financial equilibrium to the interest rate and output shown in the upper-left panel.
 
@@ -467,9 +474,7 @@ and compares the outcome to the baseline scenario as shown in figure \ref{fig:si
   \label{fig:centralbank-equilibrium}
 \end{figure}
 
-Similar to the scenario shown in section \ref{subsec:banks_ration} we find a decrease in output that is due to an increase in interest rates that reflects the central bank's sensitivity for asset price dnyamics. However, this increase in interest rates also leads to a reduction in real investment. The major difference in comparison to the pure crowding-out scenario is thereby that higher interest rates  also have a permanent depressing effect on asset markets as they make speculative endeavors effectively more expensive. Thereby the effect of higher interest rates complete dominates the (still present) feedback effect observed in the first scenario, where lower output and price-level led to more speculation via lower interest rates. 
-
-This feature also plays a role in real-world financial markets, where prices often depend on leverage and the degree of leverage is governed by the lending rate. In this context, section \ref{subsec:uncertainty} below gives some examples of how this plays out in practice.
+Similar to the scenario shown in section \ref{subsec:banks_ration} we find a decrease in output that due to a reduction in real investment. The major difference in comparison to the pure crowding-out scenario is thereby the permanent depressing effect on asset markets as higher interest rates make speculative endeavors effectively more expensive. This effect also dominates the (still present) feedback effect observed in the first scenario, where lower output and price-level led to more speculation via lower interest rates. We will return to this dampening effect of higher interest rates on speculative dynamics in section \ref{sec:real_world} as a vantage point for deepening the practical implications of this basic framework for both, policy-makers (section \ref{subsec:dual_interest}) as well as financial market pactitioners (section \ref{subsec:uncertainty}).
 
 In terms of stock-flow relations we again note that the tables provided for describing the basic asset price model in section \ref{subsec:asset_market} are sufficient for capturing this model. We also note that -- in comparison to the baseline model -- the total amount of debt is again slightly lower due to the impact of higher interest rates.
 
@@ -477,13 +482,13 @@ In terms of stock-flow relations we again note that the tables provided for desc
 
 The preceding variants locate the real effects of speculation in the banking
 sector or in the policy-rate rule. A further channel arises when firms prioritize the acquisition of speculative assets relative to producive investment.
-Such a pattern typically can occur for diverese reasons, e.g., better outside
-options from financial investment, a rise in the opportunity cost of productive
+Such patterns are widely documented \citep{Davis.2016} and typically occur for diverse reasons, like better outside options from financial investment, a rise in the opportunity cost of productive
 projects, or stakeholder demands for internal diversification to reduce perceived 
-risk-factors following a standard portfolio approach. These factors would lead firms to reduce effective investment to secure available funds directing towards financial markets transactions.
+risk-factors following a standard portfolio approach. These factors would lead firms to reduce effective investment to secure available funds directing towards financial markets transactions
+\citep{Stockhammer.2004}.
 
 In the simplified variant captured below we retain the standard policy rule and the
-exogenous credit-rationing parameter $c$, but allow asset price to influence 
+exogenous credit-rationing parameter $c$, but allow asset prices to influence 
 the investment-demand schedule via
 
 \begin{equation}
@@ -494,24 +499,25 @@ the investment-demand schedule via
 \label{eq:firms-ration}
 \end{equation}
 
-Thus a higher asset price lowers planned productive investment directly and, hence, does not require assuming any effect on the banking sector and the central bank. The coefficient $d_2$ is a reduced-form measure of firms' sensitivity to financial valuations, representing the idea that firms strive for highly valued assets to create a credible portfolio and that financialization seems more attractive in times of booms (which leads to a scenario inverse to the liquidity preference reasoning assigned to speculating households).
+Thus a higher asset price lowers planned productive investment directly and, hence, does not require assuming any effect on the banking sector and the central bank as in the preceeding section \ref{subsec:central_bank}. The coefficient $d_2$ is a reduced-form measure of firms' sensitivity to financial valuations, representing the idea that firms strive for highly valued assets to create a credible portfolio and that financialization seems more attractive in times of booms.\footnote{I should be noted that such a line of reasoning leads to a scenario, where higher asset prices increase the relative attractiveness of assets running counter to the basic intuition of the liquidity preference, which implies that the motives driving contemporary financialization of firms are probably different from what Keynes' assumed about the behavior of rentier households roughly 100 years ago.}
 
 This channel closes the real--financial loop directly. The interest rate affects
 speculative borrowing and therefore $AP$; the resulting asset price enters
 Eq.~\eqref{eq:firms-ration}, changes $D$, and feeds through to output and
-employment. In the outcome we observe a feedback effect similar to that in section \ref{subsec:banks_ration} -- lower output and prices lead to lower interest rates that boost speculation. However, but this time the mechanism does not operate through endogenous bank credit rationing. Rather, as the label ``financialization of firms'' suggest firms effectively replace the role of banks as drivers of financzialization as they themselves gain a stronger preferences for holding asssets.
+employment. In the outcome we observe a feedback effect similar to that in section \ref{subsec:banks_ration} -- lower output and prices lead to lower interest rates that boost speculation. However, but this time the mechanism does not operate through endogenous bank credit rationing. Rather, as the label ``financialization of firms'' suggest firms effectively replace the role of banks as drivers of financzialization as they themselves gain a stronger preferences for holding asssets. As indicated in the bottom right panel of Figure \ref{fig:firmsration-equilibrium} this also leads to a greater share of speculative debt in total debt.
 
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../plots/firmsration_equilibrium_panel.pdf}
-  \caption{Equilibrium in the \texttt{FirmsRation} model. Firms reduce planned
-  productive investment when asset prices rise, creating a direct transmission
+  \caption{A simple model of the financialization of firms with endogenous money. Firms reduce planned productive investment when asset prices rise, creating a direct transmission
   channel from the asset market to output and employment.}
   \label{fig:firmsration-equilibrium}
 \end{figure}
 
-%TODO hier gibt es, denke ich, schon eine neue zeile oder so im flowchart weil die firmen jetzt auch was machen (speculative debt?) müsste das niht auch in den balance sheet rein? das müsste man sich nochmal anschauen...
+As firms in this scenario start holding assets $A$ and taking up speculative debt $SD$, both of which are not captured by capital $K$ and speculative debt $L_t^S$ as they currently appear in Table \ref{tab:sfc-asset-flow} our basic accounting framework as introduced in section \ref{subsec:asset_market} would require some minimal extensions to also cover this case.
+
+%NOTE: ich würde das mal nicht aufschreiben, aber man könnte es natürlich in einen appendix packen
 
 \section{Real world analysis: Interaction between speculation and policy} \label{sec:real_world}
 
