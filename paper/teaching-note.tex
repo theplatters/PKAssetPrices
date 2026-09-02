@@ -415,7 +415,7 @@ depress real activity. The financial circulation is no longer subject to a cordo
 sanitaire---rather, it draws resources away from the industrial circulation.
 
 Figure~\ref{fig:rationing-equilibrium} shows the resulting equilibrium before and after
-a change of the baseline interest rate by setting the autonomous interest rate $i_0$ from $1\% $ to $0 \%$. Compared with the Baseline case, speculative demand now lowers available productive credit and therefore shifts the goods-market outcome (panel A in figure \ref{fig:rationing-equilibrium}) downwards, which reduces output and prices as shown in panel B. Asset Dynamics remain close to stable but are subject to a small feedback effect: as decreasing output also comes with lower prices, central banks react via lower interest rates, which slightly amplifies specultive dynamic.\footnote{WHile small in scale, the emerging feedback effect represents a plausible variant of self-reinforcing economy dynamics: reduced investment leads to lower real economic dynamism, which creates strengthens incentives for speculative activity.}
+a change of the baseline interest rate by setting the autonomous interest rate $i_0$ from $1\% $ to $0 \%$. Compared with the Baseline case, speculative demand now lowers available productive credit and therefore shifts the goods-market outcome (panel A in figure \ref{fig:rationing-equilibrium}) downwards, which reduces output and prices as shown in panel B. Asset Dynamics remain close to stable but are subject to a small feedback effect: as decreasing output also comes with lower prices, central banks react via lower interest rates, which slightly amplifies specultive dynamic.\footnote{While small in scale, the emerging feedback effect represents a plausible variant of self-reinforcing economy dynamics: reduced investment leads to lower real economic dynamism, which creates strengthens incentives for speculative activity.}
 
 Finally, the lower left panel gain shows balance sheet changes for the relevant variables. While the general stock-flow relationships as mapped by tables \ref{tab:sfc-asset-stock} and \ref{tab:sfc-asset-flow} do not change, we observe a slight reduction in the total credit volume as compared by the baseline scenario. This reduction corresponds exactly to the reduction of credit provided for productive investments; correspondingly the share of speculative debt increases slightly.
 
@@ -521,22 +521,38 @@ Finally, we switch perspectives in section \ref{subsec:speculation} further belo
 
 \subsection{Dampening the impact of speculation by means of a dual interest rates} \label{subsec:dual_interest}
 
-Building on the credit rationing model developed in Section \ref{subsec:banks_ration}, we examine a specific policy scenario in which regulatory constraints lead banks to price asset-market credit differently from productive credit.
+Building on the central bank  channel developed in Section \ref{subsec:central_bank}, we examine a specific policy scenario in which regulatory constraints lead banks to price asset-market credit differently from productive credit.
+The underlying intuition is that of "dual interest rates". That means the monetary authority distiguishes between credit uses with the intent to keep credits for productive purposes cheap compared to credits for speculative assets.
+Although concrete dual interest policies are not (yet) a established instrument in practice certain regulatory practices produce results that would be akin to this.
 
-The productive rate $r$ is held fixed. 
-By contrast, the lending rate applicable to speculative asset purchases $r_{AP}$ is, assumed to be a constant multiple of $r$:
-\[r_{ AP } = i_{AP} r, \]
-where $i_{AP} > 1$ denotes the multiplier introduced through  the regulatory policy.
+The oldest archetype is margin regulation in the United States: since the Securities Exchange Act of 1934, the Federal Reserve's Regulation~T has capped the share of a securities purchase that may be financed with borrowed funds (currently 50\%), and margin loans are priced at a premium over base rates, so that credit for securities purchases carries a systematically higher effective cost than credit for production.
 
-Speculative demand is therefore given as 
+China operates what is arguably the most explicit dual-rate system. Its banking system has long steered lending through a dual-track structure of policy and market rates \citep{heDualtrackInterestRates2012}, and under the mortgage-rate framework introduced in 2019, newly issued first-home mortgages faced a floor at the five-year LPR, while second-home mortgages faced a floor 60 basis points higher \citep{peoplesbankofchinaChinaReformIndividual2019}, i.e.\ a statutory $i_{AP}>1$.
+
+Finally, sectoral capital requirements operate as a de facto $i_{AP}>1$: Belgium, for instance, has required banks to hold a sectoral systemic risk buffer of up to 9\% of CET1 capital against their IRB exposures to Belgian residential real estate since May 2022 \citep{nationalbankofbelgiumIntroductionSectoralSystemic2023}, raising the capital cost of mortgage lending relative to corporate lending without touching the general policy rate. Agent-based studies of borrower-specific credit constraints document exactly the mechanism our model emphasizes: restricting the credit access of investors---rather than tightening all credit uniformly---yields the strongest reductions in debt and cyclical house-price dynamics \citep{tarneEffectBorrowerspecificLoantovalue2022,tarneRoofRealEstate2025}.
+
+
+Against this backdrop, we model the policy as follows. The productive rate $r$ is held unchanged.
+By contrast, the lending rate applicable to speculative asset purchases, $r_{AP}$, is assumed to
+be a constant multiple of $r$:
+\[ r_{AP} = i_{AP} r, \]
+where $i_{AP} > 1$ denotes the multiplier introduced through the regulatory policy.
+
+Speculative demand is therefore given as
 \begin{equation}
   SD = s_0 - s_1 r_{AP} - s_2 (AP - 1) = s_0 - s_1 i_{AP} r - s_2 (AP - 1).
 \end{equation}
 
-Thus, a higher $i_{AP}$ reduces speculative borrowing and, consequently, speculative debt. Because the credit-rationing channel is active in this scenario, this reduction in speculative debt relaxes credit rationing and weakens the associated crowding-out effect on productive demand.
-However a  lower demand for speculative assets also reduces the price for assets given that the supply is constant through the $- s_2 (AP - 1)$ channel. This mechanism can be observed through the low asset price of $AP = 0.24$ compared to $0.93$ in the credit rationing model.
+Thus, a higher $i_{AP}$ reduces speculative borrowing and, consequently, speculative debt. Because
+the central bank channel is active in this scenario, the resulting decline in asset prices feeds
+back into the policy rule (Eq.~\ref{eq:i-ap}): the lending rate $r$ falls, which lowers financing
+costs for productive investment relative to the central-bank scenario of
+Section~\ref{subsec:central_bank}. At the same time, lower speculative demand depresses the asset
+price itself, given the fixed supply of assets (Eq.~\ref{eq:as}); the effect is visible in the
+asset price of $AP = 0.18$, compared to $0.87$ in the central-bank scenario.
 
-This mechanism is relflected in Figure \ref{fig:pqcrdiff-equilibrium} for $i_{AP} = 2$ the risk indicator $\psi$ falls from $0.11$ to $0.03$ while GDP rises from $6.2$ to $6.5$.
+This mechanism is reflected in Figure~\ref{fig:pqcrdiff-equilibrium}: for $i_{AP} = 2$, the risk
+indicator $\psi$ falls from $0.10$ to $0.02$, while GDP rises from $6.32$ to $6.51$.
 
 \begin{figure}[htbp]
   \centering

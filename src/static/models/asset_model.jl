@@ -261,12 +261,11 @@ PQC = @scenario AssetModel begin
 end
 
 PQCr = @scenario AssetModel begin
-  credit_sd_channel = 1.0
   policy_ap_channel = 1.0
 end
 
 PQCrDIFF = @scenario AssetModel begin
-  credit_sd_channel = 1.0
+  policy_ap_channel = 1.0
   differential_rate_channel = 1.0
 end
 
