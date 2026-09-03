@@ -109,7 +109,7 @@ AssetModel = @model begin
     i0 = 0.01, "autonomous policy rate"
     i1 = 0.05, "goods-price induced policy rate"
     i2 = 0.02, "asset-price induced policy rate"
-    iAP = 2.0, "penalty for financing speculative assets"
+    iAP = 1.2, "penalty for financing speculative assets"
     m = 0.15, "bank markup"
     k = 0.3, "reserve share"
     n = 0.15, "firm markup"
@@ -265,8 +265,7 @@ PQCr = @scenario AssetModel begin
 end
 
 PQCrDIFF = @scenario AssetModel begin
-  policy_ap_channel = 1.0
-  differential_rate_channel = 1.0
+  differential_rate_channel = 1.2
 end
 
 FirmsRation = @scenario AssetModel begin
