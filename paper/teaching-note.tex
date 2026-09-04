@@ -582,15 +582,6 @@ The fact that the post-2020 correlation between crypto and equity markets rose s
 \paragraph{The two-way street.}
 Our model emphasizes the arrow from monetary conditions to asset prices, but recent experience also illustrates the reverse: the housing wealth effect from QE generated additional consumption, contributing to the post-2021 inflation that forced the Fed to tighten in the first place \citep{klein2025}. This creates a closed loop that our static model cannot fully capture but that the dynamic extensions of the \texttt{PKAssetPrices} framework are designed to explore: easy money \(\to\) rising asset prices \(\to\) rising consumption \(\to\) inflation \(\to\) tighter money \(\to\) falling asset prices. Keynes's insight that the speculative motive connects financial and industrial circulations in \emph{both} directions is borne out by the data.
 
-\section{Some extensions of the basic model}
-
-%NOTE: DAS HIER KÖNNTE MAN VLLT AUCH IN DIE CONCLUSION EINBAUEN, ODER HALT HIER VLLT 3-4 Punkte kursorisch andeuten (andere taylor rule, rolle von gamma, dynamisierung)
-
-The turnover share \(\alpha\) and asset-creation rate \(g_a\) are fixed parameters
-in the teaching variants. Dynamic or experimental specifications that
-endogenize turnover are outside the model presented here and are not used for
-the equilibrium figures or comparative claims in this note.
-
 \section{Conclusion}
 
 The distance from the \treatise{} to the \GT{} is often described as a profound theoretical rupture---the shift from the quantity theory of money (via the fundamental equations) to the principle of effective demand. Our exercise suggests a more parsimonious interpretation: in the limited domain of the real-financial nexus, the two books differ along two independent dimensions---the nature of money and the connectedness of speculation to the real economy---and each occupies a different cell in the resulting 2\,$\times$\,2 typology.
@@ -602,6 +593,20 @@ Our model makes this visible. The Baseline variant reproduces the \treatise{} re
 The recent empirical record---from the everything rally of 2020--2021 to the crypto winter of 2022--2023, from the housing wealth effect of QE to the leveraged deleveraging triggered by rate hikes---suggests that the bottom-right cell (endogenous money with real feedback from speculation) is the empirically relevant one for the contemporary world. But the \treatise{} distinction between industrial and financial circulation remains analytically useful: it forces us to specify the \emph{exact channel} through which the financial circulation reaches the industrial circulation, rather than treating the connection as automatic. The distinction between the PQC (credit crowding-out) and PQCr (interest rate) channels matters for policy: macroprudential tools versus interest rate policy are not perfect substitutes, as recent debates on ``leaning against the wind'' illustrate.
 
 This parsimony is itself a pedagogical lesson: large theoretical differences can turn on small structural assumptions. The space of possibilities defined by our four cells also reminds us that the choice between the \treatise{} and the \GT{} is not forced---a third position (our bottom-right) combines the descriptive richness of the former with the causal mechanism of the latter, and is arguably the most adequate framework for understanding the contemporary world.
+
+Dynamic or experimental specifications that endogenize turnover are outside the model presented here and are not used for
+the equilibrium figures or comparative claims in this note.
+Such dynamic models would alow for a greater variety of behavioral assumptions such as differentiating between the price level and the change in price when determining asset demand 
+$$
+SD_t = s_0 - s_1  r - s_2 * AP_{t - 1} + s_3 \frac{AP_{t - 1} - AP_{t - 2}}{AP_{t - 2}}.
+$$
+
+Furthermore such a model could incorporate a complete Taylor rule, using changes in GDP, for seting the policy rate. 
+
+Another path of extending the model could be to enogenize the Asset supply.
+A possible rule could be
+$$AQ = (\alpha + g_a) AS.$$
+The turnover share \(\alpha\) would depend on the asset market, while $AS$, the asset supply, and \(g_a\) the asset creation rate are fixed parameters.
 
 \printbibliography
 
