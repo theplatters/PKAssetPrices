@@ -43,7 +43,7 @@
   {\multicitedelim}
   {\usebibmacro{postnote}}
 \DeclareRobustCommand{\treatise}[1][]{\treatisecite[][#1]{johnmaynardkeynesTreatiseMoneyTwo2011}\xspace}
-\DeclareRobustCommand{\GT}[1][]{\GTcite[][#1]{Keynes.2018}\xspace}
+\DeclareRobustCommand{\GT}[1][]{\GTcite[][#1]{keynesGeneralTheoryEmployment2009}\xspace}
 
 \author{Franz Scharnreitner, Jakob Kapeller}
 \title{Keynes on speculation and endogenous money: a teaching note}
@@ -60,7 +60,7 @@ In this paper we build on \citet{fontanaSimpleTeachableMacroeconomic2009} to dev
 
 Aside from its core purpose to rationally reconstruct key stances on money and finance developed by Keynes, we find that the resulting model can also be used to introduce students to the concept of endogenous money as a key starting point for understanding and modeling interactions between real and financial sectors.
 
-To also provide a historically coherent account, we first trace Keynes' original arguments in the \treatise and the \GT in section \ref{sec:historyofthought} and discuss how Keynes used these different approaches to describe monetary policy and financial activities under different historical and institutional conditions. Following the Keynesian adage that economists should focusing on "choosing models that are relevant to the contemporary world" \citep{Keynes1938HarrodLetter}, we suggest recombining different arguments made in both works to arrive at a convincing representations of contemporary monetary systems.
+To also provide a historically coherent account, we first trace Keynes' original arguments in the \treatise and the \GT in section \ref{sec:historyofthought} and discuss how Keynes used these different approaches to describe monetary policy and financial activities under different historical and institutional conditions. Following the Keynesian adage that economists should focusing on "choosing models that are relevant to the contemporary world" \citep{keynesLetterRoyHarrod1973}, we suggest recombining different arguments made in both works to arrive at a convincing representations of contemporary monetary systems.
 
 On this basis, we then present a simple baseline model in section \ref{sec:model} that provides a framework for integrating key insights of Keynes on money and speculation. We then enrich this baseline model in several ways to illustrate how speculative markets may impact on the real economy and how different model assumptions can capture different channels of influence that have been proposed in the respective literature (see section \ref{sec:real_impact}). Finally, we aim to connect our modeling efforts with real-world experiences relating in economic policy and speculative practice in section \ref{sec:real_world} with a topical focus of notions on stability and instability.
 
@@ -163,7 +163,7 @@ In the \GT[Ch.~15], this institutional apparatus is set aside. Keynes defines mo
 M = M_1 + M_2 = L_1(Y) + L_2(r) \tag{GT, Ch.~15}
 \end{equation}
 
-The left-hand side $M$ is the total quantity of money, now treated as a variable ``determined by the action of the central bank'' \citep[Ch.~15]{Keynes.2018} --- that is, as an exogenously given stock. The analytical effort shifts entirely to the right-hand side: the \emph{demand} for money, which is decomposed into the transactions motive $L_1(Y)$ and the speculative motive $L_2(r)$. The latter variable is thereby directly tied to asset prices, as the real interest rate $r$ is high when bond prices are low, and vice versa.
+The left-hand side $M$ is the total quantity of money, now treated as a variable ``determined by the action of the central bank'' \citep[Ch.~15]{keynesGeneralTheoryEmployment2009} --- that is, as an exogenously given stock. The analytical effort shifts entirely to the right-hand side: the \emph{demand} for money, which is decomposed into the transactions motive $L_1(Y)$ and the speculative motive $L_2(r)$. The latter variable is thereby directly tied to asset prices, as the real interest rate $r$ is high when bond prices are low, and vice versa.
 
 As large parts of the \GT treat bonds as the main category of speculative assets, the interest rate $r$ and the price of speculative assets behave proportionally: the greater the price of speculative assets, the higher the demand for money (as people wait for falling asset prices), which effectively drives the price of cash (in form of $r$). While such a channel from speculative to interest rate seems plausible in principle -- e.g., when central banks respond to speculative frenzies by financial market tightening --, this setups results in a very peculiar and specific scenario, where speculative dynamics are the sole main driver of real interest rates. 
 
@@ -175,7 +175,7 @@ However, at the same time, high real interest rates might easily feed back on as
 A further consequence of this assumption is that the banking system as a credit-creating institution is essentially absent from the analysis in the \GT; loans, deposits, and reserve management are no longer explicitly modeled.Consequently, the famous classification in the \treatise[Vol.~1, Ch.~3] is collapsed into a single sentence in the \GT[Ch.~15]:
 
 \begin{quote}
-Money held for each of the three purposes forms, nevertheless, a single pool, which the holder is under no necessity to segregate into three water-tight compartments; for they need not be sharply divided even in his own mind, and the same sum can be held primarily for one purpose and secondarily for another. \citep[p. 172]{Keynes.2018}
+Money held for each of the three purposes forms, nevertheless, a single pool, which the holder is under no necessity to segregate into three water-tight compartments; for they need not be sharply divided even in his own mind, and the same sum can be held primarily for one purpose and secondarily for another. \citep[p. 172]{keynesGeneralTheoryEmployment2009}
 \end{quote}
 
 The ``single pool'' formulation is an important analytical simplification --- it lets Keynes model portfolio choice parsimoniously --- but it also discards the \treatise's insight that the money stock is itself an outcome of the credit creation process.
@@ -204,14 +204,14 @@ This is the \emph{cordon sanitaire}: speculative activity can expand the financi
 In the \GT{}, this separation is abandoned. The same money stock serves both the transactions and speculative motives, as the liquidity preference equation $M = L_1(Y) + L_2(r)$ makes clear. Now as these two motives draw on a common pool, any increase in speculative demand for money also presses on the rate of interest, which creates a link between speculation and the real economy:
 
 \begin{quote}
-It is by playing on the speculative-motive that monetary management (or, in the absence of management, chance changes in the quantity of money) is brought to bear on the economic system. \citep[p. 173]{Keynes.2018}
+It is by playing on the speculative-motive that monetary management (or, in the absence of management, chance changes in the quantity of money) is brought to bear on the economic system. \citep[p. 173]{keynesGeneralTheoryEmployment2009}
 \end{quote}
 
 However, Keynes acknowledges the simultaneous nature of the speculation---interest-rate nexus and, especially, the fact that speculation als has an impact of the rate of interest, without making this complex recursive structure explicit in this modeling setup.\footnote{The most straightforward way to express this in the framework of the \GT would be to state $M = M_Y + M_r = L_1(Y) + L_2(r(M_2))$, which makes the recursive character explicit and would invite a more explicit consideration of time as also found in the simple model shown in section \ref{sec:model}.}.
 However, this recursive structure is nonetheless decisive for understanding the feedback on macroeconomic dynamics as the interest rate also governs investment, and investment governs output and employment by means of the consumption multiplier. Hence, the channel from speculation to the real economy in the \GT explicitly runs through the cost of capital, not through balance-sheet crowding-out. And a famous passage from the \GT[Ch.~12] captures the \emph{normative} implication:
 
 \begin{quote}
-Speculators may do no harm as bubbles on a steady stream of enterprise. But the position is serious when enterprise becomes the bubble on a whirlpool of speculation. When the capital development of a country becomes a by-product of the activities of a casino, the job is likely to be ill-done. \citep[p. 139]{Keynes.2018}
+Speculators may do no harm as bubbles on a steady stream of enterprise. But the position is serious when enterprise becomes the bubble on a whirlpool of speculation. When the capital development of a country becomes a by-product of the activities of a casino, the job is likely to be ill-done. \citep[p. 139]{keynesGeneralTheoryEmployment2009}
 \end{quote}
 
 Speculation, hence, can harm enterprise and economic development, in the \GT{} framework, \textit{only through the rate of interest}. A more leveraged financial sector is fine as long as it does not shift the liquidity preference schedule too much so that productive investment is left unconstrained. In such a situation speculation is, strictly speaking, harmless. However, as soon as speculation may crowd out investment via higher interest rates this separation breaks and speculation can have \textit{real} consequences.\footnote{The rate of interest is thereby not the only possible dampening channel on investment. A key example for an alternative factor is that speculation provide an outside option for liquid individuals, who can directly substitute investment for speculative activity.}
@@ -325,12 +325,10 @@ more generally, debt taken is $s_0-s_1 r - s_2(AP-1)$: Speculative debt falls wi
 
 Buying assets shifts liquidity to their sellers. If a share $\gamma$ of each seller's receipts is used to purchase another asset within the same period, repeated transactions generate the multiplier $1/(1-\gamma)$ in Eq.~\ref{eq:ad}. Thus $AE$ measures gross nominal transactions - in contrast to either newly created bank debt ($SD$) or a physical stock of assets ($QA$).
 
-
-
 Equations~\ref{eq:sd}--\ref{eq:ap} form a simultaneous but linear feedback loop. Substitution gives the unique asset price
 \begin{equation}
   AP
-  =\frac{\left[ (1 - \gamma) + (s_0+s_2-s_1r)\right]}
+  =\frac{\left( s_0+s_2-s_1r\right)}
   {QA(1-\gamma) +s_2},
   \label{eq:linear-ap-solution}
 \end{equation}
@@ -385,17 +383,15 @@ In particular, speculative debt $SD$ now enters bank lending alongside productiv
 
 \section{Real economic impacts of financial speculation} \label{sec:real_impact}
 
-In this section we suggest different formulations that will break the 'cordon sanitaire' betwen industrial and financial circulation and, hence, allow speculation to affect real economic activity. We thereby move from the position of the \treatise{} as captured in section \ref{subsec:asset_market} to a formulation that combines this setup with the idea from the \GT{} that financial transmarkets also have an impact on the real economy. As indicated by table \ref{tab:typology} we thereby move from a rational reconstruction \citep{rortyHistoriographyPhilosophyFour1984} of the \treatise{} to a model rortyHistoriographyPhilosophyFour1984riographyPhilosophyFour1984ng the core intuition found in post-Keynesian (and large parts of heterodox economics).
+In this section we suggest different formulations that will break the 'cordon sanitaire' betwen industrial and financial circulation and, hence, allow speculation to affect real economic activity. We thereby move from the position of the \treatise{} as captured in section \ref{subsec:asset_market} to a formulation that combines this setup with the idea from the \GT{} that financial transmarkets also have an impact on the real economy. As indicated by table \ref{tab:typology} we thereby move from a rational reconstruction \citep{rortyHistoriographyPhilosophyFour1984} of the \treatise{} to a model representing the core intuition found in post-Keynesian (and large parts of heterodox economics).
 
 However, the relevant literature suggests that such interaction between real and financial sphere can be driven by different actors and, hence, different causal channels. In what follows we focus three such channels driven by three different actors. In the first of these the propensity of banks to provide credit for real investment is negatively affected by speculative alternatives mimicing a crowding-out effect in credit provision (section \ref{subsec:banks_ration}). In the second scenario, the central bank is responsive to the development of asset prices $AP$ in addition to the (conventional) price level $P$, which affects the lending rate and, hence, has an indirect impact investment \ref{subsec:central_bank}. Finally, the third scenario captures the idea of a financialization of firms (SOURCE) \ref{subsec:financialization}. In this setup, firms themselves condition their planned productive investment on asset prices taking into account speculative activities as a viable alternative to real investment, which similarly affects real activity \citep{stockhammerFinancialisationSlowdownAccumulation2004,stockhammerFinancialisationDebateTransdisciplinary2026}.
 
-
 As we will see in what follows these scenarios build on imposing some unilateral impact of financial markets on the real economy; however, developments in the real economy then inevitable feed back on financial markets, which indicates that breaking the cordon sanitaire between both spheres will quickly create non-trivial interactions that depend on the specific modeling setup.
-
 
 \subsection{The Credit Rationing Channel} \label{subsec:banks_ration}
 
-This channel builds on the intuition that credit provided for financial speculation might crowd out credit provided for real investment \citep{wolfsonPostKeynesianTheory1996a}, e.g. when the former provides higher expected returns or when the related collaterals are perceived as more secure and preferable (e.g. in real-estate). The probably most pronounced example for such an effect is the case of a credit crunch, where a sudden drop in confidence creates a tightening of lending conditions \citep[as in][]{kapellerDebtBoomBust2014}. However, we can also assume a more secular trend, where increased attractivity of speculation requires real investment to provide greater ``margins of safety'' \citep[][Ch. 8]{minskyStabilizingUnstableEconomy1986} and therey constrain access to external funding.
+This channel builds on the intuition that credit provided for financial speculation might crowd out credit provided for real investment \citep{wolfsonPostKeynesianTheory1996}, e.g. when the former provides higher expected returns or when the related collaterals are perceived as more secure and preferable (e.g. in real-estate). The probably most pronounced example for such an effect is the case of a credit crunch, where a sudden drop in confidence creates a tightening of lending conditions \citep[as in][]{kapellerDebtBoomBust2014}. However, we can also assume a more secular trend, where increased attractivity of speculation requires real investment to provide greater ``margins of safety'' \citep[][Ch. 8]{minskyStabilizingUnstableEconomy1986} and therey constrain access to external funding.
 
 A simple approach to model auch an impact is to partly endogenize the credit rationing parameter $c$ with an endogenous function of asset demand:
 
@@ -534,16 +530,20 @@ Although concrete dual interest policies are not (yet) a established instrument 
 
 The oldest archetype is margin regulation in the United States: since the Securities Exchange Act of 1934, the Federal Reserve's Regulation~T has capped the share of a securities purchase that may be financed with borrowed funds (currently 50\%), and margin loans are priced at a premium over base rates, so that credit for securities purchases carries a systematically higher effective cost than credit for production.
 
+%TODO: different storyline; see equation \ref{eq:i-ap} and the discussion in section \ref{subsec:central_bank}: here, the central bank reacts to asset prices by raising interest rates, which increases the cost of borrowing for both productive and speculative purposes. In contrast, a dual-rate policy would raise the cost of borrowing for speculative purposes only, leaving productive credit unaffected.
+
 China operates what is arguably the most explicit dual-rate system. Its banking system has long steered lending through a dual-track structure of policy and market rates \citep{heDualtrackInterestRates2012}, and under the mortgage-rate framework introduced in 2019, newly issued first-home mortgages faced a floor at the five-year LPR, while second-home mortgages faced a floor 60 basis points higher \citep{peoplesbankofchinaChinaReformIndividual2019}, i.e.\ a statutory $i_{AP}>1$.
 
 Finally, sectoral capital requirements operate as a de facto $i_{AP}>1$: Belgium, for instance, has required banks to hold a sectoral systemic risk buffer of up to 9\% of CET1 capital against their IRB exposures to Belgian residential real estate since May 2022 \citep{nationalbankofbelgiumIntroductionSectoralSystemic2023}, raising the capital cost of mortgage lending relative to corporate lending without touching the general policy rate. Agent-based studies of borrower-specific credit constraints document exactly the mechanism our model emphasizes: restricting the credit access of investors---rather than tightening all credit uniformly---yields the strongest reductions in debt and cyclical house-price dynamics \citep{tarneEffectBorrowerspecificLoantovalue2022,tarneRoofRealEstate2025}.
 
 
-Against this backdrop, we model the policy as follows. The productive rate $r$ is held unchanged.
-By contrast, the lending rate applicable to speculative asset purchases, $r_{AP}$, is assumed to
-be a constant multiple of $r$:
-\[ r_{AP} = i_{AP} r, \]
+Against this backdrop, we model the policy so that the interest premium from rising asset prices
+is only applied to loans for asset purchases, whereas the productive rate $r$ is held unchanged.
+This implies that the lending rate applicable to speculative asset purchases, $r_{AP}$, is greater
+than $r$, or more precisely,
+\[ r_{AP} - r = (1 + m) i_2 AP, \]
 where $i_{AP} > 1$ denotes the multiplier introduced through the regulatory policy.
+%TODO: Wenn wir bei der Gleichung bleiben, dann muss man auch den Text anpassen
 
 Speculative demand is therefore given as
 \begin{equation}
@@ -572,15 +572,15 @@ indicator $\psi$ falls from $0.10$ to $0.09$, while GDP stays constant.
 The mechanisms captured by our model variants are not merely theoretical artefacts. The period 2020--2023 provides a useful illustration of the real-financial nexus, although some of the empirical channels extend beyond the deliberately sparse teaching model.
 
 \paragraph{Quantitative easing and the ``everything rally.''}
-Between March 2020 and early 2022, the Federal Reserve purchased roughly \$1.33~trillion in mortgage-backed securities---nearly 90\% of the growth in eligible mortgages \citep{klein2025}. Combined with near-zero interest rates and comparable programmes at other major central banks, this produced what market participants called an ``everything rally'': equities, bonds, real estate, commodities, and crypto-assets all rose in synchrony \citep{ft2020everything, handwiki}. The Brookings Institution estimates that US home values rose by approximately \$100,000 on average, adding \$12~trillion in household equity and generating \$480--840~billion in additional consumption through the housing wealth effect \citep{klein2025}. The first part of this sequence is represented by Eqs.~\ref{eq:sd}--\ref{eq:ap}: a lower lending rate raises speculative debt, gross asset demand, and the asset price. The observed wealth effect is not present in the teaching variants, whose real feedbacks instead operate through credit rationing, the policy rate, or firms' investment demand; adding consumption out of wealth would require a further equation.
+Between March 2020 and early 2022, the Federal Reserve purchased roughly \$1.33~trillion in mortgage-backed securities---nearly 90\% of the growth in eligible mortgages \citep{kleinQuantitativeEasingHousing2025}. Combined with near-zero interest rates and comparable programmes at other major central banks, this produced what market participants called an ``everything rally'': equities, bonds, real estate, commodities, and crypto-assets all rose in synchrony \citep{wigglesworthEverythingRallyVaccines2020}. The Brookings Institution estimates that US home values rose by approximately \$100,000 on average, adding \$12~trillion in household equity and generating \$480--840~billion in additional consumption through the housing wealth effect \citep{kleinQuantitativeEasingHousing2025}. The first part of this sequence is represented by Eqs.~\ref{eq:sd}--\ref{eq:ap}: a lower lending rate raises speculative debt, gross asset demand, and the asset price. The observed wealth effect is not present in the teaching variants, whose real feedbacks instead operate through credit rationing, the policy rate, or firms' investment demand; adding consumption out of wealth would require a further equation.
 
 \paragraph{Monetary tightening and the ``crypto winter.''}
 When the Fed began raising rates in March 2022, the effect was felt immediately in the most leveraged corner of the financial circulation. An IMF study of the ``crypto cycle'' finds that a one-percentage-point rise in the shadow federal funds rate produces a persistent 0.15 standard-deviation decline in the common factor driving crypto-asset prices, with the entire market losing over \$1.7~trillion in value from its November 2021 peak \citep{cheCryptoCycleUS2023}. The authors attribute this to the risk-taking channel: tighter monetary policy raises the effective risk aversion of the marginal investor, who responds by deleveraging. This maps onto the asset block common to all variants: rising \(i \to\) rising \(r \to\) falling \(SD\) \(\to\) falling \(AE \to\) falling \(AP\). PQCr adds the reverse contemporaneous link, from \(AP\) to the policy rate, whereas PQCrDIFF strengthens the direct cost of speculative borrowing through \(r_{AP}=i_{AP}r\).
 
-The fact that the post-2020 correlation between crypto and equity markets rose sharply, and that the sensitivity of crypto prices to monetary policy became significant only after institutional investors entered the market \citep{cheCryptoCycleUS2023}, is also instructive. It suggests that the ``turnover multiplier'' \(1/(1-\gamma)\) advanced in our model is not a fixed structural parameter but a function of institutional participation---as more institutional investors trade crypto, the effective turnover rate \(\gamma\) rises, the multiplier increases, and the sensitivity of asset demand to changes in speculative debt grows.
+The fact that the post-2020 correlation between crypto and equity markets rose sharply, and that the sensitivity of crypto prices to monetary policy became significant only after institutional investors entered the market \citep{cheCryptoCycleUS2023}, is also instructive. It suggests that the ``turnover multiplier'' $1/(1-\gamma)$ advanced in our model is not a fixed structural parameter but a function of institutional participation. As more institutional investors trade crypto, the effective turnover rate $\gamma$ rises, the multiplier increases, and the sensitivity of asset demand to changes in speculative debt grows.
 
 \paragraph{The two-way street.}
-Our model emphasizes the arrow from monetary conditions to asset prices, but recent experience also illustrates the reverse: the housing wealth effect from QE generated additional consumption, contributing to the post-2021 inflation that forced the Fed to tighten in the first place \citep{klein2025}. This creates a closed loop that our static model cannot fully capture but that the dynamic extensions of the \texttt{PKAssetPrices} framework are designed to explore: easy money \(\to\) rising asset prices \(\to\) rising consumption \(\to\) inflation \(\to\) tighter money \(\to\) falling asset prices. Keynes's insight that the speculative motive connects financial and industrial circulations in \emph{both} directions is borne out by the data.
+Our model emphasizes the arrow from monetary conditions to asset prices, but recent experience also illustrates the reverse: the housing wealth effect from QE generated additional consumption, contributing to the post-2021 inflation that forced the Fed to tighten in the first place \citep{kleinQuantitativeEasingHousing2025}. This creates a closed loop that our static model cannot fully capture but that the dynamic extensions of the \texttt{PKAssetPrices} framework are designed to explore: easy money \(\to\) rising asset prices \(\to\) rising consumption \(\to\) inflation \(\to\) tighter money \(\to\) falling asset prices. Keynes's insight that the speculative motive connects financial and industrial circulations in \emph{both} directions is borne out by the data.
 
 \section{Conclusion}
 
