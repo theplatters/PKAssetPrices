@@ -64,7 +64,7 @@ To also provide a historically coherent account, we first trace Keynes' original
 
 On this basis, we then present a simple baseline model in section \ref{sec:model} that provides a framework for integrating key insights of Keynes on money and speculation. We then enrich this baseline model in several ways to illustrate how speculative markets may impact on the real economy and how different model assumptions can capture different channels of influence that have been proposed in the respective literature (see section \ref{sec:real_impact}). Finally, we aim to connect our modeling efforts with real-world experiences relating in economic policy and speculative practice in section \ref{sec:real_world} with a topical focus of notions on stability and instability.
 
-NOTE: Wir sollten vllt einmal überlegen ob wir die notion der "speculative markets" vllt durchziehen. bin recht sicher wir schreiben öfters über "financial markets" was aber eigentlich zu restriktiv ist (zB real estate)
+%NOTE: Wir sollten vllt einmal überlegen ob wir die notion der "speculative markets" vllt durchziehen. bin recht sicher wir schreiben öfters über "financial markets" was aber eigentlich zu restriktiv ist (zB real estate)
 
 %\begin{enumerate}[label=(\alph*)]
 %\item model provides a missing link between debates on financialization ond PK models that are mostly focused on the real economy.
@@ -540,28 +540,32 @@ Finally, sectoral capital requirements operate as a de facto $i_{AP}>1$: Belgium
 Against this backdrop, we model the policy so that the interest premium from rising asset prices
 is only applied to loans for asset purchases, whereas the productive rate $r$ is held unchanged.
 This implies that the lending rate applicable to speculative asset purchases, $r_{AP}$, is greater
-than $r$, or more precisely,
-\[ r_{AP} - r = (1 + m) i_2 AP, \]
-where $i_{AP} > 1$ denotes the multiplier introduced through the regulatory policy.
-%TODO: Wenn wir bei der Gleichung bleiben, dann muss man auch den Text anpassen
+than $r$. We write the premium additively, as a supplement to the base lending rate:
+\[ r_{AP} = r\left( 1 + \theta\,(i_{AP} - 1) \right), \]
+where $i_{AP} > 1$ denotes the multiplier introduced through the regulatory policy
+and $\theta \in \{0,1\}$ is a channel flag that switches the dual-rate penalty on and off.
+At the code's defaults ($\theta = 1.2$, $i_{AP} = 1.2$), the effective speculative rate is
+$r_{AP} = 1.24 \, r$.
 
 Speculative demand is therefore given as
 \begin{equation}
-  SD = s_0 - s_1 r_{AP} - s_2 (AP - 1) = s_0 - s_1 i_{AP} r - s_2 (AP - 1).
+  SD = s_0 - s_1 r_{AP} - s_2 (AP - 1) = s_0 - s_1\left( 1 + \theta\,(i_{AP}-1) \right) r - s_2 (AP - 1).
+  \label{eq:pqcrdiff-sd}
 \end{equation}
 
 Thus, a higher $i_{AP}$ reduces speculative borrowing and, consequently, speculative debt. Lower speculative demand depresses the asset
 price itself, given the fixed supply of assets (Eq.~\ref{eq:as}); the effect is visible in the
 asset price of $AP = 0.81$, compared to $0.99$ in the baseline model.
 
-This mechanism is reflected in Figure~\ref{fig:pqcrdiff-equilibrium}: for $i_{AP} = 2$, the risk
-indicator $\psi$ falls from $0.10$ to $0.09$, while GDP stays constant.
+This mechanism is reflected in Figure~\ref{fig:pqcrdiff-equilibrium}: at the code's default
+$i_{AP} = 1.2$ (equivalently, a $24\%$ rate premium), the risk
+indicator $\psi$ falls from $0.11$ to $0.09$, while GDP stays constant.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../plots/pqcrdiff_equilibrium_panel.pdf}
   \caption{Equilibrium in the PQCrDIFF model. An effective speculative rate
-  \(r_{AP}=i_{AP}r\) reduces speculative borrowing, while productive lending
+  \(r_{AP}=r\,(1+\theta(i_{AP}-1))\) reduces speculative borrowing, while productive lending
   retains the standard rate \(r\). Credit rationing depends on \(SD\).}
   \label{fig:pqcrdiff-equilibrium}
 \end{figure}

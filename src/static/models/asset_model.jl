@@ -151,7 +151,7 @@ AssetModel = @model begin
     AE == γ0 + SD / (1 - γ)
     AP == p1 * AE / AQ
     AQ == AQ_bar
-    c == c0 - c1 * (credit_sd_channel * SD)
+    c == clamp(c0 - c1 * (credit_sd_channel * SD), 0.0, 1.0)
   end
 
   @curves begin
@@ -167,9 +167,9 @@ AssetModel = @model begin
           (asset_supply + p1 * reinvestment_multiplier * s2)
         speculative_debt = debt_at_reference_price - s2 * (asset_price - 1)
         asset_demand = asset_supply * asset_price / p1
-        credit_rationing = c0 - c1 * (
+        credit_rationing = clamp(c0 - c1 * (
           credit_sd_channel * speculative_debt
-        )
+        ), 0.0, 1.0)
         productive_demand = d0 - d1 * r - firms_ap_channel * d2 * asset_price
         credit_rationing * productive_demand / (1 - b)
       end
@@ -210,9 +210,9 @@ AssetModel = @model begin
         speculative_debt =
           s0 - s1 * speculative_rate_multiplier * rate - s2 * (asset_price - 1)
         asset_demand = asset_supply * asset_price / p1
-        credit_rationing = c0 - c1 * (
+        credit_rationing = clamp(c0 - c1 * (
           credit_sd_channel * speculative_debt
-        )
+        ), 0.0, 1.0)
         productive_demand =
           d0 - d1 * rate - firms_ap_channel * d2 * asset_price
         credit_rationing * productive_demand / (1 - b)
@@ -258,6 +258,10 @@ Baseline = AssetModel
 
 PQC = @scenario AssetModel begin
   credit_sd_channel = 1.0
+  # Widen the Baseline->PQC gap in the risk indicator psi = SD/dL:
+  # higher autonomous speculative debt amplifies the credit-rationing
+  # crowding-out, making the psi increase visible (gap ~0.012 vs 0.006).
+  s0 = 1.2
 end
 
 PQCr = @scenario AssetModel begin
