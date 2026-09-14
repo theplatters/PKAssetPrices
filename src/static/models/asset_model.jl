@@ -258,10 +258,6 @@ Baseline = AssetModel
 
 PQC = @scenario AssetModel begin
   credit_sd_channel = 1.0
-  # Widen the Baseline->PQC gap in the risk indicator psi = SD/dL:
-  # higher autonomous speculative debt amplifies the credit-rationing
-  # crowding-out, making the psi increase visible (gap ~0.012 vs 0.006).
-  s0 = 1.2
 end
 
 PQCr = @scenario AssetModel begin

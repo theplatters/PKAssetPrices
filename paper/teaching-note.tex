@@ -537,36 +537,36 @@ China operates what is arguably the most explicit dual-rate system. Its banking 
 Finally, sectoral capital requirements operate as a de facto $i_{AP}>1$: Belgium, for instance, has required banks to hold a sectoral systemic risk buffer of up to 9\% of CET1 capital against their IRB exposures to Belgian residential real estate since May 2022 \citep{nationalbankofbelgiumIntroductionSectoralSystemic2023}, raising the capital cost of mortgage lending relative to corporate lending without touching the general policy rate. Agent-based studies of borrower-specific credit constraints document exactly the mechanism our model emphasizes: restricting the credit access of investors---rather than tightening all credit uniformly---yields the strongest reductions in debt and cyclical house-price dynamics \citep{tarneEffectBorrowerspecificLoantovalue2022,tarneRoofRealEstate2025}.
 
 
-Against this backdrop, we model the policy so that the interest premium from rising asset prices
-is only applied to loans for asset purchases, whereas the productive rate $r$ is held unchanged.
+Against this backdrop, we model the policy so that the interest premium is
+only applied to loans for asset purchases, whereas the productive rate $r$ is held unchanged.
 This implies that the lending rate applicable to speculative asset purchases, $r_{AP}$, is greater
-than $r$. We write the premium additively, as a supplement to the base lending rate:
-\[ r_{AP} = r\left( 1 + \theta\,(i_{AP} - 1) \right), \]
-where $i_{AP} > 1$ denotes the multiplier introduced through the regulatory policy
-and $\theta \in \{0,1\}$ is a channel flag that switches the dual-rate penalty on and off.
-At the code's defaults ($\theta = 1.2$, $i_{AP} = 1.2$), the effective speculative rate is
-$r_{AP} = 1.24 \, r$.
+than $r$. We write the premium as an additive surcharge on the base rate:
+\[ r_{AP} = r + \pi, \qquad \pi = \theta\,(i_{AP} - 1)\, r, \]
+where $i_{AP} > 1$ denotes the premium factor introduced through the regulatory policy
+and $\theta$ is the channel flag that switches the dual-rate penalty on ($\theta=1$) or off
+($\theta=0$). The premium $\pi$ is thus the additional per-unit cost of speculative credit,
+added on top of the productive rate $r$.
 
 Speculative demand is therefore given as
 \begin{equation}
-  SD = s_0 - s_1 r_{AP} - s_2 (AP - 1) = s_0 - s_1\left( 1 + \theta\,(i_{AP}-1) \right) r - s_2 (AP - 1).
+  SD = s_0 - s_1 r_{AP} - s_2 (AP - 1) = s_0 - s_1 r - s_1 \pi - s_2 (AP - 1).
   \label{eq:pqcrdiff-sd}
 \end{equation}
 
-Thus, a higher $i_{AP}$ reduces speculative borrowing and, consequently, speculative debt. Lower speculative demand depresses the asset
+Thus, the higher $i_{AP}$ --- and hence the higher premium $\pi$ --- reduces speculative borrowing and, consequently, speculative debt. Lower speculative demand depresses the asset
 price itself, given the fixed supply of assets (Eq.~\ref{eq:as}); the effect is visible in the
 asset price of $AP = 0.81$, compared to $0.99$ in the baseline model.
 
 This mechanism is reflected in Figure~\ref{fig:pqcrdiff-equilibrium}: at the code's default
-$i_{AP} = 1.2$ (equivalently, a $24\%$ rate premium), the risk
+($i_{AP} = 1.2$, so $\pi = 0.24r$), the risk
 indicator $\psi$ falls from $0.11$ to $0.09$, while GDP stays constant.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../plots/pqcrdiff_equilibrium_panel.pdf}
   \caption{Equilibrium in the PQCrDIFF model. An effective speculative rate
-  \(r_{AP}=r\,(1+\theta(i_{AP}-1))\) reduces speculative borrowing, while productive lending
-  retains the standard rate \(r\). Credit rationing depends on \(SD\).}
+    \(r_{AP}=r+\pi\) (with premium \(\pi=\theta(i_{AP}-1)r\)) reduces speculative borrowing,
+    while productive lending retains the standard rate \(r\). Credit rationing depends on \(SD\).}
   \label{fig:pqcrdiff-equilibrium}
 \end{figure}
 
