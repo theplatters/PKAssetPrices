@@ -2,14 +2,15 @@
 title: "Working-Paper Readiness Report: Keynes on speculation and endogenous money (teaching note)"
 author: "Hermes (statistics profile)"
 date: "2026-09-13"
-tags: [review, working-paper, PKAssetPrices, teaching-note, v2]
+tags: [review, working-paper, PKAssetPrices, teaching-note, v3]
 project: "PKAssetModel / MoneyModel PKAssetPrices"
 ---
 
+**Version 3** \textcolor{revisionV2}{(2026-09-13)}
 **Version 2** \textcolor{revisionV1}{(2026-09-13)}
 **Version 1** (2026-09-13)
 
-> \textcolor{revisionV1}{This version supersedes v1. All changes relative to v1 are marked in purple.}
+> \textcolor{revisionV2}{This version supersedes v2. Version 3 confirms **EJHET** as the target, stays with the static model, and records a decision to add a gamma-impact application (turnover multiplier) as the theoretical vehicle. Changes relative to v2 are marked in dark orange.}
 
 This report focuses on **what is missing for a complete working-paper (WP) version** of
 the teaching note `paper/teaching-note.tex`. It is the deliverable of steps (1)-(5) of
@@ -36,11 +37,17 @@ Recommendation (unchanged from the July-11 assessment): **IJPEE is the right hom
 would require the formalised "turnover multiplier" and a working dynamic model, neither of
 which is present.
 
-\textcolor{revisionV1}{\textbf{Outlet evaluation added (EJHET vs IJPEE).} The European Journal of the History of Economic Thought (EJHET; T\&F, IF ~0.32, Q4) is a history-of-economic-thought journal whose remit is textual and historical scholarship. EJHET would reward the Treatise/GT framing, the 2x2 typology and the deposit-classification reconstruction, but not the teaching apparatus, staged model variants or code. IJPEE (Inderscience economics-education) advertises exactly the pluralist-pedagogy material this note delivers, and the Julia code/dashboard are an asset there. \textbf{Verdict: IJPEE remains primary; EJHET is viable only if the paper is re-aimed as an historical essay} (park the model variants and code, foreground the textual reconstruction) --- a substantial rescale, not a light edit. JPKE stays a later target requiring the formalised turnover multiplier and a working dynamic model. Full evaluation in the section below.}
+\textcolor{revisionV1}{\textbf{Outlet evaluation added (EJHET vs IJPEE).} The European Journal of the History of Economic Thought (EJHET; T\&F, IF $\approx$ 0.32, Q4) is a history-of-economic-thought journal whose remit is textual and historical scholarship. EJHET would reward the Treatise/GT framing, the 2x2 typology and the deposit-classification reconstruction, but not the teaching apparatus, staged model variants or code. \textbf{Verdict (v2): IJPEE remains primary; EJHET is viable only if the paper is re-aimed as an historical essay, a substantial rescale.}}
+
+\textcolor{revisionV2}{\textbf{Version 3 decision: EJHET is confirmed as the target, and the rescale that v2 flagged as the condition for EJHET is now accepted in scope --- but in a form that keeps the (static) model central.} Rather than parking the model and code to foreground history-of-thought alone, the plan is to keep the static model and \textbf{add one additional application that isolates the impact of the turnover parameter $\gamma$} (the $1/(1-\gamma)$ multiplier that turns new speculative credit into gross asset expenditure). \textbf{This is the element that carries the theoretical contribution for EJHET:} it formalises, in one static extension, the Treatise idea that the financial circulation can be a multiple of net money creation --- and it connects directly to the empirical gross-vs-net trading-volume literature. The paper keeps its HET framing (Treatise vs. GT, 2x2 typology) while making the formalisation, not just the pedagogy, the result.}
+
+\textcolor{revisionV2}{\textbf{New theoretical payoff (to be written in):} the model delivers a two-by-two classification of how breaking the cordon sanitaire affects the economy, by ``who'' reacts. Simulated channels split cleanly into two private and two public responses: \textbf{PQC (banks ration credit as $SD$ rises) and FirmsRation (financialised firms divert investment) both \emph{raise} asset prices and the share of speculative money $\psi$}; \textbf{PQCr (central bank targets $AP$) and PQCrDIFF (dual-rate penalty) both \emph{lower} them.} Whether speculation is amplified or dampened therefore depends on the mechanism, not on the fact of feedback --- a clean, defensible theoretical claim for EJHET.}
 
 # Outlet evaluation: EJHET vs IJPEE
 
-\textcolor{revisionV1}{\textbf{EJHET} publishes historical analysis of economic ideas, interdisciplinary HET, contextualisation of theory, and methodological innovation in HET; it is pluralist/non-partisan but not education-focused. What it would reward: the Treatise-vs-General Theory framing, the 2x2 typology, and the rational reconstruction of the deposit classification (industrial vs financial circulation). What it would not reward: the teaching frame, the staged variants, the balance-sheet tables, and the policy section --- all outside its historical remit. \textbf{IJPEE} publishes pluralist economics pedagogy (classroom exercises, pedagogical techniques); the staged architecture, reproducible Julia code and risk-indicator/turnover pedagogy fit its advertised scope, and code/tooling is a selling point. \textbf{Recommendation:} IJPEE primary; EJHET only if the paper is re-aimed as an HET essay (model and code moved to an appendix/repository, teaching framing dropped).}
+\textcolor{revisionV1}{\textbf{EJHET} publishes historical analysis of economic ideas, interdisciplinary HET, contextualisation of theory, and methodological innovation in HET; it is pluralist/non-partisan but not education-focused. What it would reward: the Treatise-vs-General Theory framing, the 2x2 typology, and the rational reconstruction of the deposit classification (industrial vs financial circulation). What it would not reward: the teaching frame, the staged variants, the balance-sheet tables, and the policy section --- all outside its historical remit. \textbf{IJPEE} publishes pluralist economics pedagogy (classroom exercises, pedagogical techniques); the staged architecture, reproducible Julia code and risk-indicator/turnover pedagogy fit its advertised scope, and code/tooling is a selling point. \textbf{Recommendation (v2):} IJPEE primary; EJHET only if the paper is re-aimed as an HET essay (model and code moved to an appendix/repository, teaching framing dropped).}
+
+\textcolor{revisionV2}{\textbf{Version 3 decision (EJHET confirmed).} The target is now \textbf{EJHET}, and the v2 "rescaling" condition is met --- but \emph{keeping the static model central}. Concretely, the planned EJHET submission: (1) retains the HET framing (Treatise vs. GT, 2x2 typology, deposit-classification reconstruction) as the expositional spine; (2) keeps the static model rather than the dashboards / dynamic extensions; and (3) \textbf{adds one application isolating the turnover parameter $\gamma$} --- the $1/(1-\gamma)$ multiplier that converts new speculative credit into gross asset expenditure. This gamma-application is the EJHET-appropriate theoretical contribution (a formal reconstruction of the Treatise's financial-circulation/velocity insight), and it connects to the empirical gross-vs-net trading-volume literature as a bridge. The two-private / two-public channel split (Section~1) is a second, model-internal theoretical payoff of the same submission.}
 
 # What the static manuscript depends on (scope)
 
@@ -83,7 +90,7 @@ depot). The code's parameters are `s0 = 0.836089551258839`, `s1 = 4.0`, `s2 = 0.
 | PQCrDIFF | base / alt | 0.8143 | 0.3176 | 6.566 | 0.8000 | 0.1120 | 0.0882 |
 | FirmsRation | base / alt | 1.0258 | 0.4001 | 5.8006 | 0.8000 | 0.1077 | 0.1212 |
 
-\textcolor{revisionV1}{Raising PQC \texttt{s0} to \texttt{1.2} lifts \texttt{SD} (0.393 -> 0.637) and \texttt{AP} (1.008 -> 1.632), lowers \texttt{c} (0.761 -> 0.736) and output (6.264 -> 6.076), and raises \texttt{psi} to 0.1732 (a delta of ~0.062) --- which would make the Baseline->PQC \texttt{psi} gap clearly visible. \textbf{This was tested and then reverted:} the working tree is back at the base \texttt{s0 = 0.836} (PQC \texttt{psi = 0.1115}), and the figures are regenerated from the base spec. The \texttt{s0 = 1.2} column is thus retrospective documentation of a tried-but-reverted alternative, included so the report records what was examined.}
+\textcolor{revisionV1}{Raising PQC \texttt{s0} to \texttt{1.2} lifts \texttt{SD} (0.393 -> 0.637) and \texttt{AP} (1.008 -> 1.632), lowers \texttt{c} (0.761 -> 0.736) and output (6.264 -> 6.076), and raises \texttt{psi} to 0.1732 (a delta of $\approx$ 0.062) --- which would make the Baseline->PQC \texttt{psi} gap clearly visible. \textbf{This was tested and then reverted:} the working tree is back at the base \texttt{s0 = 0.836} (PQC \texttt{psi = 0.1115}), and the figures are regenerated from the base spec. The \texttt{s0 = 1.2} column is thus retrospective documentation of a tried-but-reverted alternative, included so the report records what was examined.}
 
 ## Status of reported numbers
 
@@ -97,7 +104,7 @@ depot). The code's parameters are `s0 = 0.836089551258839`, `s1 = 4.0`, `s2 = 0.
 
 \textcolor{revisionV1}{\textbf{Revisiting the three items v1 listed:} the first two are \textbf{resolved}, as verified this revision; only the third (comments) remains open as a WP-readiness cleanup, and it is cosmetic rather than scientific.}
 
-1. \textcolor{revisionV1}{\textbf{Closed-form Eq.~(5) (\texttt{teaching-note.tex:332}) -- RESOLVED (verified correct).} The file contains \texttt{AP = (s\_0+s\_2-s\_1 r)/[QA(1-\gamma)+s\_2]}, which with the real parameters evaluates to \texttt{AP = 0.99656}, matching the compiled model. The v1 claim of an algebraically wrong closed form (giving ~1.84, from a formula with an extra \texttt{(1-\gamma)} in the numerator) does not match the current text. No fix needed.}
+1. \textcolor{revisionV1}{\textbf{Closed-form Eq.~(5) (\texttt{teaching-note.tex:332}) -- RESOLVED (verified correct).} The file contains \texttt{AP = (s\_0+s\_2-s\_1 r)/[QA(1-\gamma)+s\_2]}, which with the real parameters evaluates to \texttt{AP = 0.99656}, matching the compiled model. The v1 claim of an algebraically wrong closed form (giving $\approx$ 1.84, from a formula with an extra \texttt{(1-\gamma)} in the numerator) does not match the current text. No fix needed.}
 2. \textcolor{revisionV1}{\textbf{Dual-interest-rate prose equation (\texttt{teaching-note.tex:540-562}) -- RESOLVED (rewritten additively).} Section 5.1 now writes the premium purely additively: \texttt{r\_{AP} = r + \pi} with \texttt{\pi = \theta(i\_{AP}-1)r}, and \texttt{SD = s\_0 - s\_1 r - s\_1 \pi - s\_2(AP-1)}. There is no multiplicative framing (\texttt{i\_{AP}r}, "24\% rate premium", etc.) anywhere in the section or its figure caption. At \texttt{i\_{AP}=1.2} this reproduces \texttt{AP=0.81}, \texttt{\psi 0.11\to0.09}, GDP constant.}
 3. **Unclipped $c$ (formerly open) -- RESOLVED in code.** \textcolor{revisionV1}{The rule \texttt{c = c\_0 - c\_1 SD} is now wrapped in \texttt{clamp(..., 0, 1)} in both the equation and the IS/ADc curve blocks (\texttt{asset\_model.jl}), so \texttt{0 \le c \le 1} holds by construction. At PQC \texttt{c = 0.7607}, inside the range. The "parameter-space note" v1 asked for is therefore obsolete at the code level; a one-line statement in the paper that \texttt{c} is clipped would close it in the text.}
 
@@ -145,11 +152,11 @@ Beyond fixing errors, the following content is needed for a complete WP. \textco
 
 The assessment (`paper/AI-assessment-July11.txt`) remains largely live:
 
-- **IJPEE target:** still the right call given the current scope. \textcolor{revisionV1}{Cross-checked against EJHET this revision; see the outlet-evaluation section.}
+- **IJPEE target:** still the right call given the current scope. \textcolor{revisionV1}{Cross-checked against EJHET this revision; see the outlet-evaluation section.} \textcolor{revisionV2}{\textbf{Revised for v3: the target is now EJHET.} The static model is retained and given one additional application (the gamma/turnover application) rather than being parked. See Section~1 and the outlet-evaluation section.}
 - **Turnover multiplier as the JPKE lever:** still the single biggest missing theoretical
   contribution. The note references $\gamma$ and the $1/(1-\gamma)$ multiplier (lines 339,
   580) but does not formalise it as a derived "turnover multiplier" analogous to the income
-  multiplier. Live recommendation.
+  multiplier. \textcolor{revisionV1}{Live recommendation.} \textcolor{revisionV2}{\textbf{Reframed for v3 / EJHET:} rather than waiting for the (absent) dynamic model, the turnover multiplier is now promoted into the static EJHET submission as a dedicated application. Its novelty as an \emph{exact formal ingredient} (credit-finance + reinvestment loop $AE = SD/(1-\gamma)$) is assessed as defensible ($\approx$70\% confidence it is unformalised elsewhere as a macro multiplier); the concept itself has deep lineage (Keynes's Treatise, Minsky's leverage, resale-turnover work), so the paper should both credit that lineage and pre-empt the "just velocity" objection by connecting $\gamma$ to the empirical gross-vs-net trading-volume gap. Full discussion in \texttt{paper/turnover-multiplier-novelty.md}.}
 - **Dynamic model completeness:** correctly identified as incomplete; the repo's dynamic
   part is still a sketch. Live.
 - **SFC / Minsky / financialization literature:** the citations are present
@@ -177,14 +184,20 @@ Should fix for a complete WP:
 5. Add a one-paragraph limitations note on the ad-hoc asset pricing.
 6. Add the endogenising-$\alpha$ subsection to the dynamic track, or state explicitly that it stays future work. \textcolor{revisionV1}{(Re-added to the list in v2.)}
 
+\textcolor{revisionV2}{\textbf{Version 3 / EJHET-specific (added v3):}}
+
+7. \textcolor{revisionV2}{\textbf{Add the gamma/turnover application} to the static model: one section that isolates the $1/(1-\gamma)$ multiplier (gross asset expenditure from new speculative credit), so the turnover parameter becomes the EJHET-appropriate theoretical contribution. Anchor it to the Treatise's financial-circulation/velocity idea and pre-empt the "just velocity" objection via the gross-vs-net trading-volume empirical bridge. (\texttt{paper/turnover-multiplier-novelty.md} is the working draft.)}
+8. \textcolor{revisionV2}{\textbf{Write in the two-private / two-public channel-split paragraph} (PQC \& FirmsRation raise asset prices and $\psi$; PQCr \& PQCrDIFF lower them) --- a model-internal theoretical payoff that strengthens the EIHT contribution. See Section~1.}
+
 Nice to have (post-WP / JPKE path):
 
-7. Formalise the turnover multiplier as a derived result.
-8. Deepen engagement with the financialization/SFC/Minsky literature in section 3.
-9. Promote the dynamic model from sketch to result only in a follow-up paper.
+9. Formalise the turnover multiplier as a derived result. \textcolor{revisionV2}{(Now partially absorbed into the EJHET gamma-application; the fully dynamic formalisation remains a later JPKE target.)}
+10. Deepen engagement with the financialization/SFC/Minsky literature in section 3.
+11. Promote the dynamic model from sketch to result only in a follow-up paper.
 
-\textcolor{revisionV1}{\textbf{Working-tree notes (v2):} the compiled model is reverted to the base specification (\texttt{s0 = 0.836}); the \texttt{s0 = 1.2} PQC values are retrospective. Regenerated figures reflect the base spec. The \texttt{Manifest.toml} is the 1.12.7 content; cleaner version-numbered manifests (\texttt{Manifest-1.12.1.toml}, \texttt{Manifest-1.12.7.toml}) are available. All figures were regenerated under Julia 1.12.7 (warm depot).}
+Working-tree notes \textcolor{revisionV1}{(v2)}: the compiled model is reverted to the base specification (\texttt{s0 = 0.836}); the \texttt{s0 = 1.2} PQC values are retrospective. Regenerated figures reflect the base spec. The \texttt{Manifest.toml} is the 1.12.7 content; cleaner version-numbered manifests (\texttt{Manifest-1.12.1.toml}, \texttt{Manifest-1.12.7.toml}) are available. All figures were regenerated under Julia 1.12.7 (warm depot). \textcolor{revisionV2}{\textbf{v3 note:} the EJHET target keeps the static model; the gamma-application and the two-private/two-public channel split are the two additions to bring in. No change to the replicated numbers.}
 ## Revision Log
 
 - **Version 1** (2026-09-13) --- Original five-step readiness report (scope, numerical verification, citations, authoring gaps, July-11 assessment review, action list).
 - **Version 2** \textcolor{revisionV1}{(2026-09-13)} --- Verifies that the citation/reference errors and the garbled string reported in v1 are already resolved; verifies the closed-form Eq.~(5) is algebraically correct; rewrites section 5.1 so the dual-rate premium is expressed purely additively; implements c-clipping in the code; adds an EJHET outlet evaluation; documents a test of PQC `s0 = 1.2` (later reverted); collapses the citations and authoring-gap sections; folds in TODOs/NOTEs from the tex; re-adds the endogenising-`alpha` item as a suggestion.
+- **Version 3** \textcolor{revisionV2}{(2026-09-13)} --- Confirms **EJHET** as the target (staying with the static model); records the decision to add a **gamma/turnover application** as the EJHET-appropriate theoretical contribution (with novelty assessment and gross-vs-net trading-volume bridge, per `paper/turnover-multiplier-novelty.md`); marks the two-private / two-public channel-split as a second model-internal payoff; updates the action list with the two new additions.
