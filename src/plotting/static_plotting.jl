@@ -19,6 +19,7 @@ const BALANCE_SECTOR_GAP = 1.0
 
 # These figures are included at `\textwidth` in `paper/teaching-note.tex`.
 const FIGURE_FONT_SIZE = 20
+const FIGURE_TITLE_SIZE = 30
 const AXIS_TITLE_SIZE = 26
 const AXIS_LABEL_SIZE = 20
 const LEGEND_LABEL_SIZE = 20
@@ -90,8 +91,12 @@ end
 """
 Plot the IS and interest-rate-rule curves on the presentation range.
 
-A subdued counterfactual IR curve shows the effect of multiplying the
-autonomous policy rate by `lower_i0_factor`.
+A dashed counterfactual IR curve shows the effect of multiplying the
+autonomous policy rate by `lower_i0_factor` (pass `nothing` to hide it).
+`counterfactual` accepts any alternative specification — a solved
+`Static.Solution`, a `Static.Parametrization`, a `Real` lower-i₀ factor, or
+`AbstractDict`/`NamedTuple` parameter overrides — resolved against `sol.model`
+and drawn as dotted IS/IR curves.
 """
 function plot_is_lm(
   sol::Static.Solution,
