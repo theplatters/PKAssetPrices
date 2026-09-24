@@ -243,8 +243,6 @@ Against this backdrop we would suggest to rewrite equations \ref{eq:simple_y} in
   D &= I_P = d_0 - d_1 r \label{eq:teaching_d},
 \end{align}
 
-%NOTE: Sollen wir der Einfachheit halber das Goods Market I weggeben und nur in einer Fußnote erwähnen?
-
 to better align the presentation with conventional notation and assumptions typically employed in Keynesian-style models.
 This applies especially to the idea that consumption is governed by comparatively constant behavioral patterns (see equation \ref{eq:teaching_nd}), while investment is guided by animal spirits and speculative markets conditions.
 In the above setup, the latter enter via $r$ as a general constraint and $c$, which depends on the portfolio choices of the banking sector as well as the solvency of potential borrowers.\footnote{In Minskyan terms, $c$ can be interpreted as a reduced-form representation of borrower's and lender's risk, which constrain the volume of debt-financed investment \parencite[Ch.~8]{minskyStabilizingUnstableEconomy1986}. While $c$ is taken as given in the baseline model, Section~\ref{subsec:banks_ration} subsequently endogenizes it with respect to asset demand. The model nevertheless remains static and therefore does not capture the intertemporal transition from hedge to speculative and Ponzi finance central to Minsky's financial instability hypothesis \parencite{minskyFinancialInstabilityHypothesis1992}.}
@@ -363,9 +361,6 @@ with loans creating deposits one-for-one ($dM=dL$), $\mu$ measures the flow of n
   \label{fig:baseline-equilibrium}
 \end{figure}
 
-
-%TODO: (2) in den captions genau ausweisen, was die underlying definitions für die closures sind. eventuell sollte man auch die fixe zuordnung der neuen deposits aufheben und das flexibel über households und firms schreiben. aber dann bricht die klare definition... (eventuell dazu mal in den gelöschten slop-text schauen) --> UPDATE: DAZU HABE ICH EIGENTLICH WAS GEMACHT; EVENTUELL IS ES ERLEDIGT...
-% Vielleicht können wir darüber reden
 
 %NOTE: eventuell auch mal hier reinschauen: https://www.tandfonline.com/doi/full/10.1080/09538259.2025.2484594
 
@@ -591,20 +586,18 @@ The recent empirical record---from the everything rally of 2020--2021 to the cry
 
 This parsimony is itself a pedagogical lesson: large theoretical differences can turn on small structural assumptions. The space of possibilities defined by our four cells also reminds us that the choice between the \treatise{} and the \GT{} is not forced---a third position (our bottom-right) combines the descriptive richness of the former with the causal mechanism of the latter, and is arguably the most adequate framework for understanding the contemporary world.
 
-Dynamic or experimental specifications that endogenize turnover are outside the model presented here and are not used for
-the equilibrium figures or comparative claims in this note.
-Such dynamic models would allow for a greater variety of behavioral assumptions such as differentiating between the price level and the change in price when determining asset demand 
-$$
-SD_t = s_0 - s_1  r - s_2 * AP_{t - 1} + s_3 \frac{AP_{t - 1} - AP_{t - 2}}{AP_{t - 2}}.
-$$
-
-Furthermore such a model could incorporate a complete Taylor rule, using changes in GDP, for setting the policy rate. 
-
-Another path of extending the model could be to endogenize the asset supply.
-A possible rule could be
-$$ QA = (\alpha + g_a) AS.$$
-The turnover share \(\alpha\) would depend on the asset market, while $AS$, the asset supply, and \(g_a\) the asset creation rate are fixed parameters.
-
+Dynamic specifications that endogenize turnover are outside the scope of the model presented here. Accordingly, the equilibrium figures and comparative claims in this note are based on a static asset-demand specification. A dynamic extension would, however, permit a broader range of behavioral assumptions. In particular, asset demand could distinguish between the price level and price growth, for example through
+\[
+SD_t
+= s0 - s1 r - s2 AP{t-1}
+- s3 \frac{AP{t-1}-AP_{t-2}}{AP_{t-2}}.
+\]
+In this specification, the lagged price level and its growth rate have separate effects on asset demand.
+A further extension would be to introduce a more complete Taylor rule, allowing the policy rate to respond not only to price stability but also to GDP growth. Alternatively, asset supply could be endogenized. One possible rule would be
+\[
+QA = (\alpha + g_a)AS,
+\]
+where the turnover share \(\alpha\) would be determined by conditions in the asset market, while the asset supply \(AS\) and the asset-creation rate \(g_a\) would remain fixed parameters.
 \printbibliography
 
 \end{document}
