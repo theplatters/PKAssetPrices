@@ -55,7 +55,7 @@ const STANDARD_IS_IR_LABELS = Dict(
     ),
     "IR" => LabelSpec((0.88, 0.88); space = :relative, align = (:right, :top)),
     "IR (lower i₀)" => LabelSpec(
-        (0.88, 0.72);
+        (0.88, 0.52);
         space = :relative,
         align = (:right, :top),
     ),
@@ -77,7 +77,7 @@ const IS_IR_LABELS_WITH_TEXTLABEL = Dict(
     ),
     "IR" => LabelSpec((0.88, 0.88); space = :relative, align = (:right, :top)),
     "IR (lower i₀)" => LabelSpec(
-        (0.88, 0.72);
+        (0.88, 0.52);
         space = :relative,
         align = (:right, :top),
         textlabel = true,
@@ -135,7 +135,7 @@ const STANDARD_ASSET_MARKET_LABELS = Dict(
         align = (:right, :top),
     ),
     "Asset Demand\n(base)" => LabelSpec(
-        (0.42, 0.08);
+        (0.78, 0.40);
         space = :relative,
         align = (:center, :bottom),
     ),
@@ -159,7 +159,7 @@ const ASSET_MARKET_LABELS_WITH_TEXTLABEL = Dict(
         align = (:right, :top),
     ),
     "Asset Demand\n(base)" => LabelSpec(
-        (0.42, 0.08);
+        (0.78, 0.40);
         space = :relative,
         align = (:center, :bottom),
     ),

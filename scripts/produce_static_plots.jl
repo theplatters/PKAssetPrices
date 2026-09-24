@@ -134,8 +134,8 @@ function (@main)(ARGS)
   pqcrdiff_label_positions = (
     is_ir=Dict(
       "IS" => (0.25, 8 / 9),
-      "IR" => (7 / 12, 905 / 100),
-      "IR (lower i₀)" => (53 / 60, 75 / 100),
+      "IR" => (7 / 12, 90.5 / 100),
+      "IR (lower i₀)" => (53 / 60, 52 / 100),
       "IS (base)" => (0.55, 1 / 6),
     ),
     ad_as=Dict(
@@ -148,11 +148,11 @@ function (@main)(ARGS)
       "Asset Demand" => (0.45, 0.12),
       "Asset Supply" => (0.27, 0.1),
       "Asset Demand\n(lower i₀)" => (0.72, 0.35),
-      "Asset Demand\n(base)" => (-100, 0.),
+      "Asset Demand\n(base)" => (0.78, 0.40),
     ),
   )
 
-  # PQCrDIFF has no cited notebook, so it keeps default (empty) positions.
+  # PQCrDIFF has no cited notebook, so its positions are maintained explicitly here.
   model_panel_specs = (
     ("pqc", PQC, 0.0, pqc_label_positions),
     ("pqcr", PQCr, 0.0, pqcr_label_positions),

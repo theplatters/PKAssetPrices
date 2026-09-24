@@ -276,7 +276,7 @@ The final component of this minimal macroeconomic model with endogenous money is
 
 Here we reproduce a simple standard setup: firms set prices as a markup on unit labour costs (Eq.~\ref{eq:simple_p}), while nominal wages fall with unemployment (Eq.~\ref{eq:simple_w}), reflecting workers' reduced bargaining power. In this setup, $a$ is a fixed unit labour requirement, so that productivity is given by $\frac{1}{a}$. Employment is therefore proportional to output (Eq.~\ref{eq:simple_n}) and unemployment is given by the gap between labour supply $N^f$ and actual employment (Eq.~\ref{eq:simple_u}).
 
-Figure~\ref{fig:simplepk-equilibrium} summarizes the baseline formulation diagrammatically by showing how a change in interest rates affect the static equilibrium. The upper left panel shows the intersection of the goods-market dynamics, represented by an IS-curve, with the interest rate rule imposed by the central bank behavior, as captured by the IR-curve. As usual the latter represents labor market, price dynamics and interest rates; specifically, current output impacts on employment and prices, which lead the central bank to adjust the interest rate. As indicated the scenario in Figure~\ref{fig:simplepk-equilibrium} shows the effect of a more lenient interest rate rule (i.e., a lower $i_0$) that shifts the IR-curve downwards. Correspondingly, the upper right panel shows an AD-curve that modifies the IS-relation from before to capture the feedback from prices on output. Correspondingly, the AS-curve is derived from the labor market and price dynamics and indicates how higher output leads to higher prices. Comparing intersections of the AD-curve and the AS-curve shows how a more lenient interest rate rule leads to higher output and prices in the static equilibrium.
+Figure~\ref{fig:simplepk-equilibrium} summarizes the baseline formulation diagrammatically by showing how a change in the autonomous interest rate affects the static equilibrium. The upper left panel shows the intersection of the goods-market dynamics, represented by an IS-curve, with the interest rate rule imposed by the central bank behavior, as captured by the IR-curve. As usual the latter represents labor market, price dynamics and interest rates; specifically, current output impacts on employment and prices, which lead the central bank to adjust the interest rate. As indicated the scenario in Figure~\ref{fig:simplepk-equilibrium} shows the effect of a more lenient interest rate rule (i.e., a lower $i_0$) that shifts the IR-curve downwards. Correspondingly, the upper right panel shows an AD-curve that modifies the IS-relation from before to capture the feedback from prices on output. Correspondingly, the AS-curve is derived from the labor market and price dynamics and indicates how higher output leads to higher prices. Comparing intersections of the AD-curve and the AS-curve shows how a more lenient interest rate rule leads to higher output and prices in the static equilibrium.
 
 Finally, the figure in the lower panel shows the corresponding financial balance sheets of the three sectors in the model: the private sector, the banking sector, and the central bank indicating their interconnectedness via loans and deposits. 
 
@@ -391,7 +391,7 @@ A simple approach to model such an impact is to partly endogenize the credit rat
 
 When speculative debt $SD$ is taken up, the banking sector reduces the share of
 credit available for productive purposes. The linear rule is clipped in
-the code, so its parameter values stay in an economcally interpretable range
+the code, so its parameter values stay in an economcally interpretable
 $0\leq c \leq1$.
 
 This yields a \GT{} result: an increase in speculative
@@ -520,8 +520,6 @@ Although concrete dual interest policies are not (yet) an established instrument
 
 The oldest archetype is margin regulation in the United States: since the Securities Exchange Act of 1934, the Federal Reserve's Regulation~T has capped the share of a securities purchase that may be financed with borrowed funds (currently 50\%), and margin loans are priced at a premium over base rates, so that credit for securities purchases carries a systematically higher effective cost than credit for production.
 
-%TODO: different storyline; see equation \ref{eq:i-ap} and the discussion in section \ref{subsec:central_bank}: here, the central bank reacts to asset prices by raising interest rates, which increases the cost of borrowing for both productive and speculative purposes. In contrast, a dual-rate policy would raise the cost of borrowing for speculative purposes only, leaving productive credit unaffected.
-% Ich denke das ist obsolet, oder?
 
 China operates what is arguably the most explicit dual-rate system. Its banking system has long steered lending through a dual-track structure of policy and market rates \citep{heDualtrackInterestRates2012}, and under the mortgage-rate framework introduced in 2019, newly issued first-home mortgages faced a floor at the five-year LPR, while second-home mortgages faced a floor 60 basis points higher \citep{peoplesbankofchinaChinaReformIndividual2019}, i.e.\ a statutory $i_{AP}>1$.
 
@@ -598,6 +596,7 @@ A further extension would be to introduce a more complete Taylor rule, allowing 
 QA = (\alpha + g_a)AS,
 \]
 where the turnover share \(\alpha\) would be determined by conditions in the asset market, while the asset supply \(AS\) and the asset-creation rate \(g_a\) would remain fixed parameters.
+ 
 \printbibliography
 
 \end{document}
