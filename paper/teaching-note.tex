@@ -295,9 +295,10 @@ This aspect and related notions of stock-flow consistency can be captured even m
 
 While such matrices are typically not often employed for simple static models -- exactly because such models only represent flows and corresponding closures -- they are a useful pedagogical device to create an intuition for the underlying balance sheet dynamics, which begin to carry greater weight as soon as asset markets are introduced into the model.
 
-\input{tables/StockMatrix_simple.tex} \label{tab:sfc-simple-stocks}
+% Stock-flow matrices for the simple model (labels live inside the floats)
+\input{tables/StockMatrix_simple.tex}
 
-\input{tables/FlowMatrix_simple.tex} \label{tab:sfc-simple-flows}
+\input{tables/FlowMatrix_simple.tex}
 
 \subsection{Adding an Asset Market}\label{subsec:asset_market}
 
@@ -364,10 +365,10 @@ with loans creating deposits one-for-one ($dM=dL$), $\mu$ measures the flow of n
 
 %NOTE: eventuell auch mal hier reinschauen: https://www.tandfonline.com/doi/full/10.1080/09538259.2025.2484594
 
-\input{tables/StockMatrix_assets.tex} \label{tab:sfc-asset-stock}
+\input{tables/StockMatrix_assets.tex}
 %expand? -- (1) das ist traditionell geschrieben, aber man könnte auch die rentiers auskoppeln und als eigene Klasse darstellen. (machen wir mal eher nicht...?) – FS: Find ich würd dann einen zu großen anderen Punkt auchmachen mm lieber nicht. --> DANN LASSEN WIR ES MAL SO!
 
-\input{tables/FlowMatrix_assets.tex} \label{tab:sfc-asset-flow}
+\input{tables/FlowMatrix_assets.tex}
 
 In particular, speculative debt $SD$ now enters bank lending alongside productive credit, so that total loan creation becomes $dL=cD+SD$, with a corresponding one-for-one creation of deposits. Similarly, the flow matrix captures flows induced by $SD$ as well as overall speculative trading within the private sector. By these extensions new asset-market block is therefore fully integrated into the stock-flow framework, but in the present static version it leaves the real side of the model unchanged.
 
