@@ -479,6 +479,7 @@ function plot_is_ir(
         reference_solution::Union{Nothing, Static.Solution} = nothing,
         labels = STANDARD_IS_IR_LABELS,
         show_ir_base::Bool = false,
+        show_is_base::Bool = true,
     )
 
     lower_rate_solution = lower_autonomous_policy_rate(sol.model, factor = lower_i0_factor) |> Static.solve_model
@@ -506,7 +507,9 @@ function plot_is_ir(
         )
 
         if (!isnothing(reference_solution))
-            x_curve!(builder, "IS (base)", :IS, :r, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
+            if show_is_base
+                x_curve!(builder, "IS (base)", :IS, :r, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
+            end
             if show_ir_base
                 lowered_reference = lower_autonomous_policy_rate(reference_solution.model, factor = lower_i0_factor) |> Static.solve_model
                 y_curve!(builder, "IR (base)", :IR, :Y, reference_solution, color = REFERENCE_COLOR, linewidth = 2.5)
@@ -727,7 +730,7 @@ function risk_indicator(sol::Static.Solution)
 end
 
 """Plot sector balance sheets as grouped vertical asset and liability bars."""
-function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
+function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis; reference_solution = nothing)
     dM = sol.variables[:dM]
     dL = sol.variables[:dL]
     dR = sol.variables[:dR]
@@ -773,10 +776,32 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis)
            color = (:black, 0.35), linewidth = 1.0, linestyle = :dash)
 
     risk = get(sol.variables, :SD, 0.0) / dL
-    annotation = join([
-        @sprintf("Total Debt / GDP: %.2f", dL / sol.variables[:Y]),
-        @sprintf("Speculative debt / Total Debt: %.2f", risk),
-    ], '\n')
+    # Two summary ratios, each annotated in purple with its change relative to
+    # the reference (baseline) scenario, in percentage points.
+    ratio_labels = ("Total Debt / GDP", "Speculative debt / Total Debt")
+    ratio_values = (dL / sol.variables[:Y], risk)
+
+    # NB: `join` flattens RichText to String (colour lost), so the two cases are
+    # built separately: plain String without a reference, RichText with one.
+    function ratio_line(index, reference_value)
+        line = @sprintf("%s: %.2f", ratio_labels[index], ratio_values[index])
+        isnothing(reference_value) && return line
+        delta_pp = 100 * (ratio_values[index] - reference_value)
+        return rich(line * " ", rich(@sprintf("→ %+.2f pp", delta_pp); color = IS_COLOR))
+    end
+
+    if isnothing(reference_solution)
+        annotation = join((ratio_line(index, nothing) for index in 1:2), '\n')
+    else
+        first_value = reference_solution.variables[:dL] / reference_solution.variables[:Y]
+        second_value = get(reference_solution.variables, :SD, 0.0) /
+            reference_solution.variables[:dL]
+        annotation = rich(
+            ratio_line(1, first_value),
+            "\n",
+            ratio_line(2, second_value),
+        )
+    end
     text!(ax, 0.97, 0.97; text = annotation, space = :relative,
           align = (:right, :top), fontsize = BALANCE_ANNOTATION_SIZE, color = (:black, 0.75))
     text!(ax, [1.7, 4.5, 7.3], fill(5.2, 3);
@@ -906,6 +931,7 @@ function _fill_axis(
         reference_solution = nothing,
         asset_market_textlabel = false,
         show_ir_base = false,
+        show_is_base = true,
         is_ir_textlabel = false,
         force_standard_asset_range = false,
     )
@@ -920,10 +946,10 @@ function _fill_axis(
     ad_as_labels = reposition_labels(STANDARD_AD_AS_LABELS, ad_as_label_positions)
     asset_market_labels = reposition_labels(asset_market_base, asset_market_label_positions)
 
-    plot_is_ir(sol, axis.curve_axis; labels = is_ir_labels, kwargs_is_ir..., show_ir_base)
+    plot_is_ir(sol, axis.curve_axis; labels = is_ir_labels, kwargs_is_ir..., show_ir_base, show_is_base)
     plot_ad_as(sol, axis.ad_as_axis; labels = ad_as_labels, kwargs_ad_as...)
     _plot_asset_market(sol, axis; labels = asset_market_labels, kwargs_asset...)
-    plot_balance_sheets(sol, axis.balance_axis)
+    plot_balance_sheets(sol, axis.balance_axis; reference_solution)
 
     return nothing
 end
@@ -946,7 +972,9 @@ method contains IS–IR, AD–AS, and balance-sheet plots. Dispatch on
 `AssetMarketPanel` to additionally show the asset market. Both panel variants
 accept `lower_i0_factor` and `reference_solution`; when a reference solution is
 supplied, the available curve plots show grey base reference curves (and dashed
-lower-policy-rate reference curves where applicable). The three label-position
+lower-policy-rate reference curves where applicable); `show_is_base = false`
+drops the grey IS base curve from the IS–IR panel while `show_ir_base = true`
+adds the grey IR base curves. The three label-position
 dictionaries map curve labels to `(x, y)` positions in relative axis space. The
 existing, unused `title` keyword remains accepted unchanged.
 """
@@ -962,6 +990,7 @@ function panel(
         lower_i0_factor = 0.0,
         asset_market_textlabel = false,
         show_ir_base = false,
+        show_is_base = true,
         is_ir_textlabel = false,
         force_standard_asset_range = false,
     )
@@ -979,6 +1008,7 @@ function panel(
         lower_i0_factor,
         asset_market_textlabel,
         show_ir_base,
+        show_is_base,
         is_ir_textlabel,
         force_standard_asset_range,
     )

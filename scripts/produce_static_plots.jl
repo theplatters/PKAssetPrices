@@ -77,8 +77,8 @@ function (@main)(ARGS)
       "IS (base)" => (0.52, 1 / 6),
     ),
     ad_as=Dict(
-      "AD" => (0.12, 0.88),
-      "AD (lower i₀)" => (0.29, 0.76),
+      "AD" => (0.18, 0.88),
+      "AD (lower i₀)" => (0.42, 0.76),
       "AS" => (0.92, 0.66),
       "AD (base)" => (16 / 30, 1 / 10),
     ),
@@ -91,22 +91,21 @@ function (@main)(ARGS)
   )
   pqcr_label_positions = (
     is_ir=Dict(
-      "IS" => (8 / 30, 8 / 9),
-      "IR" => (16 / 24, 87 / 90),
-      "IR (lower i₀)" => (0.2, 0.852),
-      "IS (base)" => (0.54, 1 / 6),
+      "IS" => (9 / 30, 8 / 9),
+      "IR" => (14 / 24, 87 / 90),
+      "IR (lower i₀)" => (0.22, 0.652),
       "IR (base)" => (0.25, 0.3),
     ),
     ad_as=Dict(
-      "AD" => (0.06, 0.88),
-      "AD (lower i₀)" => (0.008, 0.7),
-      "AS" => (0.88, 0.65),
+      "AD" => (0.12, 0.88),
+      "AD (lower i₀)" => (0.31, 0.73),
+      "AS" => (0.88, 0.79),
       "AD (base)" => (16 / 30, 1 / 10),
     ),
     asset_market=Dict(
       "Asset Demand" => (0.3, 0.1),
       "Asset Supply" => (0.23, 0.1),
-      "Asset Demand\n(lower i₀)" => (0.695, 0.498),
+      "Asset Demand\n(lower i₀)" => (0.5, 0.45),
       "Asset Demand\n(base)" => (60 / 70, 0.22),
     ),
   )
@@ -133,22 +132,22 @@ function (@main)(ARGS)
 
   pqcrdiff_label_positions = (
     is_ir=Dict(
-      "IS" => (0.25, 8 / 9),
-      "IR" => (7 / 12, 90.5 / 100),
+      "IS" => (0.3, 8 / 9),
+      "IR" => (8 / 12,76 / 100),
       "IR (lower i₀)" => (53 / 60, 52 / 100),
-      "IS (base)" => (0.55, 1 / 6),
+      "IR (base)" => (0.42, 0.35),
     ),
     ad_as=Dict(
-      "AD" => (0.1, 0.88),
+      "AD" => (0.2, 0.88),
       "AD (lower i₀)" => (0.392, 0.788),
-      "AS" => (0.9, 0.85),
-      "AD (base)" => (17 / 30, 1 / 10),
+      "AS" => (0.9, 0.83),
+      "AD (base)" => (16.5 / 30, 1 / 10),
     ),
     asset_market=Dict(
       "Asset Demand" => (0.012, 0.198),
-      "Asset Supply" => (0.27, 0.1),
-      "Asset Demand\n(lower i₀)" => (0.885, 0.34),
-      "Asset Demand\n(base)" => (0.78, 0.40),
+      "Asset Supply" => (0.23, 0.1),
+      "Asset Demand\n(lower i₀)" => (0.5, 0.38),
+      "Asset Demand\n(base)" => (0.78, 0.30),
     ),
   )
 
@@ -160,8 +159,12 @@ function (@main)(ARGS)
     ("pqcrdiff", PQCrDIFF, 0.0, pqcrdiff_label_positions),
   )
   for (name, model, i₀, positions) in model_panel_specs
-    use_textlabel = name in ("pqcr", "firmsration")
-    use_ir_base = name == "pqcr"
+    # White boxed labels: also needed on Fig 6 (pqcrdiff) panel (C), matching Fig 4.
+    use_textlabel = name in ("pqcr", "firmsration", "pqcrdiff")
+    # Figure 4 (pqcr) and Figure 6 (pqcrdiff): no grey IS base line in panel (A).
+    use_is_base = !(name in ("pqcr", "pqcrdiff"))
+    # Figure 4 (pqcr) and Figure 6 (pqcrdiff): grey IR base lines alongside the purple IR.
+    use_ir_base = name in ("pqcr", "pqcrdiff")
     use_ir_textlabel = name == "pqcr"
     force_standard_asset = name == "pqcrdiff"
     solution = solve_model(model)
@@ -175,6 +178,7 @@ function (@main)(ARGS)
       asset_market_label_positions=positions.asset_market,
       asset_market_textlabel=use_textlabel,
       show_ir_base=use_ir_base,
+      show_is_base=use_is_base,
       is_ir_textlabel=use_ir_textlabel,
       force_standard_asset_range=force_standard_asset,
     )
