@@ -93,20 +93,20 @@ function (@main)(ARGS)
     is_ir=Dict(
       "IS" => (8 / 30, 8 / 9),
       "IR" => (16 / 24, 87 / 90),
-      "IR (lower i₀)" => (53 / 60, 66 / 90),
+      "IR (lower i₀)" => (0.2, 0.852),
       "IS (base)" => (0.54, 1 / 6),
       "IR (base)" => (0.25, 0.3),
     ),
     ad_as=Dict(
       "AD" => (0.06, 0.88),
-      "AD (lower i₀)" => (0.22, 0.76),
+      "AD (lower i₀)" => (0.008, 0.7),
       "AS" => (0.88, 0.65),
       "AD (base)" => (16 / 30, 1 / 10),
     ),
     asset_market=Dict(
       "Asset Demand" => (0.3, 0.1),
       "Asset Supply" => (0.23, 0.1),
-      "Asset Demand\n(lower i₀)" => (0.42, 0.55),
+      "Asset Demand\n(lower i₀)" => (0.695, 0.498),
       "Asset Demand\n(base)" => (60 / 70, 0.22),
     ),
   )
@@ -140,14 +140,14 @@ function (@main)(ARGS)
     ),
     ad_as=Dict(
       "AD" => (0.1, 0.88),
-      "AD (lower i₀)" => (0.08, 0.7),
+      "AD (lower i₀)" => (0.392, 0.788),
       "AS" => (0.9, 0.85),
       "AD (base)" => (17 / 30, 1 / 10),
     ),
     asset_market=Dict(
-      "Asset Demand" => (0.45, 0.12),
+      "Asset Demand" => (0.012, 0.198),
       "Asset Supply" => (0.27, 0.1),
-      "Asset Demand\n(lower i₀)" => (0.72, 0.35),
+      "Asset Demand\n(lower i₀)" => (0.885, 0.34),
       "Asset Demand\n(base)" => (0.78, 0.40),
     ),
   )
