@@ -17,13 +17,16 @@ const DP = PKAssetPrices.DynamicPlotting
     @test SP.plot_is_ir(solution, axis) === axis
     @test length(axis.scene.plots) == 6
     @test axis.limits[] == ((4.0, 10.0), (0.06, 0.15))
-    @test axis.yticks[][2] == ["6%", "8%", "10%", "12%", "14%"]
+    # Teaching-note figures show decimal interest rates with automatic ticks.
+    @test axis.yticks[] isa Makie.Automatic
+    @test axis.ytickformat[] isa Makie.Automatic
     is_ir_lines = filter(plot -> plot isa Lines, axis.scene.plots)
-    @test is_ir_lines[1].color[] == RGBAf(SP.IS_COLOR)
+    # IS is orange; both the solid and dashed IR curves are opaque purple.
+    @test is_ir_lines[1].color[] == RGBAf(SP.IR_COLOR)
     @test is_ir_lines[1].linewidth[] == 3.0
-    @test is_ir_lines[2].color[] == RGBAf(SP.IR_COLOR)
-    @test is_ir_lines[3].color[] == RGBAf(SP.IS_COLOR, 0.38f0)
-    @test is_ir_lines[3].linewidth[] == 2.0
+    @test is_ir_lines[2].color[] == RGBAf(SP.IS_COLOR)
+    @test is_ir_lines[3].color[] == RGBAf(SP.IS_COLOR)
+    @test is_ir_lines[3].linewidth[] == 3.0
     @test is_ir_lines[3].linestyle[] == Float32[0, 3, 6]
     @test "IR (lower i₀)" in vcat([plot.text[] for plot in axis.scene.plots if plot isa Makie.Text]...)
     lower_rate_model = SP.lower_autonomous_policy_rate(solution.model)
@@ -46,14 +49,16 @@ const DP = PKAssetPrices.DynamicPlotting
     ad_as_axis = Axis(figure[2, 1])
     @test SP.plot_ad_as(solution, ad_as_axis) === ad_as_axis
     @test length(ad_as_axis.scene.plots) == 6
-    @test ad_as_axis.limits[] == ((5.0, 9.0), (1.2, 2.2))
+    @test ad_as_axis.limits[] == ((5.5, 8.5), (1.2, 2.2))
     @test asset_axis.limits[] == ((0.6, 1.3), (0.7, 1.3))
     ad_lines = filter(plot -> plot isa Lines, ad_as_axis.scene.plots)
     @test ad_lines[1].color[] == RGBAf(SP.IS_COLOR)
     @test ad_lines[2].color[] == RGBAf(SP.IR_COLOR)
     @test ad_lines[3].linestyle[] == Float32[0, 3, 6]
-    @test Set(vcat([plot.text[] for plot in ad_as_axis.scene.plots if plot isa Makie.Text]...)) ==
+    @test Set(vcat([plot.text[] for plot in ad_as_axis.scene.plots if
+        plot isa Union{Makie.Text, Makie.TextLabel}]...)) ==
         Set(["AD", "AD (lower i₀)", "AS"])
+    @test count(plot -> plot isa Makie.TextLabel, ad_as_axis.scene.plots) == 1
     balance_text = [plot.text[][1] for plot in balance_axis.scene.plots if
         plot isa Makie.Text && length(plot.text[]) == 1]
     @test only(balance_text) == join([
@@ -125,7 +130,7 @@ const DP = PKAssetPrices.DynamicPlotting
         asset_models[i] === S.FirmsRation)
     firms_ad_axis = only(content for content in firms_panel.content if
         content isa Axis && occursin("Output and Inflation Dynamics", string(content.title[])))
-    @test first(firms_ad_axis.limits[][1]) < 5.0
+    @test firms_ad_axis.limits[] == ((5.5, 8.5), (1.2, 2.2))
     pqcrdiff_entry = only(asset_panels[i] for i in eachindex(asset_models) if
         asset_models[i] === S.PQCrDIFF)
     pqcrdiff_asset_axis = only(content for content in pqcrdiff_entry.figure.content if
@@ -157,10 +162,10 @@ const DP = PKAssetPrices.DynamicPlotting
         content for content in asset_panel.content
         if content isa Axis && occursin("Financial Market Dynamics", string(content.title[]))
     )
-    @test asset_market_axis.xlabel[] == "Base-price-equivalent quantity"
+    @test asset_market_axis.xlabel[] == "Quantity of assets traded"
     @test asset_market_axis.ylabel[] == "Asset Price AP"
     @test count(content -> content isa Axis &&
-        occursin("Sector Balance Sheets", string(content.title[])), asset_panel.content) == 1
+        occursin("Changes in Balance Sheets", string(content.title[])), asset_panel.content) == 1
 
     custom_label_panel = SP.panel(
         solution,
@@ -273,7 +278,7 @@ const DP = PKAssetPrices.DynamicPlotting
     end
     @test [point[1] for point in asset_lines[4][1][]] ≈ expected_ref_demand
     asset_texts = vcat([plot.text[] for plot in asset_ax.scene.plots if plot isa Makie.Text]...)
-    @test "Demand (base)" in asset_texts
+    @test "Asset Demand\n(base)" in asset_texts
 
     # --- panel-level reference rendering ------------------------------------
     ref_panel = SP.panel(sol, SP.AssetMarketPanel(); reference_solution = ref, size = (900, 700))
