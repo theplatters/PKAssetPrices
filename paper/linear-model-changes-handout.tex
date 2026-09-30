@@ -1,3 +1,12 @@
+% STALE --- marked 30 September 2026. Archival record only; do not rely on it.
+% Documents the model as of commits a3a3020 / 1e555f8 (7 August 2026) and no
+% longer describes the current code. Known discrepancy: the variant table in
+% section 3 presents the channels as cumulative ("PQCr adds ... on top of the
+% PQC credit-rationing channel", "PQCrDIFF ... makes credit rationing depend on
+% SD"), whereas src/static/models/asset_model.jl defines PQC, PQCr, PQCrDIFF,
+% and FirmsRation as independent single-channel scenarios on the shared base
+% model. Sources of truth: src/static/models/asset_model.jl and
+% paper/teaching-note.tex.
 \documentclass[10pt,a4paper]{article}
 
 \usepackage[a4paper,margin=13mm]{geometry}
@@ -12,6 +21,7 @@
 
 \definecolor{accent}{HTML}{28536B}
 \definecolor{light}{HTML}{EAF1F4}
+\definecolor{stale}{HTML}{9C2A2A}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2pt}
 \setlist[itemize]{leftmargin=4.5mm,itemsep=0pt,topsep=1pt}
@@ -25,6 +35,23 @@
 \begin{document}
 
 \small
+
+\colorbox{stale}{%
+  \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
+    \color{white}\bfseries STALE --- archival record, do not rely on this
+    document (marked 30 September 2026).\par\medskip
+    \mdseries This handout captures the state of the asset model at commits
+    \commit{a3a3020} and \commit{1e555f8} (7 August 2026). It no longer
+    describes the current code: in particular, the variant table in section~3
+    presents the transmission channels as cumulative, whereas
+    \pathcode{src/static/models/asset\_model.jl} defines \texttt{PQC},
+    \texttt{PQCr}, \texttt{PQCrDIFF}, and \texttt{FirmsRation} as independent
+    single-channel scenarios on the shared base model. The sources of truth are
+    \pathcode{src/static/models/asset\_model.jl} and the current
+    \pathcode{paper/teaching-note.tex}.}%
+}\par
+
+\vspace{2mm}
 
 {\color{accent}\LARGE\bfseries Linear Asset-Market Teaching Model}\par
 {\large Handout on commits \commit{a3a3020} and \commit{1e555f8}}\hfill

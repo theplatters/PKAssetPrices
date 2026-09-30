@@ -37,8 +37,11 @@ projects or for interactive teaching and is **outside the scope** of the working
 - `paper/tables/StockMatrix_*.tex`, `paper/tables/FlowMatrix_*.tex` -- the stock-flow
   matrices input by the paper (`\input{tables/...}`).
 - `paper/ref.bib`, `paper/speculation-refs.bib` -- the bibliography.
-- `paper/linear-model-changes-handout.tex` -- the author handout documenting how the
-  linear model became canonical (useful provenance, not part of the paper build).
+- `paper/linear-model-changes-handout.tex` -- **STALE** (marked 30 September 2026):
+  the author handout documenting how the linear model became canonical (useful
+  provenance, not part of the paper build). It describes the model at commits
+  `a3a3020` / `1e555f8` and its variant table no longer matches the code; kept as
+  an archival record only.
 
 # Present in the repo but NOT needed for the static teaching note
 
