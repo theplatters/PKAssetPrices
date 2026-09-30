@@ -398,14 +398,15 @@ This channel builds on the intuition that credit provided for financial speculat
 A simple approach to model such an impact is to partly endogenize the credit rationing parameter $c$ with an endogenous function of asset demand:
 
 \begin{equation}
-  c = c_0 - c_1 SD \label{eq:c-sd}
+  c = \min\{1,\max\{0,c_0-c_1 SD\}\} \label{eq:c-sd}
 \end{equation}
 
 When speculative debt $SD$ is taken up, the banking sector reduces the share of
-credit available for productive purposes. The linear rule is clipped in
-the code, so that $c$ remains within the economically interpretable
-interval $0\leq c \leq1$.
+credit available for productive purposes. The implemented rule clips the value of
+$c$ to the economically interpretable interval $0\leq c \leq1$. Since the
+goods-market equation contains the product $cD$ and $c$ is now endogenous,
 
+this extension is nonlinear. 
 This yields a \GT{} result: an increase in speculative
 activity -- here modeled as a rise in $s_0$ -- raises $SD$, which lowers $c$ thereby contracting demand and, hence, $Y$ through Eqs.~\ref{eq:simple_y} and \ref{eq:simple_nd}.
 The mechanism here is a crowding-out effect emerging from the portfolio decisions of banks. Their impact on speculative leverage is captured by the minimal formulation in equation \ref{eq:c-sd}, but could be modeled in greater detail.
