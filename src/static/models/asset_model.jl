@@ -265,7 +265,7 @@ PQCr = @scenario AssetModel begin
 end
 
 PQCrDIFF = @scenario AssetModel begin
-  differential_rate_channel = 1.2
+  differential_rate_channel = 1.0
 end
 
 FirmsRation = @scenario AssetModel begin

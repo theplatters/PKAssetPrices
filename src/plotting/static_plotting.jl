@@ -778,7 +778,7 @@ function plot_balance_sheets(sol::Static.Solution, ax::Makie.Axis; reference_sol
     risk = get(sol.variables, :SD, 0.0) / dL
     # Two summary ratios, each annotated in purple with its change relative to
     # the reference (baseline) scenario, in percentage points.
-    ratio_labels = ("Total Debt / GDP", "Speculative debt / Total Debt")
+    ratio_labels = ("Total Debt / GDP", "Speculative lending share")
     ratio_values = (dL / sol.variables[:Y], risk)
 
     # NB: `join` flattens RichText to String (colour lost), so the two cases are

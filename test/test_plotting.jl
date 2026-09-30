@@ -58,7 +58,7 @@ const DP = PKAssetPrices.DynamicPlotting
         plot isa Makie.Text && length(plot.text[]) == 1]
     @test only(balance_text) == join([
         @sprintf("Total Debt / GDP: %.2f", solution.variables[:dL] / solution.variables[:Y]),
-        @sprintf("Speculative debt / Total Debt: %.2f", solution.variables[:SD] / solution.variables[:dL]),
+        @sprintf("Speculative lending share: %.2f", solution.variables[:SD] / solution.variables[:dL]),
     ], '\n')
     annotation_plot = only(plot for plot in balance_axis.scene.plots if
         plot isa Makie.Text && length(plot.text[]) == 1)

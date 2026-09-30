@@ -76,6 +76,21 @@ end
     @test solution.variables[:AP] ≈ 0.996559575559978
 end
 
+@testset "Dual-rate premium matches the teaching note" begin
+    params = S.PQCrDIFF.params
+    baseline = PKAssetPrices.solve_model(S.Baseline).variables
+    variables = PKAssetPrices.solve_model(S.PQCrDIFF).variables
+    speculative_rate = params[:iAP] * variables[:r]
+
+    @test params[:differential_rate_channel] == 1.0
+    @test variables[:SD] ≈ params[:s0] - params[:s1] * speculative_rate -
+        params[:s2] * (variables[:AP] - 1)
+    @test variables[:Y] ≈ baseline[:Y]
+    @test variables[:r] ≈ baseline[:r]
+    @test variables[:AP] < baseline[:AP]
+    @test variables[:SD] / variables[:dL] < baseline[:SD] / baseline[:dL]
+end
+
 @testset "Static IS and IR curves meet at equilibrium" begin
     for name in (:SimplePK, :Baseline, :PQC, :PQCr, :PQCrDIFF, :FirmsRation)
         solution = PKAssetPrices.solve_model(getproperty(S, name))
