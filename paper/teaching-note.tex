@@ -22,6 +22,7 @@
 \usepackage{multirow}
 \usepackage{array}
 \usepackage{caption}
+\usepackage{authblk}
 \usepackage[table]{xcolor}
 
 \definecolor{NewTermPurple}{RGB}{128,0,128}
@@ -51,12 +52,23 @@
 \DeclareRobustCommand{\treatise}[1][]{\treatisecite[][#1]{johnmaynardkeynesTreatiseMoneyTwo2011}\xspace}
 \DeclareRobustCommand{\GT}[1][]{\GTcite[][#1]{keynesGeneralTheoryEmployment2009}\xspace}
 
-\author{Franz Scharnreitner, Jakob Kapeller}
-\title{Keynes on speculation and endogenous money: a teaching note}
+\title{Keynes on speculation and endogenous money: A model for integrating original and contemporary views}
+
+\author[1]{Franz Scharnreitner}
+\author[2]{Jakob Kapeller}
+\affil[1]{\small{Johannes Kepler University Linz, Institute for Comprehensive Analysis of the Economy (ICAE) \href{mailto:franz.scharnreiter@jku.at}{franz.scharnreiter@jku.at}}}
+\affil[2]{\small{Corresponding author, Institute for Socio-Economics, University of Duisburg-Essen and \linebreak Institute for Comprehensive Analysis of the Economy (ICAE), Johannes Kepler University Linz, \href{mailto:jakob.kapeller@uni-due.de}{jakob.kapeller@uni-due.de}}}
+
+
+
 \begin{document}
 
 \maketitle
-\include{abstract.tex}
+
+\input{abstract.tex}
+
+\clearpage
+
 \section{Introduction}\label{sec:intro}
 
 Keynes is often credited with fundamentally changing the way economists think about money and finance, especially when it comes to evaluating the link between speculative market dynamics and real economic activity. However, Keynes himself was not fully consistent in his treatment of money, finance and speculation across his works, and in recent decades different authors and traditions have taken up and emphasized different aspects of his core contributions.
