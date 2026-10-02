@@ -192,7 +192,7 @@ Money held for each of the three purposes forms, nevertheless, a single pool, wh
 The ``single pool'' formulation is an important analytical simplification --- it lets Keynes model portfolio choice parsimoniously --- but it also discards the \treatise's insight that the money stock is itself an outcome of the credit creation process.
 In sum, the \treatise{} asks the more aggregate question ``how is money created?'' and answers ``through bank lending'', while the \GT{} poses the more decision-focused question ``how is money held?'' and answers ``as a portfolio choice between liquidity and earning assets.'' In the latter account, macro-properties of the monetary system are then presented as a corollary to that question. While both questions provide legitimate vantage points in principle, they are anchored in different theoretical perspectives, represented by the bottom and top rows, respectively, of the typology shown in Table~\ref{tab:typology}.
 
-\subsection{The Real Impacts of Speculation} \label{subsec:speculation}
+\subsection{The real impacts of speculation} \label{subsec:speculation}
 
 The second cleavage identified when comparing the \treatise and the \GT concerns the question whether speculative activity in speculative markets can affect real economic activity, that is, output, employment, or productivity. Here again the two books give different answers.
 
@@ -229,7 +229,7 @@ Speculation, hence, can harm enterprise and economic development, in the \GT{} f
 
 %expand? :wir könnten mal drüber nachdenken was es in unserem framework heißen würde, den portfolio choice explicit zu machen –– also eine erwartete profitrate und einen erwartete preissteigerung zu berechnen und damit die investitionen direkt zu modellieren. Das wäre im Wesentlichen was in der Fußnote steht...
 
-\section{A simple teaching model} \label{sec:model}
+\section{A simple model of endogenous money and speculation} \label{sec:model}
 
 In what follows we embed key arguments from the bottom row of table \ref{tab:typology} in a simple linear model of endogenous money.
 We thereby take the endogenous money model by \citet{fontanaSimpleTeachableMacroeconomic2009} as a starting point and extend this model with an explicit market for speculative assets.
@@ -252,7 +252,7 @@ The key equations for the goods market are, hence, given by
 where output $Y$ is the sum of non-debt-financed demand $\ND$ and credit-rationed debt-financed demand $cD$, with $c$ serving as a credit rationing parameter.
 Since non-debt-financed demand depends on income (Eq.~\ref{eq:simple_nd}), while debt-financed demand depends negatively on the lending rate $r$ (Eq.~\ref{eq:simple_d}), the model maps closely onto conventional Keynesian notation: $\ND$ corresponds to consumption $C$, whereas $cD$ corresponds to realized investment $I$, with $D$ representing planned investment $I_P$ and $(1-c)$ the share of planned investment that cannot be implemented due to a lack of liquid funds.
 
-Against this backdrop, we suggest rewriting Eqs.~\ref{eq:simple_y}--\ref{eq:simple_d} in teaching contexts as
+Against this backdrop, we suggest rewriting Eqs.~\ref{eq:simple_y}--\ref{eq:simple_d} as
 
 \paragraph{Goods market II}
 \begin{align}
@@ -318,7 +318,7 @@ While such matrices are typically not often employed for simple static models --
 
 \input{tables/FlowMatrix_simple.tex}
 
-\subsection{Adding an Asset Market}\label{subsec:asset_market}
+\subsection{Adding an asset market and speculation} \label{subsec:asset_market}
 
 In a next step we introduce a market for speculative assets in this framework. Four new variables describe it: nominal speculative debt $SD$, nominal gross asset expenditure $AE$, the quantity of assets offered for trade $QA$, and the level of asset prices $AP$. The assets can be interpreted as urban real estate, bonds, shares, pieces of art, crypto-assets, or a composite of these. As a consequence our conceptualization of assets covers everything that can be conceived to be targeted for speculative endeavors and is not per se restricted to the financial sphere. Because Eq.~\ref{eq:as} pins $QA$ to parameters, the operative feedback among $SD$, $AE$, and $AP$ is linear. This keeps the extension analytically transparent while allowing the asset market and the macroeconomic block to be solved simultaneously.
 
@@ -404,7 +404,7 @@ However, the relevant literature suggests that such interaction between the real
 
 As we will see in what follows these scenarios build on imposing some unilateral impact of speculative markets on the real economy; however, developments in the real economy then inevitably feed back on speculative markets, which indicates that breaking the cordon sanitaire between both spheres will quickly create non-trivial interactions that depend on the specific modeling setup.
 
-\subsection{The Credit Rationing Channel} \label{subsec:banks_ration}
+\subsection{The credit rationing channel} \label{subsec:banks_ration}
 
 This channel builds on the intuition that credit provided for financial speculation might crowd out credit provided for real investment \citep{wolfsonPostKeynesianTheory1996}, e.g. when the former provides higher expected returns or when the related collateral is perceived as more secure and preferable (e.g. in real estate). Perhaps the clearest example of such an effect is a credit crunch, where a sudden drop in confidence creates a tightening of lending conditions \citep[as in][]{kapellerDebtBoomBust2014}. However, we can also assume a more secular trend, where increased attractiveness of speculation requires real investment to provide greater ``margins of safety'' \citep[][Ch. 8]{minskyStabilizingUnstableEconomy1986} and thereby constrains access to external funding.
 
@@ -443,7 +443,7 @@ Finally, the lower right panel summarizes balance sheet changes for the relevant
   \label{fig:rationing-equilibrium}
 \end{figure}
 
-\subsection{The Central Bank Channel} \label{subsec:central_bank}
+\subsection{The central bank channel} \label{subsec:central_bank}
 
 In this variant, we assume that the central bank is sensitive to asset price dynamics
 and, hence, considers asset prices analogously to prices for goods and services.
@@ -484,7 +484,7 @@ Similar to the scenario shown in section \ref{subsec:banks_ration} we find a dec
 
 In terms of stock-flow relations we again note that the tables provided for describing the basic asset price model in section \ref{subsec:asset_market} are sufficient for capturing this model. We also note that -- in comparison to the baseline model -- the total amount of debt is again slightly lower due to the impact of higher interest rates.
 
-\subsection{The Financialization of Firms} \label{subsec:financialization}
+\subsection{The financialization of firms} \label{subsec:financialization}
 
 The preceding variants locate the real effects of speculation in the banking
 sector or in the policy-rate rule. A further channel arises when firms prioritize the acquisition of speculative assets relative to productive investment.
@@ -570,10 +570,10 @@ lending share $\psi$ falls from $0.11$ to $0.09$, while GDP stays constant relat
 
 \subsection{Speculative market dynamics as decisions under uncertainty}\label{subsec:uncertainty}
 
-The mechanisms captured by our model variants are not merely theoretical artefacts. The period 2020--2023 provides a useful illustration of the real-financial nexus, although some of the empirical channels extend beyond the deliberately sparse teaching model.
+The mechanisms captured by our model variants are not merely theoretical artefacts. The period 2020--2023 provides a useful illustration of the real-financial nexus, although some of the empirical channels extend beyond the deliberately sparse basic model.
 
 \paragraph{Quantitative easing and the ``everything rally.''}
-Between March 2020 and early 2022, the Federal Reserve purchased roughly \$1.33~trillion in mortgage-backed securities---nearly 90\% of the growth in eligible mortgages \citep{kleinQuantitativeEasingHousing2025}. Combined with near-zero interest rates and comparable programmes at other major central banks, this produced what market participants called an ``everything rally'': equities, bonds, real estate, commodities, and crypto-assets all rose in synchrony \citep{wigglesworthEverythingRallyVaccines2020}. The Brookings Institution estimates that US home values rose by approximately \$100,000 on average, adding \$12~trillion in household equity and generating \$480--840~billion in additional consumption through the housing wealth effect \citep{kleinQuantitativeEasingHousing2025}. The first part of this sequence is represented by Eqs.~\ref{eq:sd}--\ref{eq:ap}: a lower lending rate raises speculative debt, gross asset demand, and the asset price. The observed wealth effect is not present in the teaching variants, whose real feedbacks instead operate through credit rationing, the policy rate, or firms' investment demand; adding consumption out of wealth would require a further equation.
+Between March 2020 and early 2022, the Federal Reserve purchased roughly \$1.33~trillion in mortgage-backed securities---nearly 90\% of the growth in eligible mortgages \citep{kleinQuantitativeEasingHousing2025}. Combined with near-zero interest rates and comparable programmes at other major central banks, this produced what market participants called an ``everything rally'': equities, bonds, real estate, commodities, and crypto-assets all rose in synchrony \citep{wigglesworthEverythingRallyVaccines2020}. The Brookings Institution estimates that US home values rose by approximately \$100,000 on average, adding \$12~trillion in household equity and generating \$480--840~billion in additional consumption through the housing wealth effect \citep{kleinQuantitativeEasingHousing2025}. The first part of this sequence is represented by Eqs.~\ref{eq:sd}--\ref{eq:ap}: a lower lending rate raises speculative debt, gross asset demand, and the asset price. The observed wealth effect is not present in the simple models presented above, whose real feedbacks instead operate through credit rationing, the policy rate, or firms' investment demand; adding consumption out of wealth would require a further equation.
 
 \paragraph{Monetary tightening and the ``crypto winter.''}
 When the Fed began raising rates in March 2022, the effect was felt immediately in the most leveraged corner of the financial circulation. An IMF study of the ``crypto cycle'' finds that a one-percentage-point rise in the shadow federal funds rate produces a persistent 0.15 standard-deviation decline in the common factor driving crypto-asset prices, with the entire market losing over \$1.7~trillion in value from its November 2021 peak \citep{cheCryptoCycleUS2023}. The authors attribute this to the risk-taking channel: tighter monetary policy raises the effective risk aversion of the marginal investor, who responds by deleveraging. This maps onto the asset block common to all variants: rising \(i \to\) rising \(r \to\) falling \(SD\) \(\to\) falling \(AE \to\) falling \(AP\). The central bank channel (section~\ref{subsec:central_bank}) adds the reverse contemporaneous link, from \(AP\) back into the policy rule of Eq.~\eqref{eq:i-ap}, whereas the dual-rate variant (section~\ref{subsec:dual_interest}) strengthens the direct cost of speculative borrowing: speculators pay the premium rate \(r_{AP}=r+\pi=i_{AP}r\), with \(\pi=(i_{AP}-1)r\), while productive loans keep the standard rate \(r\) (Eq.~\eqref{eq:pqcrdiff-sd}).
