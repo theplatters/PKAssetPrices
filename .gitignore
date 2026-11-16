@@ -1,0 +1,20 @@
+# Reproducible output and machine-local files.
+/plots/
+.DS_Store
+/.vscode/
+/.idea/
+*.jl.cov
+*.jl.mem
+
+# Research and manuscript files belong in the private development repository.
+/paper/
+/notebooks/
+/archive/
+/archives/
+/src/dynamic/
+/src/dash/
+/src/dash.jl
+/src/optim/
+/src/plotting/dynamic_plotting.jl
+*.md
+!README.md

@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+# Keep private development pushes independent of the public release policy.
+case "${2:-}" in
+    https://github.com/theplatters/PKAssetPrices|https://github.com/theplatters/PKAssetPrices.git|git@github.com:theplatters/PKAssetPrices.git|git@github.com:theplatters/PKAssetPrices|ssh://git@github.com/theplatters/PKAssetPrices.git) ;;
+    *) exit 0 ;;
+esac
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+    if [ "$remote_ref" != refs/heads/main ] ||
+       [ "$local_sha" = 0000000000000000000000000000000000000000 ]; then
+        echo 'The public repository accepts only updates to main.' >&2
+        exit 1
+    fi
+    sh "$(git rev-parse --show-toplevel)/scripts/check_public.sh" "$local_sha"
+done
